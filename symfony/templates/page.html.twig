@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container pt-4">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_index' ? 'active' : '' }}" href="{{ url('app_index') }}">Index</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_login' ? 'active' : '' }}" href="{{ url('app_login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_register' ? 'active' : '' }}" href="{{ url('app_register') }}">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_logout' ? 'active' : '' }}" href="{{ url('app_logout') }}">Logout</a>
+        </li>
+    </ul>
+    <div class="pt-4">
+    {% block content %}
+    {% endblock %}
+    </div>
+</div>
+{% endblock %}
