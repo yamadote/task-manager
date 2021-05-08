@@ -1,13 +1,13 @@
 <?php
 
-namespace App\HeaderLink\Repository;
+namespace App\Config;
 
-use App\HeaderLink\Dto\HeaderLinkDto;
+use App\Entity\HeaderLink;
 
-class HeaderLinkRepository
+class HeaderLinkConfig
 {
     private const TITLE_FIELD = 'title';
-    private const ROUTE = 'route';
+    private const ROUTE_FIELD = 'route';
 
     private const INDEX_LINK_ID = 0;
     private const LOGIN_LINK_ID = 1;
@@ -18,23 +18,23 @@ class HeaderLinkRepository
     private const LINKS = [
         self::INDEX_LINK_ID => [
             self::TITLE_FIELD => 'Index',
-            self::ROUTE => 'app_index'
+            self::ROUTE_FIELD => 'app_index'
         ],
         self::LOGIN_LINK_ID => [
             self::TITLE_FIELD => 'Login',
-            self::ROUTE => 'app_login'
+            self::ROUTE_FIELD => 'app_login'
         ],
         self::REGISTER_LINK_ID => [
             self::TITLE_FIELD => 'Register',
-            self::ROUTE => 'app_register'
+            self::ROUTE_FIELD => 'app_register'
         ],
         self::LOGOUT_LINK_ID => [
             self::TITLE_FIELD => 'Logout',
-            self::ROUTE => 'app_logout'
+            self::ROUTE_FIELD => 'app_logout'
         ],
         self::TASKS_LINK_ID => [
             self::TITLE_FIELD => 'Tasks',
-            self::ROUTE => 'app_task_index'
+            self::ROUTE_FIELD => 'app_task_index'
         ]
     ];
 
@@ -51,7 +51,7 @@ class HeaderLinkRepository
     ];
 
     /**
-     * @return HeaderLinkDto[]
+     * @return HeaderLink[]
      */
     public function getUserLinks(): array
     {
@@ -59,7 +59,7 @@ class HeaderLinkRepository
     }
 
     /**
-     * @return HeaderLinkDto[]
+     * @return HeaderLink[]
      */
     public function getAnonymousLinks(): array
     {
@@ -68,22 +68,23 @@ class HeaderLinkRepository
 
     /**
      * @param int[] $ids
-     * @return HeaderLinkDto[]
+     * @return HeaderLink[]
      */
     private function getLinksByIds(array $ids): array
     {
         $links = [];
         foreach ($ids as $id) {
-            $links[] = $this->createLink(self::LINKS[$id]);
+            $links[] = $this->createLink($id, self::LINKS[$id]);
         }
         return $links;
     }
 
-    private function createLink(array $raw): HeaderLinkDto
+    private function createLink(int $id, array $raw): HeaderLink
     {
-        return new HeaderLinkDto(
+        return new HeaderLink(
+            $id,
             $raw[self::TITLE_FIELD],
-            $raw[self::ROUTE]
+            $raw[self::ROUTE_FIELD]
         );
     }
 }

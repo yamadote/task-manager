@@ -1,19 +1,28 @@
 <?php
 
-namespace App\HeaderLink\Dto;
+namespace App\Entity;
 
-class HeaderLinkDto
+class HeaderLink
 {
+    /** @var int */
+    private $id;
+
     /** @var string */
     private $title;
 
     /** @var string */
     private $route;
 
-    public function __construct(string $title, string $route)
+    public function __construct(int $id, string $title, string $route)
     {
+        $this->id = $id;
         $this->title = $title;
         $this->route = $route;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getTitle(): string

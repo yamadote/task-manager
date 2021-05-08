@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Config\UserStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskFormType;
@@ -18,6 +19,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class TaskController extends AbstractController
 {
+    /** @var UserStatusConfig */
+    private $userStatusConfig;
+
+    public function __construct(UserStatusConfig $userStatusConfig)
+    {
+        $this->userStatusConfig = $userStatusConfig;
+    }
+
     /**
      * @return User
      */
@@ -31,10 +40,11 @@ class TaskController extends AbstractController
      */
     public function index(TaskRepository $taskRepository): Response
     {
+        $tasks = $taskRepository->findUserTasks($this->getUser());
+        $statusList = $this->userStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findBy([
-                'user' => $this->getUser()
-            ], ['id' => 'DESC']),
+            'tasks' => $tasks,
+            'statusList' => $statusList
         ]);
     }
 
@@ -46,7 +56,9 @@ class TaskController extends AbstractController
         $task = new Task();
         $task->setUser($this->getUser());
         $task->setCreatedAt(new DateTime());
-        $form = $this->createForm(TaskFormType::class, $task);
+        $form = $this->createForm(TaskFormType::class, $task, [
+            TaskFormType::NO_REMOVED_STATUS_OPTION => true
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -83,21 +95,5 @@ class TaskController extends AbstractController
             'task' => $task,
             'form' => $form->createView(),
         ]);
-    }
-
-    /**
-     * @Route("/{id}", name="task_delete", methods={"POST"})
-     */
-    public function delete(Request $request, Task $task): Response
-    {
-        // todo: check if can edit
-
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($task);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_task_index');
     }
 }

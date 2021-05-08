@@ -2,3 +2,31 @@
     padding: .3rem .6rem;
     line-height: 38px;
 }
+
+.h1, h1 {
+    font-size: 1.7rem;
+}
+
+.table .task.task-status-progress {
+    background: #FFA900;
+}
+
+.table .task.task-status-pending {
+    background: #87AFFA;
+}
+
+.table .task.task-status-frozen {
+    background: #0099CC;
+}
+
+.table .task.task-status-completed {
+    background: #8FBC8F;
+}
+
+.table .task.task-status-potential {
+    background: #cc66ff;
+}
+
+.table .task.task-status-canceled {
+    background: #778899;
+}

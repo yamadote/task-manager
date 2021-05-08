@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\HeaderLink\Dto\HeaderLinkDto;
-use App\HeaderLink\Generator\HeaderLinkGenerator;
+use App\Entity\HeaderLink;
+use App\Repository\HeaderLinkRepository;
 use Symfony\Component\Security\Core\Security;
 
 class GlobalTemplateService
@@ -11,17 +11,17 @@ class GlobalTemplateService
     /** @var Security */
     private $security;
 
-    /** @var HeaderLinkGenerator */
+    /** @var HeaderLinkRepository */
     private $headerLinkGenerator;
 
-    public function __construct(Security $security, HeaderLinkGenerator $headerLinkGenerator)
+    public function __construct(Security $security, HeaderLinkRepository $headerLinkGenerator)
     {
         $this->security = $security;
         $this->headerLinkGenerator = $headerLinkGenerator;
     }
 
     /**
-     * @return HeaderLinkDto[]
+     * @return HeaderLink[]
      */
     public function generateHeaderLinks(): array
     {
