@@ -29,17 +29,24 @@ class TaskRepository extends ServiceEntityRepository
 
     private function prepareUserTasksQueryBuilder(User $user): QueryBuilder
     {
+        $statusOrder = $this->userStatusConfig->getTasksListStatusOrder();
+        $compiledStatusOrder = "CASE t.status ";
+        foreach ($statusOrder as $order => $statusId) {
+            $compiledStatusOrder .= " WHEN " . $statusId . " THEN " . $order;
+        }
+        $compiledStatusOrder .= " ELSE -1 END";
+
         $removedStatusId = $this->userStatusConfig->getRemovedStatusId();
         return $this->createQueryBuilder('t')
-            ->andWhere("t.status <> :status")
             ->andWhere("t.user = :user")
+            ->andWhere("t.status <> :removedStatus")
             ->setParameters([
-                'status' => $removedStatusId,
+                'removedStatus' => $removedStatusId,
                 'user' => $user,
                 'time' => new DateTime()
             ])
             ->orderBy("CASE WHEN t.reminder < :time THEN 1 ELSE 0 END", "DESC")
-            ->addOrderBy("t.status", "ASC")
+            ->addOrderBy($compiledStatusOrder, "ASC")
             ->addOrderBy("t.id", "DESC")
         ;
     }
@@ -61,6 +68,22 @@ class TaskRepository extends ServiceEntityRepository
     {
         return $this->prepareUserTasksQueryBuilder($user)
             ->andWhere("t.reminder < :time")
+            ->getQuery()->getResult();
+    }
+
+    public function findUserTodoTasks(User $user): array
+    {
+        $statusIds = $this->userStatusConfig->getTodoStatusIds();
+        return $this->prepareUserTasksQueryBuilder($user)
+            ->andWhere("t.reminder < :time OR t.status in (" . implode(',', $statusIds). ")")
+            ->getQuery()->getResult();
+    }
+
+    public function findUserTasksByStatus(User $user, int $status): array
+    {
+        return $this->prepareUserTasksQueryBuilder($user)
+            ->andWhere("t.status = :status")
+            ->setParameter('status', $status)
             ->getQuery()->getResult();
     }
 }

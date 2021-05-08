@@ -36,11 +36,17 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/", name="app_task_index", methods={"GET"})
+     * @Route("", name="app_task_index", methods={"GET"})
      */
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskRepository $taskRepository, Request $request): Response
     {
-        $tasks = $taskRepository->findUserTasks($this->getUser());
+        $statusSlug = $request->query->get('status');
+        if (empty($statusSlug)) {
+            $tasks = $taskRepository->findUserTasks($this->getUser());
+            return $this->renderTaskListPage($tasks);
+        }
+        $statusId = $this->userStatusConfig->getStatusIdBySlug($statusSlug);
+        $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $statusId);
         return $this->renderTaskListPage($tasks);
     }
 
@@ -50,6 +56,15 @@ class TaskController extends AbstractController
     public function reminders(TaskRepository $taskRepository): Response
     {
         $tasks = $taskRepository->findUserReminders($this->getUser());
+        return $this->renderTaskListPage($tasks);
+    }
+
+    /**
+     * @Route("/todo", name="app_task_todo", methods={"GET"})
+     */
+    public function todo(TaskRepository $taskRepository): Response
+    {
+        $tasks = $taskRepository->findUserTodoTasks($this->getUser());
         return $this->renderTaskListPage($tasks);
     }
 

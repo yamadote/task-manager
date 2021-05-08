@@ -15,8 +15,13 @@ class UserStatusConfig
     private const FROZEN_STATUS_ID = 3;
     private const COMPLETED_STATUS_ID = 4;
     private const POTENTIAL_STATUS_ID = 5;
-    private const CANCELED_STATUS_ID = 6;
+    private const CANCELLED_STATUS_ID = 6;
     private const REMOVED_STATUS_ID = 7;
+
+    public const PROGRESS_STATUS_SLUG = 'progress';
+    public const FROZEN_STATUS_SLUG = 'frozen';
+    public const POTENTIAL_STATUS_SLUG = 'potential';
+    public const CANCELLED_STATUS_SLUG = 'cancelled';
 
     /* This list order is used for displaying */
     private const STATUSES = [
@@ -26,11 +31,11 @@ class UserStatusConfig
         ],
         self::IN_PROGRESS_STATUS_ID => [
             self::TITLE_FIELD => 'In Progress',
-            self::SLUG_FIELD => 'progress'
+            self::SLUG_FIELD => self::PROGRESS_STATUS_SLUG
         ],
         self::FROZEN_STATUS_ID => [
             self::TITLE_FIELD => 'Frozen',
-            self::SLUG_FIELD => 'frozen'
+            self::SLUG_FIELD => self::FROZEN_STATUS_SLUG
         ],
         self::COMPLETED_STATUS_ID => [
             self::TITLE_FIELD => 'Completed',
@@ -38,11 +43,11 @@ class UserStatusConfig
         ],
         self::POTENTIAL_STATUS_ID => [
             self::TITLE_FIELD => 'Potential',
-            self::SLUG_FIELD => 'potential'
+            self::SLUG_FIELD => self::POTENTIAL_STATUS_SLUG
         ],
-        self::CANCELED_STATUS_ID => [
-            self::TITLE_FIELD => 'Canceled',
-            self::SLUG_FIELD => 'canceled'
+        self::CANCELLED_STATUS_ID => [
+            self::TITLE_FIELD => 'Cancelled',
+            self::SLUG_FIELD => self::CANCELLED_STATUS_SLUG
         ],
         self::NONE_STATUS_ID => [
             self::TITLE_FIELD => 'None',
@@ -54,12 +59,26 @@ class UserStatusConfig
         ],
     ];
 
+    private const TASKS_LIST_STATUS_ORDER = [
+        self::NONE_STATUS_ID,
+        self::IN_PROGRESS_STATUS_ID,
+        self::PENDING_STATUS_ID,
+        self::FROZEN_STATUS_ID,
+        self::POTENTIAL_STATUS_ID,
+        self::CANCELLED_STATUS_ID,
+        self::COMPLETED_STATUS_ID
+    ];
+
     /**
      * @return string[]
      */
     public function getStatusTitles(): array
     {
-        return array_column(self::STATUSES, self::TITLE_FIELD);
+        $titles = [];
+        foreach (self::STATUSES as $id => $raw) {
+            $titles[$id] = $raw[self::TITLE_FIELD];
+        }
+        return $titles;
     }
 
     /**
@@ -69,7 +88,7 @@ class UserStatusConfig
     {
         $list = [];
         foreach (self::STATUSES as $id => $raw) {
-            $list[] = $this->createStatusEntity($id, $raw);
+            $list[$id] = $this->createStatusEntity($id, $raw);
         }
         return $list;
     }
@@ -86,5 +105,31 @@ class UserStatusConfig
     public function getRemovedStatusId(): int
     {
         return self::REMOVED_STATUS_ID;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getTodoStatusIds(): array
+    {
+        return [
+            self::IN_PROGRESS_STATUS_ID,
+            self::PENDING_STATUS_ID
+        ];
+    }
+
+    public function getStatusIdBySlug(string $statusSlug)
+    {
+        foreach (self::STATUSES as $id => $raw) {
+            if ($raw[self::SLUG_FIELD] === $statusSlug) {
+                return $id;
+            }
+        }
+        return self::NONE_STATUS_ID;
+    }
+
+    public function getTasksListStatusOrder(): array
+    {
+        return self::TASKS_LIST_STATUS_ORDER;
     }
 }

@@ -4,12 +4,25 @@
 <div class="container pt-4">
     <ul class="nav nav-tabs">
         {% for link in global_service.generateHeaderLinks %}
-            <li class="nav-item">
-                {% set isActive = app.request.attributes.get('_route') == link.route %}
-                <a class="nav-link {{ isActive ? 'active' : '' }}" href="{{ url(link.route) }}">
-                    {{ link.title }}
-                </a>
-            </li>
+            {% if link.isDropdown %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ link.title }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        {% for subLink in link.subLinks %}
+                            <a class="dropdown-item" href="{{ url(subLink.route, subLink.routeParams) }}">{{ subLink.title }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    {% set isActive = app.request.attributes.get('_route') == link.route %}
+                    <a class="nav-link {{ isActive ? 'active' : '' }}" href="{{ url(link.route, link.routeParams) }}">
+                        {{ link.title }}
+                    </a>
+                </li>
+            {% endif %}
         {% endfor %}
     </ul>
     <div class="pt-4">

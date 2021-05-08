@@ -13,11 +13,19 @@ class HeaderLink
     /** @var string */
     private $route;
 
-    public function __construct(int $id, string $title, string $route)
+    /** @var array */
+    private $routeParams;
+
+    /** @var HeaderLink[] */
+    private $subLinks;
+
+    public function __construct(int $id, string $title, string $route, array $routeParams, array $subLinks)
     {
         $this->id = $id;
         $this->title = $title;
         $this->route = $route;
+        $this->routeParams = $routeParams;
+        $this->subLinks = $subLinks;
     }
 
     public function getId(): int
@@ -33,5 +41,23 @@ class HeaderLink
     public function getRoute(): string
     {
         return $this->route;
+    }
+
+    public function getRouteParams(): array
+    {
+        return $this->routeParams;
+    }
+
+    public function isDropdown(): bool
+    {
+        return !empty($this->subLinks);
+    }
+
+    /**
+     * @return HeaderLink[]
+     */
+    public function getSubLinks(): array
+    {
+        return $this->subLinks;
     }
 }

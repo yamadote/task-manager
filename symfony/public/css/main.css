@@ -31,10 +31,17 @@
     background: #cc66ff;
 }
 
-.table .task.task-status-canceled .task-status-badge {
+.table .task.task-status-cancelled .task-status-badge {
     background: #778899;
 }
 
 .table .task.task-reminder .task-status-badge {
     background: #FF6347;
 }
+
+.dropdown-menu.pull-left {
+     right: 0;
+     left: auto;
+     padding-left: 1px;
+     padding-right: 1px;
+ }
