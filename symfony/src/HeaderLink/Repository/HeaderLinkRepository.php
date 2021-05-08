@@ -13,6 +13,7 @@ class HeaderLinkRepository
     private const LOGIN_LINK_ID = 1;
     private const REGISTER_LINK_ID = 2;
     private const LOGOUT_LINK_ID = 3;
+    private const TASKS_LINK_ID = 4;
 
     private const LINKS = [
         self::INDEX_LINK_ID => [
@@ -30,11 +31,16 @@ class HeaderLinkRepository
         self::LOGOUT_LINK_ID => [
             self::TITLE_FIELD => 'Logout',
             self::ROUTE => 'app_logout'
+        ],
+        self::TASKS_LINK_ID => [
+            self::TITLE_FIELD => 'Tasks',
+            self::ROUTE => 'app_task_index'
         ]
     ];
 
     private const USER_LINKS = [
         self::INDEX_LINK_ID,
+        self::TASKS_LINK_ID,
         self::LOGOUT_LINK_ID
     ];
 
