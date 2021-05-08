@@ -3,18 +3,14 @@
 {% block body %}
 <div class="container pt-4">
     <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_index' ? 'active' : '' }}" href="{{ url('app_index') }}">Index</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_login' ? 'active' : '' }}" href="{{ url('app_login') }}">Login</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_register' ? 'active' : '' }}" href="{{ url('app_register') }}">Register</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ app.request.attributes.get('_route') == 'app_logout' ? 'active' : '' }}" href="{{ url('app_logout') }}">Logout</a>
-        </li>
+        {% for link in global_service.generateHeaderLinks %}
+            <li class="nav-item">
+                {% set isActive = app.request.attributes.get('_route') == link.route %}
+                <a class="nav-link {{ isActive ? 'active' : '' }}" href="{{ url(link.route) }}">
+                    {{ link.title }}
+                </a>
+            </li>
+        {% endfor %}
     </ul>
     <div class="pt-4">
     {% block content %}
