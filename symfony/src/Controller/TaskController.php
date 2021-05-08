@@ -45,9 +45,9 @@ class TaskController extends AbstractController
             $tasks = $taskRepository->findUserTasks($this->getUser());
             return $this->renderTaskListPage($tasks);
         }
-        $statusId = $this->userStatusConfig->getStatusIdBySlug($statusSlug);
-        $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $statusId);
-        return $this->renderTaskListPage($tasks);
+        $status = $this->userStatusConfig->getStatusBySlug($statusSlug);
+        $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $status->getId());
+        return $this->renderTaskListPage($tasks, $status->getTitle());
     }
 
     /**
@@ -56,7 +56,7 @@ class TaskController extends AbstractController
     public function reminders(TaskRepository $taskRepository): Response
     {
         $tasks = $taskRepository->findUserReminders($this->getUser());
-        return $this->renderTaskListPage($tasks);
+        return $this->renderTaskListPage($tasks, 'Reminders');
     }
 
     /**
@@ -65,19 +65,20 @@ class TaskController extends AbstractController
     public function todo(TaskRepository $taskRepository): Response
     {
         $tasks = $taskRepository->findUserTodoTasks($this->getUser());
-        return $this->renderTaskListPage($tasks);
+        return $this->renderTaskListPage($tasks, 'Todo');
     }
 
     /**
      * @param Task[] $tasks
      * @return Response
      */
-    private function renderTaskListPage(array $tasks): Response
+    private function renderTaskListPage(array $tasks, string $category = null): Response
     {
         $statusList = $this->userStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', [
             'tasks' => $tasks,
-            'statusList' => $statusList
+            'statusList' => $statusList,
+            'category' => $category
         ]);
     }
 

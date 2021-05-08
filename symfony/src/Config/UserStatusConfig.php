@@ -118,7 +118,7 @@ class UserStatusConfig
         ];
     }
 
-    public function getStatusIdBySlug(string $statusSlug)
+    private function getStatusIdBySlug(string $statusSlug)
     {
         foreach (self::STATUSES as $id => $raw) {
             if ($raw[self::SLUG_FIELD] === $statusSlug) {
@@ -131,5 +131,11 @@ class UserStatusConfig
     public function getTasksListStatusOrder(): array
     {
         return self::TASKS_LIST_STATUS_ORDER;
+    }
+
+    public function getStatusBySlug(string $statusSlug): UserStatus
+    {
+        $id = $this->getStatusIdBySlug($statusSlug);
+        return $this->createStatusEntity($id, self::STATUSES[$id]);
     }
 }

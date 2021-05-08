@@ -4,7 +4,7 @@
 
 {% block content %}
     <a href="{{ path('app_task_new') }}" class="btn btn-primary float-right btn-sm">Create new</a>
-    <h1>Tasks</h1>
+    <h1>Tasks: {{ category ?? 'All' }}</h1>
 
     <table class="table">
         <thead>
