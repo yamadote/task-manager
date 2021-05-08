@@ -19,7 +19,7 @@ class HeaderLink
     /** @var HeaderLink[] */
     private $subLinks;
 
-    public function __construct(int $id, string $title, string $route, array $routeParams, array $subLinks)
+    public function __construct(int $id, string $title, string $route, array $routeParams = [], array $subLinks = [])
     {
         $this->id = $id;
         $this->title = $title;
