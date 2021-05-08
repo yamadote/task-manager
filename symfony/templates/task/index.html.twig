@@ -3,6 +3,7 @@
 {% block title %}Tasks{% endblock %}
 
 {% block content %}
+    <a href="{{ path('task_new') }}" class="btn btn-primary float-right btn-sm">Create new</a>
     <h1>Tasks</h1>
 
 {#    <div class="input-group">#}
@@ -18,8 +19,6 @@
                 <th class="task-status-badge text-center align-middle">#</th>
                 <th>Task</th>
                 <th style="width: 168px;">Reminder</th>
-                <th style="width: 168px;">CreatedAt</th>
-                <th style="width: 168px;">UpdatedAt</th>
                 <th style="width: 101px;">Status</th>
                 <th style="width: 126px;">actions</th>
             </tr>
@@ -31,23 +30,19 @@
                 <td class="task-status-badge text-center align-middle">#</td>
                 <td>{{ task.title }}</td>
                 <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ task.createdAt|date('Y-m-d H:i:s') }}</td>
-                <td>{{ task.updatedAt|date('Y-m-d H:i:s')}}</td>
                 <td>{{ status.title }}</td>
                 <td>
-                    <a href="{{ path('task_edit', {'id': task.id}) }}" class="btn btn-secondary">edit</a>
+                    <a href="{{ path('task_edit', {'id': task.id}) }}" class="btn btn-secondary btn-sm">edit</a>
                     {% if task.link is not empty %}
-                        <a href="{{ task.link }}" class="btn btn-secondary" target="_blank">link</a>
+                        <a href="{{ task.link }}" class="btn btn-secondary btn-sm" target="_blank">link</a>
                     {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="5">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('task_new') }}">Create new</a>
 {% endblock %}

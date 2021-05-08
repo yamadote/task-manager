@@ -60,4 +60,17 @@ class HeaderLink
     {
         return $this->subLinks;
     }
+
+    public function isActive(string $currentRoute): bool
+    {
+        if ($this->route === $currentRoute) {
+            return true;
+        }
+        foreach ($this->subLinks as $subLink) {
+            if ($subLink->isActive($currentRoute)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
