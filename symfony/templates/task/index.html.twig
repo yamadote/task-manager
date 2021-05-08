@@ -3,7 +3,7 @@
 {% block title %}Tasks{% endblock %}
 
 {% block content %}
-    <a href="{{ path('task_new') }}" class="btn btn-primary float-right btn-sm">Create new</a>
+    <a href="{{ path('app_task_new') }}" class="btn btn-primary float-right btn-sm">Create new</a>
     <h1>Tasks</h1>
 
     <table class="table">
@@ -25,7 +25,7 @@
                 <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ status.title }}</td>
                 <td>
-                    <a href="{{ path('task_edit', {'id': task.id}) }}" class="btn btn-secondary btn-sm">edit</a>
+                    <a href="{{ path('app_task_edit', {'id': task.id}) }}" class="btn btn-secondary btn-sm">edit</a>
                     {% if task.link is not empty %}
                         <a href="{{ task.link }}" class="btn btn-secondary btn-sm" target="_blank">link</a>
                     {% endif %}
