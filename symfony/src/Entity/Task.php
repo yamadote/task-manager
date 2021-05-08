@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -30,6 +31,7 @@ class Task
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTimeInterface
      */
     private $reminder;
 
@@ -49,6 +51,11 @@ class Task
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,11 +66,9 @@ class Task
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(string $title): void
     {
         $this->title = $title;
-
-        return $this;
     }
 
     public function getLink(): ?string
@@ -71,11 +76,9 @@ class Task
         return $this->link;
     }
 
-    public function setLink(?string $link): self
+    public function setLink(?string $link): void
     {
         $this->link = $link;
-
-        return $this;
     }
 
     public function getReminder(): ?DateTimeInterface
@@ -83,11 +86,9 @@ class Task
         return $this->reminder;
     }
 
-    public function setReminder(?DateTimeInterface $reminder): self
+    public function setReminder(?DateTimeInterface $reminder): void
     {
         $this->reminder = $reminder;
-
-        return $this;
     }
 
     public function getCreatedAt(): ?DateTimeInterface
@@ -95,11 +96,9 @@ class Task
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt): self
+    public function setCreatedAt(DateTimeInterface $createdAt): void
     {
         $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getStatus(): ?int
@@ -107,11 +106,9 @@ class Task
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    public function setStatus(int $status): void
     {
         $this->status = $status;
-
-        return $this;
     }
 
     public function getUser(): ?User
@@ -119,10 +116,26 @@ class Task
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(?User $user): void
     {
         $this->user = $user;
+    }
 
-        return $this;
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTimeInterface $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function isReminder(): bool
+    {
+        if(empty($this->reminder)) {
+            return false;
+        }
+        return $this->reminder->getTimestamp() < (new DateTime())->getTimestamp();
     }
 }

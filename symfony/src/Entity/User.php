@@ -58,11 +58,9 @@ class User implements UserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(string $email): void
     {
         $this->email = $email;
-
-        return $this;
     }
 
     /**
@@ -87,11 +85,9 @@ class User implements UserInterface
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles): void
     {
         $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -102,11 +98,9 @@ class User implements UserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password): void
     {
         $this->password = $password;
-
-        return $this;
     }
 
     /**
@@ -138,24 +132,18 @@ class User implements UserInterface
         return $this->tasks;
     }
 
-    public function addTask(Task $task): self
+    public function addTask(Task $task): void
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
             $task->setUser($this);
         }
-
-        return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeTask(Task $task): void
     {
-        if ($this->tasks->removeElement($task)) {
-            if ($task->getUser() === $this) {
-                $task->setUser(null);
-            }
+        if ($this->tasks->removeElement($task) && $task->getUser() === $this) {
+            $task->setUser(null);
         }
-
-        return $this;
     }
 }

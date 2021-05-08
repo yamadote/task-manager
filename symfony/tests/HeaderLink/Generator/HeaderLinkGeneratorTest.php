@@ -21,6 +21,7 @@ class HeaderLinkGeneratorTest extends KernelTestCase
         $expected = [
             new HeaderLink(0, "Index", 'app_index'),
             new HeaderLink(4, "Tasks", 'app_task_index'),
+            new HeaderLink(5, "Reminders", 'app_task_reminders'),
             new HeaderLink(3, "Logout", 'app_logout')
         ];
         $actual = $this->getHeaderLinkGenerator()->getLinksByUser(new User());

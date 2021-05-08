@@ -41,6 +41,24 @@ class TaskController extends AbstractController
     public function index(TaskRepository $taskRepository): Response
     {
         $tasks = $taskRepository->findUserTasks($this->getUser());
+        return $this->renderTaskListPage($tasks);
+    }
+
+    /**
+     * @Route("/reminders", name="app_task_reminders", methods={"GET"})
+     */
+    public function reminders(TaskRepository $taskRepository): Response
+    {
+        $tasks = $taskRepository->findUserReminders($this->getUser());
+        return $this->renderTaskListPage($tasks);
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @return Response
+     */
+    private function renderTaskListPage(array $tasks): Response
+    {
         $statusList = $this->userStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', [
             'tasks' => $tasks,
@@ -55,7 +73,9 @@ class TaskController extends AbstractController
     {
         $task = new Task();
         $task->setUser($this->getUser());
-        $task->setCreatedAt(new DateTime());
+        $currentTime = new DateTime();
+        $task->setCreatedAt($currentTime);
+        $task->setUpdatedAt($currentTime);
         $form = $this->createForm(TaskFormType::class, $task, [
             TaskFormType::NO_REMOVED_STATUS_OPTION => true
         ]);
@@ -82,6 +102,8 @@ class TaskController extends AbstractController
     {
         // todo: check if can edit
 
+        $currentTime = new DateTime();
+        $task->setUpdatedAt($currentTime);
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 

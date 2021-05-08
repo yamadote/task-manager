@@ -14,6 +14,7 @@ class HeaderLinkConfig
     private const REGISTER_LINK_ID = 2;
     private const LOGOUT_LINK_ID = 3;
     private const TASKS_LINK_ID = 4;
+    private const REMINDERS_LINK_ID = 5;
 
     private const LINKS = [
         self::INDEX_LINK_ID => [
@@ -35,12 +36,17 @@ class HeaderLinkConfig
         self::TASKS_LINK_ID => [
             self::TITLE_FIELD => 'Tasks',
             self::ROUTE_FIELD => 'app_task_index'
+        ],
+        self::REMINDERS_LINK_ID => [
+            self::TITLE_FIELD => 'Reminders',
+            self::ROUTE_FIELD => 'app_task_reminders'
         ]
     ];
 
     private const USER_LINKS = [
         self::INDEX_LINK_ID,
         self::TASKS_LINK_ID,
+        self::REMINDERS_LINK_ID,
         self::LOGOUT_LINK_ID
     ];
 

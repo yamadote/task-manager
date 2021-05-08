@@ -5,7 +5,9 @@ namespace App\Repository;
 use App\Config\UserStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -25,19 +27,40 @@ class TaskRepository extends ServiceEntityRepository
         $this->userStatusConfig = $userStatusConfig;
     }
 
+    private function prepareUserTasksQueryBuilder(User $user): QueryBuilder
+    {
+        $removedStatusId = $this->userStatusConfig->getRemovedStatusId();
+        return $this->createQueryBuilder('t')
+            ->andWhere("t.status <> :status")
+            ->andWhere("t.user = :user")
+            ->setParameters([
+                'status' => $removedStatusId,
+                'user' => $user,
+                'time' => new DateTime()
+            ])
+            ->orderBy("CASE WHEN t.reminder < :time THEN 1 ELSE 0 END", "DESC")
+            ->addOrderBy("t.status", "ASC")
+            ->addOrderBy("t.id", "DESC")
+        ;
+    }
+
     /**
      * @return Task[]
      */
     public function findUserTasks(User $user): array
     {
-        $removedStatusId = $this->userStatusConfig->getRemovedStatusId();
-        $queryBuilder = $this->createQueryBuilder('t');
-        $queryBuilder->andWhere("t.status <> :status AND t.user = :user");
-        $queryBuilder->setParameters([
-            'status' => $removedStatusId,
-            'user' => $user
-        ]);
-        $queryBuilder->orderBy("t.id", "DESC");
-        return $queryBuilder->getQuery()->getResult();
+        return $this->prepareUserTasksQueryBuilder($user)
+            ->getQuery()->getResult();
+    }
+
+    /**
+     * @param User $getUser
+     * @return Task[]
+     */
+    public function findUserReminders(User $user): array
+    {
+        return $this->prepareUserTasksQueryBuilder($user)
+            ->andWhere("t.reminder < :time")
+            ->getQuery()->getResult();
     }
 }

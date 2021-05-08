@@ -15,9 +15,11 @@
     <table class="table">
         <thead>
             <tr>
+                <th class="task-status-badge text-center align-middle">#</th>
                 <th>Task</th>
                 <th style="width: 168px;">Reminder</th>
                 <th style="width: 168px;">CreatedAt</th>
+                <th style="width: 168px;">UpdatedAt</th>
                 <th style="width: 101px;">Status</th>
                 <th style="width: 126px;">actions</th>
             </tr>
@@ -25,10 +27,12 @@
         <tbody>
         {% for task in tasks %}
             {% set status = statusList[task.status] %}
-            <tr class="task task-status-{{ status.slug }}">
+            <tr class="task task-status-{{ status.slug }} {{ task.isReminder ? 'task-reminder' : '' }}">
+                <td class="task-status-badge text-center align-middle">#</td>
                 <td>{{ task.title }}</td>
                 <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ task.createdAt ? task.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ task.createdAt|date('Y-m-d H:i:s') }}</td>
+                <td>{{ task.updatedAt|date('Y-m-d H:i:s')}}</td>
                 <td>{{ status.title }}</td>
                 <td>
                     <a href="{{ path('task_edit', {'id': task.id}) }}" class="btn btn-secondary">edit</a>
@@ -39,7 +43,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="7">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
