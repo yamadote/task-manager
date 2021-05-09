@@ -92,9 +92,7 @@ class TaskController extends AbstractController
         $currentTime = new DateTime();
         $task->setCreatedAt($currentTime);
         $task->setUpdatedAt($currentTime);
-        $form = $this->createForm(TaskFormType::class, $task, [
-            TaskFormType::NO_REMOVED_STATUS_OPTION => true
-        ]);
+        $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -133,5 +131,20 @@ class TaskController extends AbstractController
             'task' => $task,
             'form' => $form->createView(),
         ]);
+    }
+    /**
+     * @Route("/{id}", name="task_delete", methods={"POST"})
+     */
+    public function delete(Request $request, Task $task): Response
+    {
+        // todo: check if can edit
+
+        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($task);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_task_index');
     }
 }

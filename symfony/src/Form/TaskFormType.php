@@ -13,8 +13,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaskFormType extends AbstractType
 {
-    public const NO_REMOVED_STATUS_OPTION = 'no_removed_status_option';
-
     /** @var UserStatusConfig */
     private $userStatusConfig;
 
@@ -26,11 +24,6 @@ class TaskFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $statusList = $this->userStatusConfig->getStatusTitles();
-
-        if ($options[self::NO_REMOVED_STATUS_OPTION]) {
-            unset($statusList[$this->userStatusConfig->getRemovedStatusId()]);
-        }
-
         $builder
             ->add('title')
             ->add('link', TextType::class, [
@@ -49,9 +42,7 @@ class TaskFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Task::class,
-            self::NO_REMOVED_STATUS_OPTION => false
+            'data_class' => Task::class
         ]);
-        $resolver->setAllowedTypes(self::NO_REMOVED_STATUS_OPTION, 'bool');
     }
 }

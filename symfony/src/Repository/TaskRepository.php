@@ -36,12 +36,9 @@ class TaskRepository extends ServiceEntityRepository
         }
         $compiledStatusOrder .= " ELSE -1 END";
 
-        $removedStatusId = $this->userStatusConfig->getRemovedStatusId();
         return $this->createQueryBuilder('t')
             ->andWhere("t.user = :user")
-            ->andWhere("t.status <> :removedStatus")
             ->setParameters([
-                'removedStatus' => $removedStatusId,
                 'user' => $user,
                 'time' => new DateTime()
             ])

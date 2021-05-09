@@ -16,7 +16,6 @@ class UserStatusConfig
     private const COMPLETED_STATUS_ID = 4;
     private const POTENTIAL_STATUS_ID = 5;
     private const CANCELLED_STATUS_ID = 6;
-    private const REMOVED_STATUS_ID = 7;
 
     public const PROGRESS_STATUS_SLUG = 'progress';
     public const FROZEN_STATUS_SLUG = 'frozen';
@@ -52,11 +51,7 @@ class UserStatusConfig
         self::NONE_STATUS_ID => [
             self::TITLE_FIELD => 'None',
             self::SLUG_FIELD => 'none'
-        ],
-        self::REMOVED_STATUS_ID => [
-            self::TITLE_FIELD => 'Removed',
-            self::SLUG_FIELD => 'removed'
-        ],
+        ]
     ];
 
     private const TASKS_LIST_STATUS_ORDER = [
@@ -100,11 +95,6 @@ class UserStatusConfig
             $raw[self::TITLE_FIELD],
             $raw[self::SLUG_FIELD]
         );
-    }
-
-    public function getRemovedStatusId(): int
-    {
-        return self::REMOVED_STATUS_ID;
     }
 
     /**

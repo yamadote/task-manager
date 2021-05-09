@@ -6,8 +6,10 @@ use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
 class Task
@@ -55,6 +57,11 @@ class Task
      * @ORM\Column(type="datetime")
      */
     private $updatedAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedAt;
 
     public function getId(): ?int
     {
@@ -137,5 +144,15 @@ class Task
             return false;
         }
         return $this->reminder->getTimestamp() < (new DateTime())->getTimestamp();
+    }
+
+    public function getDeletedAt(): ?DateTimeInterface
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?DateTimeInterface $deletedAt): void
+    {
+        $this->deletedAt = $deletedAt;
     }
 }
