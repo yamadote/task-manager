@@ -36,7 +36,7 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
      * @param false $includeNode
      * @return array
      */
-    protected function children(
+    public function findChildren(
         $node = null,
         $direct = false,
         $sortByField = null,

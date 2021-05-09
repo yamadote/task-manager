@@ -74,7 +74,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return $this->email;
     }
 
     /**
@@ -149,5 +149,14 @@ class User implements UserInterface
         if ($this->tasks->removeElement($task) && $task->getUser() === $this) {
             $task->setUser(null);
         }
+    }
+
+    /**
+     * @param User $task
+     * @return bool
+     */
+    public function equals(User $task): bool
+    {
+        return $this->getId() === $task->getId();
     }
 }

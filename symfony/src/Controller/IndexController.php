@@ -13,6 +13,6 @@ class IndexController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->redirectToRoute('app_task_index');
+        return $this->redirectToRoute(TaskController::INDEX_ROUTE);
     }
 }

@@ -2,112 +2,122 @@
 
 namespace App\Controller;
 
+use App\Builder\TaskBuilder;
+use App\Config\HeaderLinkConfig;
 use App\Config\TaskStatusConfig;
+use App\Entity\HeaderLink;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskFormType;
 use App\Repository\TaskRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Route("/task")
+ * @method User getUser
  */
 class TaskController extends AbstractController
 {
+    private const PARENT_REQUEST_FIELD = 'parent';
+    private const STATUS_REQUEST_FIELD = 'status';
+    private const LINK_REQUEST_FIELD = 'link';
+    public const INDEX_ROUTE = 'app_task_index';
+
     /** @var TaskStatusConfig */
     private $taskStatusConfig;
 
     /** @var TaskRepository */
     private $taskRepository;
 
-    public function __construct(TaskStatusConfig $taskStatusConfig, TaskRepository $taskRepository)
-    {
+    /** @var HeaderLinkConfig */
+    private $headerLinkConfig;
+
+    /** @var TaskBuilder */
+    private $taskBuilder;
+
+    public function __construct(
+        TaskStatusConfig $taskStatusConfig,
+        TaskRepository $taskRepository,
+        HeaderLinkConfig $headerLinkConfig,
+        TaskBuilder $taskBuilder
+    ) {
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskRepository = $taskRepository;
+        $this->headerLinkConfig = $headerLinkConfig;
+        $this->taskBuilder = $taskBuilder;
     }
 
     /**
-     * @return User
+     * @Route("/", name="app_task_index", methods={"GET"})
+     * @Route("/{parent}", name="app_task_index_parent", methods={"GET"}, requirements={"parent"="\d+"})
      */
-    protected function getUser(): UserInterface
+    public function index(Request $request): Response
     {
-        return parent::getUser();
+        $parent = $this->getParentFromRequest($request);
+        $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
+        $root = $this->headerLinkConfig->getAllTasksLink();
+        return $this->renderTaskListPage($tasks, $parent, $root);
     }
 
     /**
      * @Route("/status/{status}", name="app_task_status", methods={"GET"})
-     * @Route("/{parent}/status/{status}", name="app_task_status_parent", methods={"GET"})
+     * @Route("/{parent}/status/{status}", name="app_task_status_parent",
+     *     methods={"GET"}, requirements={"parent"="\d+"})
      */
-    public function status(Request $request, ?Task $parent): Response
+    public function statusTab(Request $request): Response
     {
-        // todo: check if slug is valid
-        $status = $this->taskStatusConfig->getStatusBySlug($request->attributes->get('status'));
+        $parent = $this->getParentFromRequest($request);
+        $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
+        if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
+            return $this->redirectToRoute(self::INDEX_ROUTE);
+        }
+        $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
         $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $parent);
-        return $this->renderTaskListPage($tasks, $status->getTitle(), $parent);
+        $root = $this->headerLinkConfig->getLinkByTaskStatus($status);
+        return $this->renderTaskListPage($tasks, $parent, $root, ['status' => $status]);
     }
 
     /**
      * @Route("/reminders", name="app_task_reminders", methods={"GET"})
      */
-    public function reminders(): Response
+    public function remindersTab(): Response
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
-        return $this->renderTaskListPage($tasks, 'Reminders', null);
+        $root = $this->headerLinkConfig->getRemindersLink();
+        return $this->renderTaskListPage($tasks, null, $root);
     }
 
     /**
      * @Route("/todo", name="app_task_todo", methods={"GET"})
-     * @Route("/{parent}/todo", name="app_task_todo_parent", methods={"GET"})
+     * @Route("/{parent}/todo", name="app_task_todo_parent", methods={"GET"}, requirements={"parent"="\d+"})
      */
-    public function todo(?Task $parent): Response
+    public function todoTab(Request $request): Response
     {
+        $parent = $this->getParentFromRequest($request);
         $tasks = $this->taskRepository->findUserTodoTasks($this->getUser(), $parent);
-        return $this->renderTaskListPage($tasks, 'Todo', $parent);
+        $root = $this->headerLinkConfig->getTodoLink();
+        return $this->renderTaskListPage($tasks, $parent, $root);
     }
 
     /**
      * @Route("/new", name="app_task_new", methods={"GET","POST"})
-     * @Route("/{parent}/new", name="app_task_new_parent", methods={"GET","POST"})
+     * @Route("/{parent}/new", name="app_task_new_parent", methods={"GET","POST"}, requirements={"parent"="\d+"})
      */
-    public function new(Request $request, ?Task $parent): Response
+    public function new(Request $request): Response
     {
-        $task = new Task();
-        $task->setUser($this->getUser());
-        if ($parent) {
-            if ($parent->getUser()->getId() !== $this->getUser()->getId()) {
-                return $this->redirectToRoute('app_task_new');
-            }
-            $task->setParent($parent);
+        $parent = $this->getParentFromRequest($request);
+        $task = $this->taskBuilder->buildFromRequest($request, $this->getUser(), $parent);
+        if (!$this->getUser()->equals($task->getUser())) {
+            return $this->redirectToRoute(self::INDEX_ROUTE);
         }
-        $form = $this->createForm(TaskFormType::class, $task);
-        $form->handleRequest($request);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($task);
+        $entityManager->flush();
 
-        if ($task->getParent() && $task->getParent()->getUser()->getId() !== $this->getUser()->getId()) {
-            $form->get('parent')->addError(new FormError("Your can't use someone else's task!"));
-        }
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($task);
-            $entityManager->flush();
-
-            if ($task->getParent()) {
-                return $this->redirectToRoute("app_task_index_parent", [
-                    'parent' => $task->getParent()->getId()
-                ]);
-            }
-            return $this->redirectToRoute('app_task_index');
-        }
-        return $this->render('task/new.html.twig', [
-            'task' => $task,
-            'form' => $form->createView(),
-            'parent' => $task->getParent(),
-            'path' => $this->taskRepository->getPath($task->getParent())
-        ]);
+        return $this->redirectBack($request);
     }
 
     /**
@@ -115,23 +125,23 @@ class TaskController extends AbstractController
      */
     public function edit(Request $request, Task $task): Response
     {
-        if ($task->getUser()->getId() !== $this->getUser()->getId()) {
-            // todo: show error
-            return $this->redirectToRoute('app_task_index');
+        if (!$this->canEditTask($task)) {
+            return $this->redirectToRoute(self::INDEX_ROUTE);
         }
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 
+        $link = $this->getHeaderLinkFromRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('app_task_index');
+            return $this->redirectToHeaderLink($link, $task);
         }
         return $this->render('task/edit.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
             'parent' => $task->getParent(),
-            'path' => $this->taskRepository->getPath($task)
+            'path' => $this->taskRepository->getPath($task),
+            'root' => $link
         ]);
     }
 
@@ -140,49 +150,107 @@ class TaskController extends AbstractController
      */
     public function delete(Request $request, Task $task): Response
     {
-        if ($task->getUser()->getId() !== $this->getUser()->getId()) {
-            // todo: show error
-            return $this->redirectToRoute('app_task_index');
+        if (!$this->canEditTask($task)) {
+            return $this->redirectToRoute(self::INDEX_ROUTE);
         }
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
-            $children = $this->taskRepository->getChildren($task);
+            $children = $this->taskRepository->findChildren($task);
             $entityManager->remove($task);
             foreach ($children as $child) {
                 $entityManager->remove($child);
             }
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_task_index');
+        return $this->redirectBack($request);
     }
 
     /**
-     * @Route("/", name="app_task_index", methods={"GET"})
-     * @Route("/{parent}", name="app_task_index_parent", methods={"GET"})
+     * @param Task $task
+     * @return bool
      */
-    public function index(?Task $parent): Response
+    private function canEditTask(Task $task): bool
     {
-        $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
-        return $this->renderTaskListPage($tasks, "All", $parent);
+        return $this->getUser()->equals($task->getUser());
     }
 
     /**
      * @param Task[] $tasks
      * @param string $category
      * @param Task|null $parent
+     * @param HeaderLink $root
+     * @param array $additional
      * @return Response
      */
-    private function renderTaskListPage(array $tasks, string $category, ?Task $parent): Response
-    {
+    private function renderTaskListPage(
+        array $tasks,
+        ?Task $parent,
+        HeaderLink $root,
+        array $additional = []
+    ): Response {
         $path = $this->taskRepository->getPath($parent);
         $statusList = $this->taskStatusConfig->getStatusList();
-        return $this->render('task/index.html.twig', [
+        return $this->render('task/index.html.twig', array_merge([
             'tasks' => $tasks,
             'statusList' => $statusList,
-            'category' => $category,
             'parent' => $parent,
-            'path' => $path
-        ]);
+            'path' => $path,
+            'root' => $root
+        ], $additional));
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    private function redirectBack(Request $request): Response
+    {
+        return $this->redirect($request->server->get('HTTP_REFERER'));
+    }
+
+    /**
+     * @param HeaderLink $headerLink
+     * @param Task|null $task
+     * @return Response
+     */
+    private function redirectToHeaderLink(HeaderLink $link, ?Task $task): Response
+    {
+        if ($task && $task->getParent()) {
+            return $this->redirectToRoute($link->getParentRoute(), $link->getParentRouteParams($task->getParent()));
+        }
+        return $this->redirectToRoute($link->getRoute(), $link->getRouteParams());
+    }
+
+    /**
+     * @param Request $request
+     * @return HeaderLink
+     */
+    private function getHeaderLinkFromRequest(Request $request): HeaderLink
+    {
+        $linkId = $request->get(self::LINK_REQUEST_FIELD);
+        if (!$this->headerLinkConfig->isHeaderLinkIdExists($linkId)) {
+            $linkId = $this->headerLinkConfig->getAllTasksLink();
+        }
+        return $this->headerLinkConfig->getLinkById($linkId);
+    }
+
+    /**
+     * @param Request $request
+     * @return Task
+     */
+    private function getParentFromRequest(Request $request): ?Task
+    {
+        $parentId = $request->attributes->get(self::PARENT_REQUEST_FIELD);
+        if (null === $parentId) {
+            return null;
+        }
+        $parent = $this->taskRepository->find($parentId);
+        if (null === $parent) {
+            return null;
+        }
+        if (!$this->getUser()->equals($parent->getUser())) {
+            $parent = null;
+        }
+        return $parent;
     }
 }

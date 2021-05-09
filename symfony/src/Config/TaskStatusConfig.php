@@ -10,23 +10,24 @@ class TaskStatusConfig
     private const SLUG_FIELD = 'slug';
 
     private const NONE_STATUS_ID = 0;
-    private const PENDING_STATUS_ID = 1;
-    private const IN_PROGRESS_STATUS_ID = 2;
-    private const FROZEN_STATUS_ID = 3;
+    public const PENDING_STATUS_ID = 1;
+    public const IN_PROGRESS_STATUS_ID = 2;
+    public const FROZEN_STATUS_ID = 3;
     private const COMPLETED_STATUS_ID = 4;
-    private const POTENTIAL_STATUS_ID = 5;
-    private const CANCELLED_STATUS_ID = 6;
+    public const POTENTIAL_STATUS_ID = 5;
+    public const CANCELLED_STATUS_ID = 6;
 
     public const PROGRESS_STATUS_SLUG = 'progress';
     public const FROZEN_STATUS_SLUG = 'frozen';
     public const POTENTIAL_STATUS_SLUG = 'potential';
     public const CANCELLED_STATUS_SLUG = 'cancelled';
+    public const PENDING_STATUS_SLUG = 'pending';
 
     /* This list order is used for displaying */
     private const STATUSES = [
         self::PENDING_STATUS_ID => [
             self::TITLE_FIELD => 'Pending',
-            self::SLUG_FIELD => 'pending'
+            self::SLUG_FIELD => self::PENDING_STATUS_SLUG
         ],
         self::IN_PROGRESS_STATUS_ID => [
             self::TITLE_FIELD => 'In Progress',
@@ -88,6 +89,11 @@ class TaskStatusConfig
         return $list;
     }
 
+    /**
+     * @param int $id
+     * @param array $raw
+     * @return TaskStatus
+     */
     private function createStatusEntity(int $id, array $raw): TaskStatus
     {
         return new TaskStatus(
@@ -108,6 +114,10 @@ class TaskStatusConfig
         ];
     }
 
+    /**
+     * @param string $statusSlug
+     * @return string
+     */
     private function getStatusIdBySlug(string $statusSlug): string
     {
         foreach (self::STATUSES as $id => $raw) {
@@ -118,14 +128,43 @@ class TaskStatusConfig
         return self::NONE_STATUS_ID;
     }
 
+    /**
+     * @return int[]
+     */
     public function getTasksListStatusOrder(): array
     {
         return self::TASKS_LIST_STATUS_ORDER;
     }
 
+    /**
+     * @param string $statusSlug
+     * @return TaskStatus
+     */
     public function getStatusBySlug(string $statusSlug): TaskStatus
     {
-        $id = $this->getStatusIdBySlug($statusSlug);
+        return $this->getStatusById($this->getStatusIdBySlug($statusSlug));
+    }
+
+    /**
+     * @param $slug
+     * @return bool
+     */
+    public function isStatusSlugExisting($slug): bool
+    {
+        foreach (self::STATUSES as $status) {
+            if ($status[self::SLUG_FIELD] === $slug) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param int $id
+     * @return TaskStatus
+     */
+    public function getStatusById(int $id): TaskStatus
+    {
         return $this->createStatusEntity($id, self::STATUSES[$id]);
     }
 }

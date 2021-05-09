@@ -15,7 +15,7 @@ use Gedmo\Tree\TreeListener;
  * @method Task|null findOneBy(array $criteria, array $orderBy = null)
  * @method Task[]    findAll()
  * @method Task[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Task[]    getChildren(Task $node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
+ * @method Task[]    findChildren(Task $node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
  */
 class TaskRepository extends NestedTreeRepository
 {
@@ -114,6 +114,7 @@ class TaskRepository extends NestedTreeRepository
     public function findUserTasksByStatus(User $user, int $status, ?Task $parent): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        // todo: fix in progress tab, make it not nested
         $this->setParentFilter($queryBuilder, $parent);
         $queryBuilder->andWhere("t.status = :status");
         $queryBuilder->setParameter('status', $status);

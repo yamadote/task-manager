@@ -73,4 +73,16 @@ class HeaderLink
         }
         return false;
     }
+
+    public function getParentRoute(): string
+    {
+        return $this->getRoute() . "_parent";
+    }
+
+    public function getParentRouteParams(Task $parent): array
+    {
+        $params = $this->getRouteParams();
+        $params['parent'] = $parent->getId();
+        return $params;
+    }
 }
