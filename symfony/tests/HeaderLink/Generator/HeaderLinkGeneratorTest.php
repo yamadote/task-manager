@@ -19,7 +19,6 @@ class HeaderLinkGeneratorTest extends KernelTestCase
     public function testUserLinksGeneration(): void
     {
         $expected = [
-            new HeaderLink(0, "Index", 'app_index'),
             new HeaderLink(4, "Tasks", 'app_task_index', [], [
                 new HeaderLink(7, "Todo", 'app_task_todo'),
                 new HeaderLink(5, "Reminders", 'app_task_reminders'),
@@ -38,7 +37,6 @@ class HeaderLinkGeneratorTest extends KernelTestCase
     public function testAnonymousLinksGeneration(): void
     {
         $expected = [
-            new HeaderLink(0, "Index", 'app_index'),
             new HeaderLink(1, "Login", 'app_login'),
             new HeaderLink(2, "Register", 'app_register')
         ];

@@ -11,7 +11,6 @@ class HeaderLinkConfig
     private const SUB_LINKS_FIELD = 'subLinks';
     private const ROUTE_PARAMS_FIELD = 'routeParams';
 
-    private const INDEX_LINK_ID = 0;
     private const LOGIN_LINK_ID = 1;
     private const REGISTER_LINK_ID = 2;
     private const LOGOUT_LINK_ID = 3;
@@ -26,10 +25,6 @@ class HeaderLinkConfig
     private const CANCELLED_TASKS_LINK_ID = 11;
 
     private const LINKS = [
-        self::INDEX_LINK_ID => [
-            self::TITLE_FIELD => 'Index',
-            self::ROUTE_FIELD => 'app_index'
-        ],
         self::LOGIN_LINK_ID => [
             self::TITLE_FIELD => 'Login',
             self::ROUTE_FIELD => 'app_login'
@@ -91,13 +86,11 @@ class HeaderLinkConfig
     ];
 
     private const USER_LINKS = [
-        self::INDEX_LINK_ID,
         self::TASKS_LINK_ID,
         self::LOGOUT_LINK_ID
     ];
 
     private const ANONYMOUS_LINKS = [
-        self::INDEX_LINK_ID,
         self::LOGIN_LINK_ID,
         self::REGISTER_LINK_ID
     ];

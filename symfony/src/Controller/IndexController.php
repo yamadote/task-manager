@@ -13,8 +13,6 @@ class IndexController extends AbstractController
      */
     public function index(): Response
     {
-        $user = $this->getUser();
-        $username = $user ? $user->getUsername() : "Anonymous";
-        return $this->render('index/index.html.twig', ['username' => $username]);
+        return $this->redirectToRoute('app_task_index');
     }
 }
