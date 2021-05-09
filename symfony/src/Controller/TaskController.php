@@ -7,7 +7,6 @@ use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskFormType;
 use App\Repository\TaskRepository;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -90,9 +89,6 @@ class TaskController extends AbstractController
     {
         $task = new Task();
         $task->setUser($this->getUser());
-        $currentTime = new DateTime();
-        $task->setCreatedAt($currentTime);
-        $task->setUpdatedAt($currentTime);
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 
@@ -117,8 +113,6 @@ class TaskController extends AbstractController
     {
         // todo: check if can edit
 
-        $currentTime = new DateTime();
-        $task->setUpdatedAt($currentTime);
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 

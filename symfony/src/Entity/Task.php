@@ -18,16 +18,19 @@ class Task
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @var string
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string
      */
     private $link;
 
@@ -38,28 +41,36 @@ class Task
     private $reminder;
 
     /**
+     *
+     * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
+     * @var DateTimeInterface
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="smallint")
+     * @var int
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="tasks")
      * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private $user;
 
     /**
+     * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
+     * @var DateTimeInterface
      */
     private $updatedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTimeInterface
      */
     private $deletedAt;
 
