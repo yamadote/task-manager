@@ -3,17 +3,16 @@
 {% block title %}Tasks{% endblock %}
 
 {% block content %}
-    <a href="{{ path('app_task_new') }}" class="btn btn-primary float-right btn-sm">Create new</a>
-    <h1>Tasks: {{ category ?? 'All' }}</h1>
-
+    {% include'_breadcrumbs.html.twig' %}
     <table class="table">
         <thead>
             <tr>
                 <th class="task-status-badge text-center align-middle">#</th>
                 <th>Task</th>
+                <th style="width: 60px;"></th>
                 <th style="width: 168px;">Reminder</th>
                 <th style="width: 101px;">Status</th>
-                <th style="width: 154px;">actions</th>
+                <th style="width: 108px;"></th>
             </tr>
         </thead>
         <tbody>
@@ -26,14 +25,16 @@
                 {% else %}
                     <td>{{ task.title }}</td>
                 {% endif %}
-                <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ status.title }}</td>
                 <td>
-                    <a href="{{ path('app_task_new_parent', {'parent': task.id}) }}" class="btn btn-primary btn-sm">New</a>
-                    <a href="{{ path('app_task_edit', {'id': task.id}) }}" class="btn btn-secondary btn-sm">edit</a>
                     {% if task.link is not empty %}
                         <a href="{{ task.link }}" class="btn btn-secondary btn-sm" target="_blank">link</a>
                     {% endif %}
+                </td>
+                <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ status.title }}</td>
+                <td>
+                    <a href="{{ path('app_task_new_parent', {'parent': task.id}) }}" class="btn btn-secondary btn-sm">new</a>
+                    <a href="{{ path('app_task_edit', {'id': task.id}) }}" class="btn btn-secondary btn-sm">edit</a>
                 </td>
             </tr>
         {% else %}

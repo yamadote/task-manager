@@ -22,9 +22,13 @@ class TaskController extends AbstractController
     /** @var TaskStatusConfig */
     private $taskStatusConfig;
 
-    public function __construct(TaskStatusConfig $taskStatusConfig)
+    /** @var TaskRepository */
+    private $taskRepository;
+
+    public function __construct(TaskStatusConfig $taskStatusConfig, TaskRepository $taskRepository)
     {
         $this->taskStatusConfig = $taskStatusConfig;
+        $this->taskRepository = $taskRepository;
     }
 
     /**
@@ -37,31 +41,33 @@ class TaskController extends AbstractController
 
     /**
      * @Route("/status/{status}", name="app_task_status", methods={"GET"})
+     * @Route("/{parent}/status/{status}", name="app_task_status_parent", methods={"GET"})
      */
-    public function status(TaskRepository $taskRepository, Request $request): Response
+    public function status(Request $request, ?Task $parent): Response
     {
         // todo: check if slug is valid
         $status = $this->taskStatusConfig->getStatusBySlug($request->attributes->get('status'));
-        $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $status->getId());
-        return $this->renderTaskListPage($tasks, $status->getTitle());
+        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $parent);
+        return $this->renderTaskListPage($tasks, $status->getTitle(), $parent);
     }
 
     /**
      * @Route("/reminders", name="app_task_reminders", methods={"GET"})
      */
-    public function reminders(TaskRepository $taskRepository): Response
+    public function reminders(): Response
     {
-        $tasks = $taskRepository->findUserReminders($this->getUser());
-        return $this->renderTaskListPage($tasks, 'Reminders');
+        $tasks = $this->taskRepository->findUserReminders($this->getUser());
+        return $this->renderTaskListPage($tasks, 'Reminders', null);
     }
 
     /**
      * @Route("/todo", name="app_task_todo", methods={"GET"})
+     * @Route("/{parent}/todo", name="app_task_todo_parent", methods={"GET"})
      */
-    public function todo(TaskRepository $taskRepository): Response
+    public function todo(?Task $parent): Response
     {
-        $tasks = $taskRepository->findUserTodoTasks($this->getUser());
-        return $this->renderTaskListPage($tasks, 'Todo');
+        $tasks = $this->taskRepository->findUserTodoTasks($this->getUser(), $parent);
+        return $this->renderTaskListPage($tasks, 'Todo', $parent);
     }
 
     /**
@@ -99,6 +105,8 @@ class TaskController extends AbstractController
         return $this->render('task/new.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
+            'parent' => $task->getParent(),
+            'path' => $this->taskRepository->getPath($task->getParent())
         ]);
     }
 
@@ -122,13 +130,15 @@ class TaskController extends AbstractController
         return $this->render('task/edit.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
+            'parent' => $task->getParent(),
+            'path' => $this->taskRepository->getPath($task)
         ]);
     }
 
     /**
      * @Route("/{id}/delete", name="task_delete", methods={"POST"})
      */
-    public function delete(Request $request, Task $task, TaskRepository $taskRepository): Response
+    public function delete(Request $request, Task $task): Response
     {
         if ($task->getUser()->getId() !== $this->getUser()->getId()) {
             // todo: show error
@@ -136,7 +146,7 @@ class TaskController extends AbstractController
         }
         if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
-            $children = $taskRepository->children($task);
+            $children = $this->taskRepository->getChildren($task);
             $entityManager->remove($task);
             foreach ($children as $child) {
                 $entityManager->remove($child);
@@ -151,23 +161,28 @@ class TaskController extends AbstractController
      * @Route("/", name="app_task_index", methods={"GET"})
      * @Route("/{parent}", name="app_task_index_parent", methods={"GET"})
      */
-    public function index(TaskRepository $taskRepository, ?Task $parent): Response
+    public function index(?Task $parent): Response
     {
-        $tasks = $taskRepository->findUserTasks($this->getUser(), $parent);
-        return $this->renderTaskListPage($tasks);
+        $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
+        return $this->renderTaskListPage($tasks, "All", $parent);
     }
 
     /**
      * @param Task[] $tasks
+     * @param string $category
+     * @param Task|null $parent
      * @return Response
      */
-    private function renderTaskListPage(array $tasks, string $category = null): Response
+    private function renderTaskListPage(array $tasks, string $category, ?Task $parent): Response
     {
+        $path = $this->taskRepository->getPath($parent);
         $statusList = $this->taskStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', [
             'tasks' => $tasks,
             'statusList' => $statusList,
-            'category' => $category
+            'category' => $category,
+            'parent' => $parent,
+            'path' => $path
         ]);
     }
 }

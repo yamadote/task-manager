@@ -36,22 +36,27 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
      * @param false $includeNode
      * @return array
      */
-    public function children(
+    protected function children(
         $node = null,
         $direct = false,
         $sortByField = null,
         $direction = 'ASC',
         $includeNode = false
     ): array {
-        return $this->childrenQueryBuilder($node, $direct, $sortByField, $direction, $includeNode)
+        return $this->getChildrenQueryBuilder($node, $direct, $sortByField, $direction, $includeNode)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * @see getChildrenQueryBuilder
+     * @return QueryBuilder
      */
-    private function childrenQueryBuilder(
+    protected function getQueryBuilder(): QueryBuilder
+    {
+        return $this->getEntityManager()->createQueryBuilder();
+    }
+
+    protected function getChildrenQueryBuilder(
         $node = null,
         $direct = false,
         $sortByField = null,
@@ -61,7 +66,7 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
         $meta = $this->getClassMetadata();
         $config = $this->treeListener->getConfiguration($this->_em, $meta->name);
 
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb = $this->getQueryBuilder();
         $qb->select('node')
             ->from($config['useObjectClass'], 'node')
         ;
@@ -117,5 +122,55 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * Get the Tree path query builder by given $node
+     *
+     * @param object $node
+     *
+     * @return QueryBuilder
+     * @throws InvalidArgumentException - if input is not valid
+     *
+     */
+    protected function getPathQueryBuilder($node): QueryBuilder
+    {
+        $meta = $this->getClassMetadata();
+        if (!$node instanceof $meta->name) {
+            throw new InvalidArgumentException('Node is not related to this repository');
+        }
+        $config = $this->treeListener->getConfiguration($this->_em, $meta->name);
+        $wrapped = new EntityWrapper($node, $this->_em);
+        if (!$wrapped->hasValidIdentifier()) {
+            throw new InvalidArgumentException('Node is not managed by UnitOfWork');
+        }
+        $left = $wrapped->getPropertyValue($config['left']);
+        $right = $wrapped->getPropertyValue($config['right']);
+        $qb = $this->getQueryBuilder();
+        $qb->select('node')
+            ->from($config['useObjectClass'], 'node')
+            ->where($qb->expr()->lte('node.'.$config['left'], $left))
+            ->andWhere($qb->expr()->gte('node.'.$config['right'], $right))
+            ->orderBy('node.'.$config['left'], 'ASC')
+        ;
+        if (isset($config['root'])) {
+            $rootId = $wrapped->getPropertyValue($config['root']);
+            $qb->andWhere($qb->expr()->eq('node.'.$config['root'], ':rid'));
+            $qb->setParameter('rid', $rootId);
+        }
+
+        return $qb;
+    }
+
+    /**
+     * Get the Tree path of Nodes by given $node
+     *
+     * @param object $node
+     *
+     * @return array - list of Nodes in path
+     */
+    public function getPath($node): array
+    {
+        return $this->getPathQueryBuilder($node)->getQuery()->getResult();
     }
 }

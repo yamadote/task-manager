@@ -45,3 +45,7 @@
      padding-left: 1px;
      padding-right: 1px;
  }
+
+.breadcrumb-item.active a {
+    color: #6c757d;
+}

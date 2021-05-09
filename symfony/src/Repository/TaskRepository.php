@@ -15,7 +15,7 @@ use Gedmo\Tree\TreeListener;
  * @method Task|null findOneBy(array $criteria, array $orderBy = null)
  * @method Task[]    findAll()
  * @method Task[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Task[]    children($node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
+ * @method Task[]    getChildren(Task $node = null, $direct = false, $sortByField = null, $direction = 'ASC', $includeNode = false)
  */
 class TaskRepository extends NestedTreeRepository
 {
@@ -31,6 +31,10 @@ class TaskRepository extends NestedTreeRepository
         $this->taskStatusConfig = $taskStatusConfig;
     }
 
+    /**
+     * @param User $user
+     * @return QueryBuilder
+     */
     private function prepareUserTasksQueryBuilder(User $user): QueryBuilder
     {
         $statusOrder = $this->taskStatusConfig->getTasksListStatusOrder();
@@ -87,19 +91,44 @@ class TaskRepository extends NestedTreeRepository
             ->getQuery()->getResult();
     }
 
-    public function findUserTodoTasks(User $user): array
+    /**
+     * @param User $user
+     * @param Task|null $parent
+     * @return Task[]
+     */
+    public function findUserTodoTasks(User $user, ?Task $parent): array
     {
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $this->setParentFilter($queryBuilder, $parent);
         $statusIds = $this->taskStatusConfig->getTodoStatusIds();
-        return $this->prepareUserTasksQueryBuilder($user)
-            ->andWhere("t.reminder < :time OR t.status in (" . implode(',', $statusIds). ")")
-            ->getQuery()->getResult();
+        $queryBuilder->andWhere("t.reminder < :time OR t.status in (" . implode(',', $statusIds). ")");
+        return $queryBuilder->getQuery()->getResult();
     }
 
-    public function findUserTasksByStatus(User $user, int $status): array
+    /**
+     * @param User $user
+     * @param int $status
+     * @param Task|null $parent
+     * @return Task[]
+     */
+    public function findUserTasksByStatus(User $user, int $status, ?Task $parent): array
     {
-        return $this->prepareUserTasksQueryBuilder($user)
-            ->andWhere("t.status = :status")
-            ->setParameter('status', $status)
-            ->getQuery()->getResult();
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $this->setParentFilter($queryBuilder, $parent);
+        $queryBuilder->andWhere("t.status = :status");
+        $queryBuilder->setParameter('status', $status);
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param Task|null $node
+     * @return Task[]
+     */
+    public function getPath($node): array
+    {
+        if (null === $node) {
+            return [];
+        }
+        return parent::getPath($node);
     }
 }
