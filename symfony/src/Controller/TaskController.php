@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Config\UserStatusConfig;
+use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskFormType;
@@ -19,12 +19,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class TaskController extends AbstractController
 {
-    /** @var UserStatusConfig */
-    private $userStatusConfig;
+    /** @var TaskStatusConfig */
+    private $taskStatusConfig;
 
-    public function __construct(UserStatusConfig $userStatusConfig)
+    public function __construct(TaskStatusConfig $taskStatusConfig)
     {
-        $this->userStatusConfig = $userStatusConfig;
+        $this->taskStatusConfig = $taskStatusConfig;
     }
 
     /**
@@ -45,7 +45,8 @@ class TaskController extends AbstractController
             $tasks = $taskRepository->findUserTasks($this->getUser());
             return $this->renderTaskListPage($tasks);
         }
-        $status = $this->userStatusConfig->getStatusBySlug($statusSlug);
+        // todo: check if slug is valid
+        $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
         $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $status->getId());
         return $this->renderTaskListPage($tasks, $status->getTitle());
     }
@@ -74,7 +75,7 @@ class TaskController extends AbstractController
      */
     private function renderTaskListPage(array $tasks, string $category = null): Response
     {
-        $statusList = $this->userStatusConfig->getStatusList();
+        $statusList = $this->taskStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', [
             'tasks' => $tasks,
             'statusList' => $statusList,

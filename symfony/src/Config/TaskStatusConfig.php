@@ -2,9 +2,9 @@
 
 namespace App\Config;
 
-use App\Entity\UserStatus;
+use App\Entity\TaskStatus;
 
-class UserStatusConfig
+class TaskStatusConfig
 {
     private const TITLE_FIELD = 'title';
     private const SLUG_FIELD = 'slug';
@@ -77,7 +77,7 @@ class UserStatusConfig
     }
 
     /**
-     * @return UserStatus[]
+     * @return TaskStatus[]
      */
     public function getStatusList(): array
     {
@@ -88,9 +88,9 @@ class UserStatusConfig
         return $list;
     }
 
-    private function createStatusEntity(int $id, array $raw): UserStatus
+    private function createStatusEntity(int $id, array $raw): TaskStatus
     {
-        return new UserStatus(
+        return new TaskStatus(
             $id,
             $raw[self::TITLE_FIELD],
             $raw[self::SLUG_FIELD]
@@ -123,7 +123,7 @@ class UserStatusConfig
         return self::TASKS_LIST_STATUS_ORDER;
     }
 
-    public function getStatusBySlug(string $statusSlug): UserStatus
+    public function getStatusBySlug(string $statusSlug): TaskStatus
     {
         $id = $this->getStatusIdBySlug($statusSlug);
         return $this->createStatusEntity($id, self::STATUSES[$id]);

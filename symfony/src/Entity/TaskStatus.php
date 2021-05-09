@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-class UserStatus
+class TaskStatus
 {
     /** @var int */
     private $id;

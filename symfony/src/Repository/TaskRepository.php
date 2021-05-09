@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Config\UserStatusConfig;
+use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use DateTime;
@@ -18,18 +18,18 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TaskRepository extends ServiceEntityRepository
 {
-    /** @var UserStatusConfig */
-    private $userStatusConfig;
+    /** @var TaskStatusConfig */
+    private $taskStatusConfig;
 
-    public function __construct(ManagerRegistry $registry, UserStatusConfig $userStatusConfig)
+    public function __construct(ManagerRegistry $registry, TaskStatusConfig $taskStatusConfig)
     {
         parent::__construct($registry, Task::class);
-        $this->userStatusConfig = $userStatusConfig;
+        $this->taskStatusConfig = $taskStatusConfig;
     }
 
     private function prepareUserTasksQueryBuilder(User $user): QueryBuilder
     {
-        $statusOrder = $this->userStatusConfig->getTasksListStatusOrder();
+        $statusOrder = $this->taskStatusConfig->getTasksListStatusOrder();
         $compiledStatusOrder = "CASE t.status ";
         foreach ($statusOrder as $order => $statusId) {
             $compiledStatusOrder .= " WHEN " . $statusId . " THEN " . $order;
@@ -70,7 +70,7 @@ class TaskRepository extends ServiceEntityRepository
 
     public function findUserTodoTasks(User $user): array
     {
-        $statusIds = $this->userStatusConfig->getTodoStatusIds();
+        $statusIds = $this->taskStatusConfig->getTodoStatusIds();
         return $this->prepareUserTasksQueryBuilder($user)
             ->andWhere("t.reminder < :time OR t.status in (" . implode(',', $statusIds). ")")
             ->getQuery()->getResult();

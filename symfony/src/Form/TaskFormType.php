@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Config\UserStatusConfig;
+use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,17 +13,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaskFormType extends AbstractType
 {
-    /** @var UserStatusConfig */
-    private $userStatusConfig;
+    /** @var TaskStatusConfig */
+    private $taskStatusConfig;
 
-    public function __construct(UserStatusConfig $userStatusConfig)
+    public function __construct(TaskStatusConfig $taskStatusConfig)
     {
-        $this->userStatusConfig = $userStatusConfig;
+        $this->taskStatusConfig = $taskStatusConfig;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $statusList = $this->userStatusConfig->getStatusTitles();
+        $statusList = $this->taskStatusConfig->getStatusTitles();
         $builder
             ->add('title')
             ->add('link', TextType::class, [
