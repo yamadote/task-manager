@@ -108,7 +108,7 @@ class TaskStatusConfig
         ];
     }
 
-    private function getStatusIdBySlug(string $statusSlug)
+    private function getStatusIdBySlug(string $statusSlug): string
     {
         foreach (self::STATUSES as $id => $raw) {
             if ($raw[self::SLUG_FIELD] === $statusSlug) {

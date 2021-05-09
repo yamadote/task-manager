@@ -51,28 +51,28 @@ class HeaderLinkConfig
                 ],
                 self::PROGRESS_LINK_ID => [
                     self::TITLE_FIELD => 'In Progress',
-                    self::ROUTE_FIELD => 'app_task_index',
+                    self::ROUTE_FIELD => 'app_task_status',
                     self::ROUTE_PARAMS_FIELD => [
                         'status' => TaskStatusConfig::PROGRESS_STATUS_SLUG
                     ]
                 ],
                 self::FROZEN_TASKS_LINK_ID => [
                     self::TITLE_FIELD => 'Frozen',
-                    self::ROUTE_FIELD => 'app_task_index',
+                    self::ROUTE_FIELD => 'app_task_status',
                     self::ROUTE_PARAMS_FIELD => [
                         'status' => TaskStatusConfig::FROZEN_STATUS_SLUG
                     ]
                 ],
                 self::POTENTIAL_TASKS_LINK_ID => [
                     self::TITLE_FIELD => 'Potential',
-                    self::ROUTE_FIELD => 'app_task_index',
+                    self::ROUTE_FIELD => 'app_task_status',
                     self::ROUTE_PARAMS_FIELD => [
                         'status' => TaskStatusConfig::POTENTIAL_STATUS_SLUG
                     ]
                 ],
                 self::CANCELLED_TASKS_LINK_ID => [
                     self::TITLE_FIELD => 'Cancelled',
-                    self::ROUTE_FIELD => 'app_task_index',
+                    self::ROUTE_FIELD => 'app_task_status',
                     self::ROUTE_PARAMS_FIELD => [
                         'status' => TaskStatusConfig::CANCELLED_STATUS_SLUG
                     ]

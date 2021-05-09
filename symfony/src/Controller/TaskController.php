@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\TaskFormType;
 use App\Repository\TaskRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,17 +36,12 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("", name="app_task_index", methods={"GET"})
+     * @Route("/status/{status}", name="app_task_status", methods={"GET"})
      */
-    public function index(TaskRepository $taskRepository, Request $request): Response
+    public function status(TaskRepository $taskRepository, Request $request): Response
     {
-        $statusSlug = $request->query->get('status');
-        if (empty($statusSlug)) {
-            $tasks = $taskRepository->findUserTasks($this->getUser());
-            return $this->renderTaskListPage($tasks);
-        }
         // todo: check if slug is valid
-        $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
+        $status = $this->taskStatusConfig->getStatusBySlug($request->attributes->get('status'));
         $tasks = $taskRepository->findUserTasksByStatus($this->getUser(), $status->getId());
         return $this->renderTaskListPage($tasks, $status->getTitle());
     }
@@ -69,37 +65,37 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @param Task[] $tasks
-     * @return Response
-     */
-    private function renderTaskListPage(array $tasks, string $category = null): Response
-    {
-        $statusList = $this->taskStatusConfig->getStatusList();
-        return $this->render('task/index.html.twig', [
-            'tasks' => $tasks,
-            'statusList' => $statusList,
-            'category' => $category
-        ]);
-    }
-
-    /**
      * @Route("/new", name="app_task_new", methods={"GET","POST"})
+     * @Route("/{parent}/new", name="app_task_new_parent", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ?Task $parent): Response
     {
         $task = new Task();
         $task->setUser($this->getUser());
+        if ($parent) {
+            if ($parent->getUser()->getId() !== $this->getUser()->getId()) {
+                return $this->redirectToRoute('app_task_new');
+            }
+            $task->setParent($parent);
+        }
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 
+        if ($task->getParent() && $task->getParent()->getUser()->getId() !== $this->getUser()->getId()) {
+            $form->get('parent')->addError(new FormError("Your can't use someone else's task!"));
+        }
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($task);
             $entityManager->flush();
 
+            if ($task->getParent()) {
+                return $this->redirectToRoute("app_task_index_parent", [
+                    'parent' => $task->getParent()->getId()
+                ]);
+            }
             return $this->redirectToRoute('app_task_index');
         }
-
         return $this->render('task/new.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
@@ -111,8 +107,10 @@ class TaskController extends AbstractController
      */
     public function edit(Request $request, Task $task): Response
     {
-        // todo: check if can edit
-
+        if ($task->getUser()->getId() !== $this->getUser()->getId()) {
+            // todo: show error
+            return $this->redirectToRoute('app_task_index');
+        }
         $form = $this->createForm(TaskFormType::class, $task);
         $form->handleRequest($request);
 
@@ -121,25 +119,55 @@ class TaskController extends AbstractController
 
             return $this->redirectToRoute('app_task_index');
         }
-
         return $this->render('task/edit.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
         ]);
     }
-    /**
-     * @Route("/{id}", name="task_delete", methods={"POST"})
-     */
-    public function delete(Request $request, Task $task): Response
-    {
-        // todo: check if can edit
 
+    /**
+     * @Route("/{id}/delete", name="task_delete", methods={"POST"})
+     */
+    public function delete(Request $request, Task $task, TaskRepository $taskRepository): Response
+    {
+        if ($task->getUser()->getId() !== $this->getUser()->getId()) {
+            // todo: show error
+            return $this->redirectToRoute('app_task_index');
+        }
         if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
+            $children = $taskRepository->children($task);
             $entityManager->remove($task);
+            foreach ($children as $child) {
+                $entityManager->remove($child);
+            }
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_task_index');
+    }
+
+    /**
+     * @Route("/", name="app_task_index", methods={"GET"})
+     * @Route("/{parent}", name="app_task_index_parent", methods={"GET"})
+     */
+    public function index(TaskRepository $taskRepository, ?Task $parent): Response
+    {
+        $tasks = $taskRepository->findUserTasks($this->getUser(), $parent);
+        return $this->renderTaskListPage($tasks);
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @return Response
+     */
+    private function renderTaskListPage(array $tasks, string $category = null): Response
+    {
+        $statusList = $this->taskStatusConfig->getStatusList();
+        return $this->render('task/index.html.twig', [
+            'tasks' => $tasks,
+            'statusList' => $statusList,
+            'category' => $category
+        ]);
     }
 }

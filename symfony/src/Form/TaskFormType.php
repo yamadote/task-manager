@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
+use Shapecode\Bundle\HiddenEntityTypeBundle\Form\Type\HiddenEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -35,6 +36,9 @@ class TaskFormType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => array_flip($statusList)
+            ])
+            ->add('parent', HiddenEntityType::class, [
+                'class' => Task::class
             ])
         ;
     }

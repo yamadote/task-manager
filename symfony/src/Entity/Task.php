@@ -5,10 +5,12 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
+ * @Gedmo\Tree(type="nested")
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
@@ -74,6 +76,50 @@ class Task
      */
     private $deletedAt;
 
+    /**
+     * @Gedmo\TreeLeft
+     * @ORM\Column(name="lft", type="integer")
+     * @var int
+     */
+    private $lft;
+
+    /**
+     * @Gedmo\TreeLevel
+     * @ORM\Column(name="lvl", type="integer")
+     * @var int
+     */
+    private $lvl;
+
+    /**
+     * @Gedmo\TreeRight
+     * @ORM\Column(name="rgt", type="integer")
+     * @var int
+     */
+    private $rgt;
+
+    /**
+     * @Gedmo\TreeRoot
+     * @ORM\ManyToOne(targetEntity="Task")
+     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
+     * @var Task
+     */
+    private $root;
+
+    /**
+     * @Gedmo\TreeParent
+     * @ORM\ManyToOne(targetEntity="Task", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
+     * @var Task|null
+     */
+    private $parent;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="parent")
+     * @ORM\OrderBy({"lft" = "ASC"})
+     * @var Collection|Task[]
+     */
+    private $children;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -129,12 +175,12 @@ class Task
         $this->status = $status;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): void
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
@@ -165,5 +211,98 @@ class Task
     public function setDeletedAt(?DateTimeInterface $deletedAt): void
     {
         $this->deletedAt = $deletedAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLft(): int
+    {
+        return $this->lft;
+    }
+
+    /**
+     * @param int $lft
+     */
+    public function setLft(int $lft): void
+    {
+        $this->lft = $lft;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLvl(): int
+    {
+        return $this->lvl;
+    }
+
+    /**
+     * @param int $lvl
+     */
+    public function setLvl(int $lvl): void
+    {
+        $this->lvl = $lvl;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRgt(): int
+    {
+        return $this->rgt;
+    }
+
+    /**
+     * @param int $rgt
+     */
+    public function setRgt(int $rgt): void
+    {
+        $this->rgt = $rgt;
+    }
+
+    /**
+     * @return Task
+     */
+    public function getRoot(): Task
+    {
+        return $this->root;
+    }
+
+    /**
+     * @param Task $root
+     */
+    public function setRoot(Task $root): void
+    {
+        $this->root = $root;
+    }
+
+    /**
+     * @return Task|null
+     */
+    public function getParent(): ?Task
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param Task|null $parent
+     */
+    public function setParent(?Task $parent): void
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return Task[]|Collection
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    public function hasChildren(): bool
+    {
+        return !$this->getChildren()->isEmpty();
     }
 }
