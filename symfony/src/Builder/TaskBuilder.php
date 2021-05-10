@@ -59,4 +59,17 @@ class TaskBuilder
         }
         return $this->taskStatusConfig->getStatusBySlug($slug)->getId();
     }
+
+    /**
+     * @param User $user
+     * @return Task
+     */
+    public function buildRootTask(User $user): Task
+    {
+        $root = new Task();
+        $root->setUser($user);
+        $root->setTitle($this->taskConfig->getRootTaskTitle());
+        $root->setStatus($this->taskConfig->getRootTaskDefaultStatus());
+        return $root;
+    }
 }

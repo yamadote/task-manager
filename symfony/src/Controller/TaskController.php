@@ -58,8 +58,8 @@ class TaskController extends AbstractController
     {
         $parent = $this->getParentFromRequest($request);
         $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
-        $root = $this->headerLinkConfig->getAllTasksLink();
-        return $this->renderTaskListPage($tasks, $parent, $root);
+        $link = $this->headerLinkConfig->getAllTasksLink();
+        return $this->renderTaskListPage($tasks, $parent, $link);
     }
 
     /**
@@ -75,9 +75,9 @@ class TaskController extends AbstractController
             return $this->redirectToRoute(self::INDEX_ROUTE);
         }
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
-        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $parent);
-        $root = $this->headerLinkConfig->getLinkByTaskStatus($status);
-        return $this->renderTaskListPage($tasks, $parent, $root, ['status' => $status]);
+        $tasks = $this->taskRepository->findUserTasksHierarchyByStatus($this->getUser(), $parent, $status->getId());
+        $link = $this->headerLinkConfig->getLinkByTaskStatus($status);
+        return $this->renderTaskListPage($tasks, $parent, $link, ['newTaskStatus' => $status]);
     }
 
     /**
@@ -86,8 +86,8 @@ class TaskController extends AbstractController
     public function remindersTab(): Response
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
-        $root = $this->headerLinkConfig->getRemindersLink();
-        return $this->renderTaskListPage($tasks, null, $root);
+        $link = $this->headerLinkConfig->getRemindersLink();
+        return $this->renderTaskListPage($tasks, $this->getRootTask(), $link);
     }
 
     /**
@@ -97,9 +97,10 @@ class TaskController extends AbstractController
     public function todoTab(Request $request): Response
     {
         $parent = $this->getParentFromRequest($request);
-        $tasks = $this->taskRepository->findUserTodoTasks($this->getUser(), $parent);
-        $root = $this->headerLinkConfig->getTodoLink();
-        return $this->renderTaskListPage($tasks, $parent, $root);
+        $statusList = $this->taskStatusConfig->getTodoStatusIds();
+        $tasks = $this->taskRepository->findUserTasksHierarchyByStatusList($this->getUser(), $parent, $statusList);
+        $link = $this->headerLinkConfig->getTodoLink();
+        return $this->renderTaskListPage($tasks, $parent, $link);
     }
 
     /**
@@ -141,7 +142,7 @@ class TaskController extends AbstractController
             'form' => $form->createView(),
             'parent' => $task->getParent(),
             'path' => $this->taskRepository->getPath($task),
-            'root' => $link
+            'link' => $link
         ]);
     }
 
@@ -171,21 +172,21 @@ class TaskController extends AbstractController
      */
     private function canEditTask(Task $task): bool
     {
-        return $this->getUser()->equals($task->getUser());
+        return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
     }
 
     /**
      * @param Task[] $tasks
      * @param string $category
      * @param Task|null $parent
-     * @param HeaderLink $root
+     * @param HeaderLink $link
      * @param array $additional
      * @return Response
      */
     private function renderTaskListPage(
         array $tasks,
         ?Task $parent,
-        HeaderLink $root,
+        HeaderLink $link,
         array $additional = []
     ): Response {
         $path = $this->taskRepository->getPath($parent);
@@ -195,7 +196,7 @@ class TaskController extends AbstractController
             'statusList' => $statusList,
             'parent' => $parent,
             'path' => $path,
-            'root' => $root
+            'link' => $link
         ], $additional));
     }
 
@@ -242,15 +243,23 @@ class TaskController extends AbstractController
     {
         $parentId = $request->attributes->get(self::PARENT_REQUEST_FIELD);
         if (null === $parentId) {
-            return null;
+            return $this->getRootTask();
         }
         $parent = $this->taskRepository->find($parentId);
         if (null === $parent) {
-            return null;
+            return $this->getRootTask();
         }
         if (!$this->getUser()->equals($parent->getUser())) {
-            $parent = null;
+            return $this->getRootTask();
         }
         return $parent;
+    }
+
+    /**
+     * @return Task
+     */
+    private function getRootTask(): Task
+    {
+        return $this->taskRepository->findUserRootTask($this->getUser());
     }
 }

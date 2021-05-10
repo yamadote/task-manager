@@ -3,8 +3,10 @@
 {% block body %}
 <div class="container pt-4">
     <ul class="nav nav-tabs">
+        {% set requestRoute = app.request.attributes.get('_route') %}
+        {% set requestLink = app.request.get('link') %}
         {% for link in global_service.generateHeaderLinks %}
-            {% set isActive = link.isActive(app.request.attributes.get('_route')) %}
+            {% set isActive = link.isActive(requestRoute) or link.isHierarchyContainsId(requestLink) %}
             {% if link.isDropdown %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle  {{ isActive ? 'active' : '' }}"

@@ -24,6 +24,8 @@ class HeaderLinkConfig
     private const PROGRESS_LINK_ID = 9;
     private const POTENTIAL_TASKS_LINK_ID = 10;
     private const CANCELLED_TASKS_LINK_ID = 11;
+    private const PENDING_TASKS_LINK_ID = 12;
+    private const COMPLETED_TASKS_LINK_ID = 13;
 
     private const LINKS = [
         self::LOGIN_LINK_ID => [
@@ -42,13 +44,12 @@ class HeaderLinkConfig
             self::TITLE_FIELD => 'Tasks',
             self::ROUTE_FIELD => 'app_task_index',
             self::SUB_LINKS_FIELD => [
-                self::TODO_TASKS_LINK_ID,
-                self::REMINDERS_LINK_ID,
                 self::PROGRESS_LINK_ID,
                 self::FROZEN_TASKS_LINK_ID,
                 self::POTENTIAL_TASKS_LINK_ID,
                 self::CANCELLED_TASKS_LINK_ID,
-                self::ALL_TASKS_LINK_ID
+                self::COMPLETED_TASKS_LINK_ID,
+                self::ALL_TASKS_LINK_ID,
             ]
         ],
         self::TODO_TASKS_LINK_ID => [
@@ -87,6 +88,20 @@ class HeaderLinkConfig
                 'status' => TaskStatusConfig::CANCELLED_STATUS_SLUG
             ]
         ],
+        self::PENDING_TASKS_LINK_ID => [
+            self::TITLE_FIELD => 'Pending',
+            self::ROUTE_FIELD => 'app_task_status',
+            self::ROUTE_PARAMS_FIELD => [
+                'status' => TaskStatusConfig::PENDING_STATUS_SLUG
+            ]
+        ],
+        self::COMPLETED_TASKS_LINK_ID => [
+            self::TITLE_FIELD => 'Completed',
+            self::ROUTE_FIELD => 'app_task_status',
+            self::ROUTE_PARAMS_FIELD => [
+                'status' => TaskStatusConfig::COMPLETED_STATUS_SLUG
+            ]
+        ],
         self::ALL_TASKS_LINK_ID => [
             self::TITLE_FIELD => 'All',
             self::ROUTE_FIELD => 'app_task_index'
@@ -95,6 +110,8 @@ class HeaderLinkConfig
 
     private const USER_LINKS = [
         self::TASKS_LINK_ID,
+        self::TODO_TASKS_LINK_ID,
+        self::REMINDERS_LINK_ID,
         self::LOGOUT_LINK_ID
     ];
 
@@ -107,7 +124,9 @@ class HeaderLinkConfig
         TaskStatusConfig::FROZEN_STATUS_ID => self::FROZEN_TASKS_LINK_ID,
         TaskStatusConfig::IN_PROGRESS_STATUS_ID => self::PROGRESS_LINK_ID,
         TaskStatusConfig::POTENTIAL_STATUS_ID => self::POTENTIAL_TASKS_LINK_ID,
-        TaskStatusConfig::CANCELLED_STATUS_ID => self::CANCELLED_TASKS_LINK_ID
+        TaskStatusConfig::CANCELLED_STATUS_ID => self::CANCELLED_TASKS_LINK_ID,
+        TaskStatusConfig::PENDING_STATUS_ID => self::PENDING_TASKS_LINK_ID,
+        TaskStatusConfig::COMPLETED_STATUS_ID => self::COMPLETED_TASKS_LINK_ID
     ];
 
     /**

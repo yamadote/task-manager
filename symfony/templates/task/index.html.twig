@@ -23,7 +23,7 @@
                 <td class="task-status-badge text-center align-middle">#</td>
                 <td>
                     {% if task.hasChildren %}
-                        <a href="{{ path(root.parentRoute, root.parentRouteParams(task)) }}">
+                        <a href="{{ path(link.parentRoute, link.parentRouteParams(task)) }}">
                             {{ task.title }}
                         </a>
                     {% else %}
@@ -41,14 +41,14 @@
                     <a href="{{
                         path('app_task_new_parent', {
                             'parent': task.id,
-                            'link': root.id,
-                            'status': status.slug | default(null)
+                            'link': link.id,
+                            'status': newTaskStatus.slug | default(null)
                         })
                     }}" class="btn btn-secondary btn-sm">new</a>
                     <a href="{{
                         path('app_task_edit', {
                             'id': task.id,
-                            'link': root.id
+                            'link': link.id
                         })
                     }}" class="btn btn-secondary btn-sm">edit</a>
                     <form method="post" action="{{ path('task_delete', {'id': task.id}) }}" class="d-inline"

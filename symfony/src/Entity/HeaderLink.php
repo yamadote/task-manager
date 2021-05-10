@@ -61,13 +61,37 @@ class HeaderLink
         return $this->subLinks;
     }
 
+    /**
+     * @param string $currentRoute
+     * @return bool
+     */
     public function isActive(string $currentRoute): bool
     {
-        if ($this->route === $currentRoute) {
+        if ($this->getRoute() === $currentRoute) {
+            return true;
+        }
+        if ($this->getParentRoute() === $currentRoute) {
             return true;
         }
         foreach ($this->subLinks as $subLink) {
             if ($subLink->isActive($currentRoute)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param int|null $id
+     * @return bool
+     */
+    public function isHierarchyContainsId(?int $id): bool
+    {
+        if ($this->getId() === $id) {
+            return true;
+        }
+        foreach ($this->subLinks as $subLink) {
+            if ($subLink->isHierarchyContainsId($id)) {
                 return true;
             }
         }

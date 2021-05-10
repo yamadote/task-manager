@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
@@ -22,13 +23,18 @@ class TaskRepository extends NestedTreeRepository
     /** @var TaskStatusConfig */
     private $taskStatusConfig;
 
+    /** @var TaskBuilder */
+    private $taskBuilder;
+
     public function __construct(
         ManagerRegistry $registry,
         TaskStatusConfig $taskStatusConfig,
-        TreeListener $treeListener
+        TreeListener $treeListener,
+        TaskBuilder $taskBuilder
     ) {
         parent::__construct($registry, Task::class, $treeListener);
         $this->taskStatusConfig = $taskStatusConfig;
+        $this->taskBuilder = $taskBuilder;
     }
 
     /**
@@ -94,31 +100,31 @@ class TaskRepository extends NestedTreeRepository
     /**
      * @param User $user
      * @param Task|null $parent
+     * @param int[] $statusList
      * @return Task[]
      */
-    public function findUserTodoTasks(User $user, ?Task $parent): array
+    public function findUserTasksHierarchyByStatusList(User $user, ?Task $parent, array $statusList): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $queryBuilder->distinct();
         $this->setParentFilter($queryBuilder, $parent);
-        $statusIds = $this->taskStatusConfig->getTodoStatusIds();
-        $queryBuilder->andWhere("t.reminder < :time OR t.status in (" . implode(',', $statusIds). ")");
+        $queryBuilder->join(Task::class, 'c', 'WITH', 'c.user = :user');
+        $queryBuilder->setParameter('user', $user);
+        $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
+        $queryBuilder->andWhere($where);
+        $queryBuilder->setParameter('statusList', $statusList);
         return $queryBuilder->getQuery()->getResult();
     }
 
     /**
      * @param User $user
-     * @param int $status
      * @param Task|null $parent
+     * @param int $status
      * @return Task[]
      */
-    public function findUserTasksByStatus(User $user, int $status, ?Task $parent): array
+    public function findUserTasksHierarchyByStatus(User $user, ?Task $parent, int $status): array
     {
-        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        // todo: fix in progress tab, make it not nested
-        $this->setParentFilter($queryBuilder, $parent);
-        $queryBuilder->andWhere("t.status = :status");
-        $queryBuilder->setParameter('status', $status);
-        return $queryBuilder->getQuery()->getResult();
+        return $this->findUserTasksHierarchyByStatusList($user, $parent, [$status]);
     }
 
     /**
@@ -130,6 +136,24 @@ class TaskRepository extends NestedTreeRepository
         if (null === $node) {
             return [];
         }
-        return parent::getPath($node);
+        return $this->getPathQueryBuilder($node)
+            ->andWhere('node.parent is not null')
+            ->getQuery()->getResult();
+    }
+
+    /**
+     * @param User $user
+     * @return Task
+     */
+    public function findUserRootTask(User $user): Task
+    {
+        $root = $this->findOneBy(['user' => $user, 'parent' => null]);
+        if (null !== $root) {
+            return $root;
+        }
+        $root = $this->taskBuilder->buildRootTask($user);
+        $this->_em->persist($root);
+        $this->_em->flush();
+        return $this->findOneBy(['user' => $user, 'parent' => null]);
     }
 }

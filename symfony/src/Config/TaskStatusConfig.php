@@ -9,11 +9,11 @@ class TaskStatusConfig
     private const TITLE_FIELD = 'title';
     private const SLUG_FIELD = 'slug';
 
-    private const NONE_STATUS_ID = 0;
+    public const NONE_STATUS_ID = 0;
     public const PENDING_STATUS_ID = 1;
     public const IN_PROGRESS_STATUS_ID = 2;
     public const FROZEN_STATUS_ID = 3;
-    private const COMPLETED_STATUS_ID = 4;
+    public const COMPLETED_STATUS_ID = 4;
     public const POTENTIAL_STATUS_ID = 5;
     public const CANCELLED_STATUS_ID = 6;
 
@@ -22,6 +22,7 @@ class TaskStatusConfig
     public const POTENTIAL_STATUS_SLUG = 'potential';
     public const CANCELLED_STATUS_SLUG = 'cancelled';
     public const PENDING_STATUS_SLUG = 'pending';
+    public const COMPLETED_STATUS_SLUG = 'completed';
 
     /* This list order is used for displaying */
     private const STATUSES = [
@@ -39,7 +40,7 @@ class TaskStatusConfig
         ],
         self::COMPLETED_STATUS_ID => [
             self::TITLE_FIELD => 'Completed',
-            self::SLUG_FIELD => 'completed'
+            self::SLUG_FIELD => self::COMPLETED_STATUS_SLUG
         ],
         self::POTENTIAL_STATUS_ID => [
             self::TITLE_FIELD => 'Potential',
