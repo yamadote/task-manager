@@ -67,7 +67,7 @@ class HeaderLinkConfig
             self::ROUTE_FIELD => 'app_task_status',
             self::HAS_PARENT_LINK_FIELD => false,
             self::ROUTE_PARAMS_FIELD => [
-                'status' => TaskStatusConfig::PROGRESS_STATUS_SLUG
+                'status' => TaskStatusConfig::IN_PROGRESS_STATUS_SLUG
             ]
         ],
         self::FROZEN_TASKS_LINK_ID => [

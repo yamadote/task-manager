@@ -17,7 +17,7 @@ class TaskStatusConfig
     public const POTENTIAL_STATUS_ID = 5;
     public const CANCELLED_STATUS_ID = 6;
 
-    public const PROGRESS_STATUS_SLUG = 'progress';
+    public const IN_PROGRESS_STATUS_SLUG = 'progress';
     public const FROZEN_STATUS_SLUG = 'frozen';
     public const POTENTIAL_STATUS_SLUG = 'potential';
     public const CANCELLED_STATUS_SLUG = 'cancelled';
@@ -32,7 +32,7 @@ class TaskStatusConfig
         ],
         self::IN_PROGRESS_STATUS_ID => [
             self::TITLE_FIELD => 'In Progress',
-            self::SLUG_FIELD => self::PROGRESS_STATUS_SLUG
+            self::SLUG_FIELD => self::IN_PROGRESS_STATUS_SLUG
         ],
         self::FROZEN_STATUS_ID => [
             self::TITLE_FIELD => 'Frozen',
