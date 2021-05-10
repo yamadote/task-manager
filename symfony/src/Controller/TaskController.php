@@ -54,7 +54,7 @@ class TaskController extends AbstractController
      * @Route("/", name="app_task_index", methods={"GET"})
      * @Route("/{parent}", name="app_task_index_parent", methods={"GET"}, requirements={"parent"="\d+"})
      */
-    public function index(Request $request): Response
+    public function showTasks(Request $request): Response
     {
         $parent = $this->getParentFromRequest($request);
         $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
@@ -67,7 +67,7 @@ class TaskController extends AbstractController
      * @Route("/{parent}/status/{status}", name="app_task_status_parent",
      *     methods={"GET"}, requirements={"parent"="\d+"})
      */
-    public function statusTab(Request $request): Response
+    public function showTasksByStatus(Request $request): Response
     {
         $parent = $this->getParentFromRequest($request);
         $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
@@ -88,7 +88,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/reminders", name="app_task_reminders", methods={"GET"})
      */
-    public function remindersTab(): Response
+    public function showReminderTasks(): Response
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
         $link = $this->headerLinkConfig->getRemindersLink();
@@ -99,7 +99,7 @@ class TaskController extends AbstractController
      * @Route("/todo", name="app_task_todo", methods={"GET"})
      * @Route("/{parent}/todo", name="app_task_todo_parent", methods={"GET"}, requirements={"parent"="\d+"})
      */
-    public function todoTab(Request $request): Response
+    public function showTodoTasks(Request $request): Response
     {
         $parent = $this->getParentFromRequest($request);
         $statusList = $this->taskStatusConfig->getTodoStatusIds();
