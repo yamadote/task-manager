@@ -74,9 +74,14 @@ class TaskController extends AbstractController
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
             return $this->redirectToRoute(self::INDEX_ROUTE);
         }
+        $user = $this->getUser();
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
-        $tasks = $this->taskRepository->findUserTasksHierarchyByStatus($this->getUser(), $parent, $status->getId());
         $link = $this->headerLinkConfig->getLinkByTaskStatus($status);
+        if ($link->hasParentLink()) {
+            $tasks = $this->taskRepository->findUserTasksHierarchyByStatus($user, $parent, $status->getId());
+        } else {
+            $tasks = $this->taskRepository->findUserTasksByStatus($user, $status->getId());
+        }
         return $this->renderTaskListPage($tasks, $parent, $link, ['newTaskStatus' => $status]);
     }
 
@@ -189,7 +194,7 @@ class TaskController extends AbstractController
         HeaderLink $link,
         array $additional = []
     ): Response {
-        $path = $this->taskRepository->getPath($parent);
+        $path = $link->hasParentLink() ? $this->taskRepository->getPath($parent) : [];
         $statusList = $this->taskStatusConfig->getStatusList();
         return $this->render('task/index.html.twig', array_merge([
             'tasks' => $tasks,
@@ -214,9 +219,9 @@ class TaskController extends AbstractController
      * @param Task|null $task
      * @return Response
      */
-    private function redirectToHeaderLink(HeaderLink $link, ?Task $task): Response
+    private function redirectToHeaderLink(HeaderLink $link, ?Task $task = null): Response
     {
-        if ($task && $task->getParent()) {
+        if ($link->hasParentLink() && !is_null($task) && !is_null($task->getParent())) {
             return $this->redirectToRoute($link->getParentRoute(), $link->getParentRouteParams($task->getParent()));
         }
         return $this->redirectToRoute($link->getRoute(), $link->getRouteParams());
@@ -239,7 +244,7 @@ class TaskController extends AbstractController
      * @param Request $request
      * @return Task
      */
-    private function getParentFromRequest(Request $request): ?Task
+    private function getParentFromRequest(Request $request): Task
     {
         $parentId = $request->attributes->get(self::PARENT_REQUEST_FIELD);
         if (null === $parentId) {

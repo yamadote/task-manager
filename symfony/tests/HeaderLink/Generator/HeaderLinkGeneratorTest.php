@@ -20,14 +20,15 @@ class HeaderLinkGeneratorTest extends KernelTestCase
     {
         $expected = [
             new HeaderLink(4, "Tasks", 'app_task_index', [], [
-                new HeaderLink(7, "Todo", 'app_task_todo'),
-                new HeaderLink(5, "Reminders", 'app_task_reminders'),
-                new HeaderLink(9, "In Progress", 'app_task_status', ['status' => 'progress']),
+                new HeaderLink(9, "In Progress", 'app_task_status', ['status' => 'progress'], [], false),
                 new HeaderLink(8, "Frozen", 'app_task_status', ['status' => 'frozen']),
                 new HeaderLink(10, "Potential", 'app_task_status', ['status' => 'potential']),
                 new HeaderLink(11, "Cancelled", 'app_task_status', ['status' => 'cancelled']),
+                new HeaderLink(13, "Completed", 'app_task_status', ['status' => 'completed']),
                 new HeaderLink(6, "All", 'app_task_index', []),
             ]),
+            new HeaderLink(7, "Todo", 'app_task_todo'),
+            new HeaderLink(5, "Reminders", 'app_task_reminders', [], [], false),
             new HeaderLink(3, "Logout", 'app_logout')
         ];
         $actual = $this->getHeaderLinkGenerator()->getLinksByUser(new User());

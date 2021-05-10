@@ -11,6 +11,7 @@ class HeaderLinkConfig
     private const ROUTE_FIELD = 'route';
     private const SUB_LINKS_FIELD = 'subLinks';
     private const ROUTE_PARAMS_FIELD = 'routeParams';
+    private const HAS_PARENT_LINK_FIELD = 'hasParentLink';
 
     private const LOGIN_LINK_ID = 1;
     private const REGISTER_LINK_ID = 2;
@@ -58,11 +59,13 @@ class HeaderLinkConfig
         ],
         self::REMINDERS_LINK_ID => [
             self::TITLE_FIELD => 'Reminders',
-            self::ROUTE_FIELD => 'app_task_reminders'
+            self::ROUTE_FIELD => 'app_task_reminders',
+            self::HAS_PARENT_LINK_FIELD => false
         ],
         self::PROGRESS_LINK_ID => [
             self::TITLE_FIELD => 'In Progress',
             self::ROUTE_FIELD => 'app_task_status',
+            self::HAS_PARENT_LINK_FIELD => false,
             self::ROUTE_PARAMS_FIELD => [
                 'status' => TaskStatusConfig::PROGRESS_STATUS_SLUG
             ]
@@ -129,6 +132,8 @@ class HeaderLinkConfig
         TaskStatusConfig::COMPLETED_STATUS_ID => self::COMPLETED_TASKS_LINK_ID
     ];
 
+    public const DEFAULT_HAS_PARENT_LINK_VALUE = true;
+
     /**
      * @return HeaderLink[]
      */
@@ -174,12 +179,14 @@ class HeaderLinkConfig
         }
         $hasRouteParams = array_key_exists(self::ROUTE_PARAMS_FIELD, $rawLink);
         $routeParams = $hasRouteParams ? $rawLink[self::ROUTE_PARAMS_FIELD] : [];
+        $hasParentLink = $rawLink[self::HAS_PARENT_LINK_FIELD] ?? self::DEFAULT_HAS_PARENT_LINK_VALUE;
         return new HeaderLink(
             $id,
             $rawLink[self::TITLE_FIELD],
             $rawLink[self::ROUTE_FIELD],
             $routeParams,
-            $subLinks
+            $subLinks,
+            $hasParentLink
         );
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Config\HeaderLinkConfig;
+
 class HeaderLink
 {
     /** @var int */
@@ -19,13 +21,23 @@ class HeaderLink
     /** @var HeaderLink[] */
     private $subLinks;
 
-    public function __construct(int $id, string $title, string $route, array $routeParams = [], array $subLinks = [])
-    {
+    /** @var bool */
+    private $hasParentLink;
+
+    public function __construct(
+        int $id,
+        string $title,
+        string $route,
+        array $routeParams = [],
+        array $subLinks = [],
+        bool $hasParentLink = HeaderLinkConfig::DEFAULT_HAS_PARENT_LINK_VALUE
+    ) {
         $this->id = $id;
         $this->title = $title;
         $this->route = $route;
         $this->routeParams = $routeParams;
         $this->subLinks = $subLinks;
+        $this->hasParentLink = $hasParentLink;
     }
 
     public function getId(): int
@@ -100,13 +112,28 @@ class HeaderLink
 
     public function getParentRoute(): string
     {
+        if (!$this->hasParentLink) {
+            return $this->getRoute();
+        }
+
         return $this->getRoute() . "_parent";
     }
 
     public function getParentRouteParams(Task $parent): array
     {
+        if (!$this->hasParentLink) {
+            return $this->getRouteParams();
+        }
         $params = $this->getRouteParams();
         $params['parent'] = $parent->getId();
         return $params;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasParentLink(): bool
+    {
+        return $this->hasParentLink;
     }
 }

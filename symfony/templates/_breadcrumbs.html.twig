@@ -16,7 +16,7 @@
         {% endfor %}
         <li class="breadcrumb-item active" aria-current="page">
             <a href="{{ path('app_task_new_parent', {
-                'parent': parent.id, 'link': link.id, 'status': newTaskStatus.slug | default(null)
+                'parent': parent.id, 'status': newTaskStatus.slug | default(null)
             }) }}">+</a>
         </li>
     </ol>

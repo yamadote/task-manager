@@ -22,7 +22,7 @@
             <tr class="task task-status-{{ status.slug }} {{ task.isReminder ? 'task-reminder' : '' }}">
                 <td class="task-status-badge text-center align-middle">#</td>
                 <td>
-                    {% if task.hasChildren %}
+                    {% if task.hasChildren and link.hasParentLink %}
                         <a href="{{ path(link.parentRoute, link.parentRouteParams(task)) }}">
                             {{ task.title }}
                         </a>
@@ -41,7 +41,6 @@
                     <a href="{{
                         path('app_task_new_parent', {
                             'parent': task.id,
-                            'link': link.id,
                             'status': newTaskStatus.slug | default(null)
                         })
                     }}" class="btn btn-secondary btn-sm">new</a>

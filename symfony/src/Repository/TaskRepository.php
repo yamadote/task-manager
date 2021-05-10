@@ -156,4 +156,17 @@ class TaskRepository extends NestedTreeRepository
         $this->_em->flush();
         return $this->findOneBy(['user' => $user, 'parent' => null]);
     }
+
+    /**
+     * @param User $user
+     * @param int $status
+     * @return Task[]
+     */
+    public function findUserTasksByStatus(User $user, int $status): array
+    {
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $queryBuilder->andWhere("t.status = :status");
+        $queryBuilder->setParameter('status', $status);
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
