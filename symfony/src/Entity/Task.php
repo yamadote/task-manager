@@ -301,8 +301,20 @@ class Task
         return $this->children;
     }
 
+    /**
+     * @return bool
+     */
     public function hasChildren(): bool
     {
         return !$this->getChildren()->isEmpty();
+    }
+
+    /**
+     * @param Task $task
+     * @return bool
+     */
+    public function equals(Task $task): bool
+    {
+        return $this->id === $task->getId();
     }
 }

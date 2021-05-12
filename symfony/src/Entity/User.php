@@ -47,9 +47,15 @@ class User implements UserInterface
      */
     private $tasks;
 
+    /**
+     * @ORM\OneToMany(targetEntity=TrackedPeriod::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $trackedPeriods;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->trackedPeriods = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,5 +164,13 @@ class User implements UserInterface
     public function equals(User $task): bool
     {
         return $this->getId() === $task->getId();
+    }
+
+    /**
+     * @return Collection|TrackedPeriod[]
+     */
+    public function getTrackedPeriods(): Collection
+    {
+        return $this->trackedPeriods;
     }
 }

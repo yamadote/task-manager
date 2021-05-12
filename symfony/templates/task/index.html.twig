@@ -13,13 +13,14 @@
                 <th style="width: 60px;"></th>
                 <th style="width: 168px;">Reminder</th>
                 <th style="width: 101px;">Status</th>
-                <th style="width: 171px;"></th>
+                <th style="width: 221px;"></th>
             </tr>
         </thead>
         <tbody>
         {% for task in tasks %}
             {% set status = statusList[task.status] %}
-            <tr class="task task-status-{{ status.slug }} {{ task.isReminder ? 'task-reminder' : '' }}">
+            {% set isActive = active | default(false) and active.task == task %}
+            <tr class="task task-status-{{ status.slug }} {{ task.isReminder ? 'task-reminder' : '' }} {{ isActive ? 'active' : '' }}">
                 <td class="task-status-badge text-center align-middle">#</td>
                 <td>
                     {% if task.hasChildren and link.hasParentLink %}
@@ -38,6 +39,19 @@
                 <td>{{ task.reminder ? task.reminder|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ status.title }}</td>
                 <td>
+                    {% if isActive %}
+                        <a href="{{
+                            path('app_task_finish', {
+                                'id': task.id,
+                            })
+                        }}" class="btn btn-outline-warning btn-sm" style="width: 45px">stop</a>
+                    {% else %}
+                        <a href="{{
+                            path('app_task_start', {
+                                'id': task.id,
+                            })
+                        }}" class="btn btn-outline-primary btn-sm">start</a>
+                    {% endif %}
                     <a href="{{
                         path('app_task_new_parent', {
                             'parent': task.id,

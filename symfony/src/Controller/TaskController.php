@@ -7,23 +7,20 @@ use App\Config\HeaderLinkConfig;
 use App\Config\TaskStatusConfig;
 use App\Entity\HeaderLink;
 use App\Entity\Task;
-use App\Entity\User;
 use App\Form\TaskFormType;
 use App\Repository\TaskRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\TrackedPeriodRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/task")
- * @method User getUser
  */
 class TaskController extends AbstractController
 {
     private const PARENT_REQUEST_FIELD = 'parent';
     private const STATUS_REQUEST_FIELD = 'status';
-    private const LINK_REQUEST_FIELD = 'link';
     public const INDEX_ROUTE = 'app_task_index';
 
     /** @var TaskStatusConfig */
@@ -38,16 +35,22 @@ class TaskController extends AbstractController
     /** @var TaskBuilder */
     private $taskBuilder;
 
+    /** @var TrackedPeriodRepository */
+    private $trackedPeriodRepository;
+
     public function __construct(
         TaskStatusConfig $taskStatusConfig,
         TaskRepository $taskRepository,
         HeaderLinkConfig $headerLinkConfig,
-        TaskBuilder $taskBuilder
+        TaskBuilder $taskBuilder,
+        TrackedPeriodRepository $trackedPeriodRepository
     ) {
+        parent::__construct($headerLinkConfig);
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskRepository = $taskRepository;
         $this->headerLinkConfig = $headerLinkConfig;
         $this->taskBuilder = $taskBuilder;
+        $this->trackedPeriodRepository = $trackedPeriodRepository;
     }
 
     /**
@@ -156,6 +159,7 @@ class TaskController extends AbstractController
      */
     public function delete(Request $request, Task $task): Response
     {
+        // todo: stop period of task, maybe remove it also?
         if (!$this->canEditTask($task)) {
             return $this->redirectToRoute(self::INDEX_ROUTE);
         }
@@ -201,43 +205,9 @@ class TaskController extends AbstractController
             'statusList' => $statusList,
             'parent' => $parent,
             'path' => $path,
-            'link' => $link
+            'link' => $link,
+            'active' => $this->trackedPeriodRepository->getActivePeriod($this->getUser())
         ], $additional));
-    }
-
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    private function redirectBack(Request $request): Response
-    {
-        return $this->redirect($request->server->get('HTTP_REFERER'));
-    }
-
-    /**
-     * @param HeaderLink $headerLink
-     * @param Task|null $task
-     * @return Response
-     */
-    private function redirectToHeaderLink(HeaderLink $link, ?Task $task = null): Response
-    {
-        if ($link->hasParentLink() && !is_null($task) && !is_null($task->getParent())) {
-            return $this->redirectToRoute($link->getParentRoute(), $link->getParentRouteParams($task->getParent()));
-        }
-        return $this->redirectToRoute($link->getRoute(), $link->getRouteParams());
-    }
-
-    /**
-     * @param Request $request
-     * @return HeaderLink
-     */
-    private function getHeaderLinkFromRequest(Request $request): HeaderLink
-    {
-        $linkId = $request->get(self::LINK_REQUEST_FIELD);
-        if (!$this->headerLinkConfig->isHeaderLinkIdExists($linkId)) {
-            $linkId = $this->headerLinkConfig->getAllTasksLink();
-        }
-        return $this->headerLinkConfig->getLinkById($linkId);
     }
 
     /**
