@@ -79,10 +79,21 @@ class TaskRepository extends NestedTreeRepository
      * @param Task|null $parent
      * @return Task[]
      */
-    public function findUserTasks(User $user, ?Task $parent): array
+    public function findUserTasksByParent(User $user, ?Task $parent): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         $this->setParentFilter($queryBuilder, $parent);
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param User $user
+     * @param Task|null $parent
+     * @return Task[]
+     */
+    public function findUserTasks(User $user): array
+    {
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         return $queryBuilder->getQuery()->getResult();
     }
 

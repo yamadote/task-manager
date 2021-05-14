@@ -14,7 +14,7 @@ const TasksPage = () => {
     }, []);
 
     return (
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} parent={null} />
     );
 }
 

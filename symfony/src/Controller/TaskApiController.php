@@ -28,13 +28,24 @@ class TaskApiController extends AbstractController
      */
     public function showTasks(): JsonResponse
     {
-        $root = $this->taskRepository->findUserRootTask($this->getUser());
-        $tasks = $this->taskRepository->findUserTasks($this->getUser(), $root);
+        $tasks = $this->taskRepository->findUserTasks($this->getUser());
+        $root = null;
+        foreach ($tasks as $task) {
+            if (null === $task->getParent()) {
+                $root = $task;
+                break;
+            }
+        }
         $data = [];
         foreach ($tasks as $task) {
+            if (null === $task->getParent()) {
+                continue;
+            }
+            $parentId = $task->getParent()->getId();
             $data[] = [
                 'id' => $task->getId(),
-                'title' => $task->getTitle()
+                'title' => $task->getTitle(),
+                'parent' => $parentId === $root->getId() ? null : $parentId
             ];
         }
         return new JsonResponse($data);

@@ -60,7 +60,7 @@ class TaskController extends AbstractController
     public function showTasks(Request $request): Response
     {
         $parent = $this->getParentFromRequest($request);
-        $tasks = $this->taskRepository->findUserTasks($this->getUser(), $parent);
+        $tasks = $this->taskRepository->findUserTasksByParent($this->getUser(), $parent);
         $link = $this->headerLinkConfig->getAllTasksLink();
         return $this->renderTaskListPage($tasks, $parent, $link);
     }
