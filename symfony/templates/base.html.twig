@@ -2,9 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Time Manager{% endblock %}</title>
         {% block stylesheets %}
             <link rel="stylesheet" href="/css/bootstrap.min.css">
+            <link rel="stylesheet" href="/css/main.css">
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
     </head>
@@ -15,7 +16,6 @@
             <script src="/js/jquery-3.2.1.slim.min.js"></script>
             <script src="/js/popper.min.js"></script>
             <script src="/js/bootstrap.min.js"></script>
-            {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </body>
 </html>

@@ -1,8 +1,9 @@
-{% extends 'page.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Login | {{ parent() }}{% endblock %}
 
-{% block content %}
+{% block body %}
+<div class="container pt-4 mt-5 login">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -14,6 +15,10 @@
         {{ form_row(loginForm.password) }}
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div>
+            <button type="submit" class="btn btn-primary mr-1">Login</button>
+            <a href="{{ path('app_register') }}" class="btn btn-secondary">Register</a>
+        </div>
     {{ form_end(loginForm) }}
+</div>
 {% endblock %}

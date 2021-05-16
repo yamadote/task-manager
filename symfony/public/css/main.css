@@ -1,51 +1,20 @@
-.table td {
-    padding: .3rem .6rem;
-    line-height: 38px;
+body {
+    font-family: "Roboto",Arial,sans-serif;
+    background: #f7f6f3;
+    font-size: 0.85rem;
 }
 
-.h1, h1 {
-    font-size: 1.7rem;
+.container {
+    background: #fff;
+    box-shadow: 0 0 30px -20px rgba(0,0,0,0.5);
 }
 
-.task-status-badge {
-    width: 37px;
+.container.full-height {
+    min-height: 100vh;
 }
 
-.table .task.task-status-progress .task-status-badge {
-    background: #FFA900;
-}
-
-.table .task.task-status-pending .task-status-badge {
-    background: #87AFFA;
-}
-
-.table .task.task-status-frozen .task-status-badge {
-    background: #0099CC;
-}
-
-.table .task.task-status-completed .task-status-badge {
-    background: #8FBC8F;
-}
-
-.table .task.task-status-potential .task-status-badge {
-    background: #cc66ff;
-}
-
-.table .task.task-status-cancelled .task-status-badge {
-    background: #778899;
-}
-
-.table .task.task-reminder .task-status-badge {
-    background: #FF6347;
-}
-
-.dropdown-menu.pull-left {
-     right: 0;
-     left: auto;
-     padding-left: 1px;
-     padding-right: 1px;
- }
-
-.breadcrumb-item.active a {
-    color: #6c757d;
+.container.login, .container.register {
+    max-width: 460px;
+    padding: 30px 40px;
+    border-radius: 3px;
 }

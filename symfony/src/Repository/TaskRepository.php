@@ -59,32 +59,32 @@ class TaskRepository extends NestedTreeRepository
         ;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param Task|null $parent
-     * @return QueryBuilder
-     */
-    private function setParentFilter(QueryBuilder $queryBuilder, ?Task $parent): void
-    {
-        if (null === $parent) {
-            $queryBuilder->andWhere("t.parent is null");
-        } else {
-            $queryBuilder->andWhere("t.parent = :parent");
-            $queryBuilder->setParameter("parent", $parent);
-        }
-    }
+//    /**
+//     * @param QueryBuilder $queryBuilder
+//     * @param Task|null $parent
+//     * @return QueryBuilder
+//     */
+//    private function setParentFilter(QueryBuilder $queryBuilder, ?Task $parent): void
+//    {
+//        if (null === $parent) {
+//            $queryBuilder->andWhere("t.parent is null");
+//        } else {
+//            $queryBuilder->andWhere("t.parent = :parent");
+//            $queryBuilder->setParameter("parent", $parent);
+//        }
+//    }
 
-    /**
-     * @param User $user
-     * @param Task|null $parent
-     * @return Task[]
-     */
-    public function findUserTasksByParent(User $user, ?Task $parent): array
-    {
-        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        $this->setParentFilter($queryBuilder, $parent);
-        return $queryBuilder->getQuery()->getResult();
-    }
+//    /**
+//     * @param User $user
+//     * @param Task|null $parent
+//     * @return Task[]
+//     */
+//    public function findUserTasksByParent(User $user, ?Task $parent): array
+//    {
+//        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+//        $this->setParentFilter($queryBuilder, $parent);
+//        return $queryBuilder->getQuery()->getResult();
+//    }
 
     /**
      * @param User $user
@@ -114,11 +114,10 @@ class TaskRepository extends NestedTreeRepository
      * @param int[] $statusList
      * @return Task[]
      */
-    public function findUserTasksHierarchyByStatusList(User $user, ?Task $parent, array $statusList): array
+    public function findUserTasksHierarchyByStatusList(User $user, array $statusList): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         $queryBuilder->distinct();
-        $this->setParentFilter($queryBuilder, $parent);
         $queryBuilder->join(Task::class, 'c', 'WITH', 'c.user = :user');
         $queryBuilder->setParameter('user', $user);
         $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
@@ -133,51 +132,38 @@ class TaskRepository extends NestedTreeRepository
      * @param int $status
      * @return Task[]
      */
-    public function findUserTasksHierarchyByStatus(User $user, ?Task $parent, int $status): array
+    public function findUserTasksHierarchyByStatus(User $user, int $status): array
     {
-        return $this->findUserTasksHierarchyByStatusList($user, $parent, [$status]);
+        return $this->findUserTasksHierarchyByStatusList($user, [$status]);
     }
 
-    /**
-     * @param Task|null $node
-     * @return Task[]
-     */
-    public function getPath($node): array
-    {
-        if (null === $node) {
-            return [];
-        }
-        return $this->getPathQueryBuilder($node)
-            ->andWhere('node.parent is not null')
-            ->getQuery()->getResult();
-    }
+//    /**
+//     * @param Task|null $node
+//     * @return Task[]
+//     */
+//    public function getPath($node): array
+//    {
+//        if (null === $node) {
+//            return [];
+//        }
+//        return $this->getPathQueryBuilder($node)
+//            ->andWhere('node.parent is not null')
+//            ->getQuery()->getResult();
+//    }
 
-    /**
-     * @param User $user
-     * @return Task
-     */
-    public function findUserRootTask(User $user): Task
-    {
-        $root = $this->findOneBy(['user' => $user, 'parent' => null]);
-        if (null !== $root) {
-            return $root;
-        }
-        $root = $this->taskBuilder->buildRootTask($user);
-        $this->_em->persist($root);
-        $this->_em->flush();
-        return $this->findOneBy(['user' => $user, 'parent' => null]);
-    }
-
-    /**
-     * @param User $user
-     * @param int $status
-     * @return Task[]
-     */
-    public function findUserTasksByStatus(User $user, int $status): array
-    {
-        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        $queryBuilder->andWhere("t.status = :status");
-        $queryBuilder->setParameter('status', $status);
-        return $queryBuilder->getQuery()->getResult();
-    }
+//    /**
+//     * @param User $user
+//     * @return Task
+//     */
+//    public function findUserRootTask(User $user): Task
+//    {
+//        $root = $this->findOneBy(['user' => $user, 'parent' => null]);
+//        if (null !== $root) {
+//            return $root;
+//        }
+//        $root = $this->taskBuilder->buildRootTask($user);
+//        $this->_em->persist($root);
+//        $this->_em->flush();
+//        return $this->findOneBy(['user' => $user, 'parent' => null]);
+//    }
 }
