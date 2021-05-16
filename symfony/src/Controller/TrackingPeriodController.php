@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Config\HeaderLinkConfig;
 use App\Config\TaskConfig;
 use App\Entity\Task;
 use App\Entity\TrackedPeriod;
@@ -26,10 +25,8 @@ class TrackingPeriodController extends AbstractController
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
-        HeaderLinkConfig $headerLinkConfig,
         TaskConfig $taskConfig
     ) {
-        parent::__construct($headerLinkConfig);
         $this->trackedPeriodRepository = $trackedPeriodRepository;
         $this->taskConfig = $taskConfig;
     }

@@ -7,7 +7,7 @@ import './App.scss';
 const App = () => {
     return (
         <Router>
-            <nav>
+            <nav className="main-nav">
                 <ul className="nav nav-tabs">
                     <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle"

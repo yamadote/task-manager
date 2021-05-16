@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Task;
 use App\Entity\TrackedPeriod;
 use App\Entity\User;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
