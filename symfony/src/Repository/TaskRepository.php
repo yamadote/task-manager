@@ -151,19 +151,19 @@ class TaskRepository extends NestedTreeRepository
 //            ->getQuery()->getResult();
 //    }
 
-//    /**
-//     * @param User $user
-//     * @return Task
-//     */
-//    public function findUserRootTask(User $user): Task
-//    {
-//        $root = $this->findOneBy(['user' => $user, 'parent' => null]);
-//        if (null !== $root) {
-//            return $root;
-//        }
-//        $root = $this->taskBuilder->buildRootTask($user);
-//        $this->_em->persist($root);
-//        $this->_em->flush();
-//        return $this->findOneBy(['user' => $user, 'parent' => null]);
-//    }
+    /**
+     * @param User $user
+     * @return Task
+     */
+    public function findUserRootTask(User $user): Task
+    {
+        $root = $this->findOneBy(['user' => $user, 'parent' => null]);
+        if (null !== $root) {
+            return $root;
+        }
+        $root = $this->taskBuilder->buildRootTask($user);
+        $this->_em->persist($root);
+        $this->_em->flush();
+        return $this->findOneBy(['user' => $user, 'parent' => null]);
+    }
 }

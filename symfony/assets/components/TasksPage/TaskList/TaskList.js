@@ -15,7 +15,7 @@ const TaskList = (props) => {
     return (
         <div className="tasks">
             {children.map(task => {
-                return <Task key={task.id} task={task} tasks={props.tasks}/>
+                return <Task key={task.id} task={task} tasks={props.tasks} events={props.events}/>
             })}
         </div>
     );

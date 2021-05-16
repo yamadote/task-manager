@@ -1,28 +1,11 @@
 
 import React, {useState} from 'react';
-import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
-import TasksPage from "../TasksPage/TasksPage";
+import {BrowserRouter as Router, Switch, Link, Route} from "react-router-dom";
 import './App.scss';
+import TasksPage from "../TasksPage/TasksPage";
 
 const App = () => {
-    const [tasks, setTasks] = useState(undefined);
-    const createNewTask = () => {
-        console.log(window.location.pathname);
-    }
-    const initTasksPage = (url) => {
-        setTasks(undefined);
-        fetch(url)
-            .then(response => response.json())
-            .then(tasks => setTasks(tasks));
-    }
-    const renderTaskPage = (path, fetchFrom, nested = true) => {
-        return (
-            <Route path={path}>
-                <TasksPage fetchFrom={fetchFrom} nested={nested} tasks={tasks} init={initTasksPage}/>
-            </Route>
-        )
-    }
-
+    const [renderTaskPage, events] = prepareTaskPageHandlers()
     return (
         <Router>
             <nav className="main-nav navbar justify-content-between">
@@ -53,7 +36,7 @@ const App = () => {
                 </ul>
                 <ul className="nav nav-tabs">
                     <li className="nav-item nav-item-new-task">
-                        <button className="nav-link" onClick={createNewTask}>New Task</button>
+                        <button className="nav-link" onClick={events.createNewTask}>New Task</button>
                     </li>
                     <li className="nav-item">
                         <a href="/logout" className="nav-link">Logout</a>
@@ -72,6 +55,50 @@ const App = () => {
             </Switch>
         </Router>
     );
+}
+
+const prepareTaskPageHandlers = () => {
+    const [tasks, setTasks] = useState(undefined);
+    const createNewTask = (parent = null) => {
+        fetch('/api/tasks/new', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                'parent': parent ? parent.id : null
+            })
+        })  .then(response => response.json())
+            .then(task => setTasks([task, ...tasks]))
+    }
+    const removeTask = (task) => {
+        fetch('/api/tasks/' + task.id + '/delete', {method: 'POST'})
+            .then(() => {
+                // todo: remove task children
+                setTasks(tasks.filter(i => i.id !== task.id))
+            })
+    }
+    const events = {
+        'createNewTask': createNewTask,
+        'removeTask': removeTask
+    }
+    const renderTaskPage = (path, fetchFrom, nested = true) => {
+        return (
+            <Route path={path}>
+                <TasksPage
+                    fetchFrom={fetchFrom}
+                    nested={nested}
+                    tasks={tasks}
+                    init={(url) => {
+                        setTasks(undefined);
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(tasks => setTasks(tasks));
+                    }}
+                    events={events}
+                />
+            </Route>
+        )
+    }
+    return [renderTaskPage, events];
 }
 
 export default App;

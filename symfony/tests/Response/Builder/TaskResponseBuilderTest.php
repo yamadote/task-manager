@@ -15,7 +15,7 @@ class TaskResponseBuilderTest extends TestCase
 
     public function testEmptyResponseBuild(): void
     {
-        self::assertEquals(new JsonResponse([]), $this->getBuilder()->build([]));
+        self::assertEquals(new JsonResponse([]), $this->getBuilder()->buildListResponse([]));
     }
 
     public function testBuild(): void
@@ -33,7 +33,7 @@ class TaskResponseBuilderTest extends TestCase
                 'parent' => 1,
                 'link' => 'first task link'
             ]
-        ]), $this->getBuilder()->build($this->prepareTaskListMock()));
+        ]), $this->getBuilder()->buildListResponse($this->prepareTaskListMock()));
     }
 
     /**

@@ -6,4 +6,13 @@
   margin-bottom: 1rem;
   border: 1px solid #888;
   position: relative;
+  font-size:  0.85rem;
+
+  .btn {
+    margin-right: 5px;
+  }
+
+  .btn:last-child {
+    margin-right: 0;
+  }
 }
