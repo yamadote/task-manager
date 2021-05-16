@@ -67,13 +67,13 @@ const prepareTaskPageHandlers = () => {
                 'parent': parent ? parent.id : null
             })
         })  .then(response => response.json())
-            .then(task => setTasks([task, ...tasks]))
+            .then(task => setTasks(tasks => [task, ...tasks]))
     }
     const removeTask = (task) => {
         fetch('/api/tasks/' + task.id + '/delete', {method: 'POST'})
             .then(() => {
                 // todo: remove task children
-                setTasks(tasks.filter(i => i.id !== task.id))
+                setTasks(tasks => tasks.filter(i => i.id !== task.id))
             })
     }
     const events = {
