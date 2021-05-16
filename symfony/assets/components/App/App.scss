@@ -2,6 +2,10 @@
   margin-bottom: 1rem;
 }
 
+.navbar {
+  padding: 0;
+}
+
 .nav-tabs {
   border: none;
 
@@ -12,7 +16,11 @@
     margin-bottom: 0;
   }
 
-  .nav-item:nth-child(1) {
+  .nav-item:last-child {
+    margin-right: 0;
+  }
+
+  .nav-item-tasks {
     background: antiquewhite !important;
   }
 
@@ -21,12 +29,25 @@
     color: black;
   }
 
-  .nav-item:nth-child(2) {
+  .nav-item-todo {
     background: lightblue
   }
 
-  .nav-item:nth-child(3) {
+  .nav-item-reminders {
     background: lightpink
+  }
+
+  .nav-item-progress {
+    background-color: #ffc107;
+  }
+
+  .nav-item-new-task {
+    background-color: #6c757d;
+    button, button:hover, button:focus {
+      background: transparent;
+      outline: none;
+      color: white;
+    }
   }
 
   .nav-link:focus, .nav-link {

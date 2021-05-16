@@ -15,7 +15,7 @@
         {{ form_row(loginForm.password) }}
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        <div>
+        <div class="mt-4">
             <button type="submit" class="btn btn-primary mr-1">Login</button>
             <a href="{{ path('app_register') }}" class="btn btn-secondary">Register</a>
         </div>

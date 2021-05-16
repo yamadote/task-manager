@@ -1,24 +1,20 @@
 
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import TaskList from './TaskList/TaskList'
 
 const TasksPage = (props) => {
-    const [tasks, setTasks] = useState(undefined);
     useEffect(() => {
-        setTasks(undefined);
-        fetch(props.url)
-            .then(response => response.json())
-            .then(tasks => setTasks(tasks));
-    }, [props.url]);
+        props.init(props.fetchFrom);
+    }, [props.fetchFrom]);
 
-    if (tasks === undefined) {
-        return "loading";
+    if (props.tasks === undefined) {
+        return "loading ...";
     }
-    if (tasks.length === 0) {
+    if (props.tasks.length === 0) {
         return "no records found";
     }
-    const parent = tasks.find(task => task.parent === null);
-    return (<TaskList tasks={tasks} parent={parent.id} nested={props.nested}/>);
+    const parent = props.tasks.find(task => task.parent === null);
+    return (<TaskList tasks={props.tasks} parent={parent.id} nested={props.nested}/>);
 }
 
 export default TasksPage;
