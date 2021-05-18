@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Response\Builder;
+namespace App\Builder;
 
 use App\Entity\Task;
 use PHPUnit\Framework\TestCase;

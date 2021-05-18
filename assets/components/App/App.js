@@ -8,7 +8,7 @@ const App = () => {
     const [renderTaskPage, events] = prepareTaskPageHandlers()
     return (
         <Router>
-            <nav className="main-nav navbar justify-content-between">
+            <nav className="navbar justify-content-between">
                 <ul className="nav nav-tabs">
                     <li className="nav-item dropdown nav-item-tasks">
                         <a className="nav-link dropdown-toggle"

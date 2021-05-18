@@ -59,33 +59,6 @@ class TaskRepository extends NestedTreeRepository
         ;
     }
 
-//    /**
-//     * @param QueryBuilder $queryBuilder
-//     * @param Task|null $parent
-//     * @return QueryBuilder
-//     */
-//    private function setParentFilter(QueryBuilder $queryBuilder, ?Task $parent): void
-//    {
-//        if (null === $parent) {
-//            $queryBuilder->andWhere("t.parent is null");
-//        } else {
-//            $queryBuilder->andWhere("t.parent = :parent");
-//            $queryBuilder->setParameter("parent", $parent);
-//        }
-//    }
-
-//    /**
-//     * @param User $user
-//     * @param Task|null $parent
-//     * @return Task[]
-//     */
-//    public function findUserTasksByParent(User $user, ?Task $parent): array
-//    {
-//        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-//        $this->setParentFilter($queryBuilder, $parent);
-//        return $queryBuilder->getQuery()->getResult();
-//    }
-
     /**
      * @param User $user
      * @param Task|null $parent
@@ -136,20 +109,6 @@ class TaskRepository extends NestedTreeRepository
     {
         return $this->findUserTasksHierarchyByStatusList($user, [$status]);
     }
-
-//    /**
-//     * @param Task|null $node
-//     * @return Task[]
-//     */
-//    public function getPath($node): array
-//    {
-//        if (null === $node) {
-//            return [];
-//        }
-//        return $this->getPathQueryBuilder($node)
-//            ->andWhere('node.parent is not null')
-//            ->getQuery()->getResult();
-//    }
 
     /**
      * @param User $user

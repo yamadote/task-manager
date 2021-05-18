@@ -6,7 +6,7 @@ use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
-use App\Response\Builder\TaskResponseBuilder;
+use App\Builder\TaskResponseBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -101,7 +101,6 @@ class TaskController extends AbstractController
                 return new JsonResponse(['error' => 'Permission denied.'], 403);
             }
         } else {
-            // todo: validate user id
             $parent = $this->taskRepository->findUserRootTask($this->getUser());
         }
         $task = $this->taskBuilder->buildFromRequest($request, $this->getUser(), $parent);
@@ -119,8 +118,9 @@ class TaskController extends AbstractController
         if (!$this->canEditTask($task)) {
             return new JsonResponse(['error' => 'Permission denied'], 403);
         }
-//          todo: stop period of task, maybe remove it also?
-//        if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
+//        todo: stop period of task, maybe remove it also?
+//        todo: investigate adding csrf token validation
+//        $this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))
         $entityManager = $this->getDoctrine()->getManager();
         $children = $this->taskRepository->findChildren($task);
         $entityManager->remove($task);
