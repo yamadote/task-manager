@@ -67,7 +67,7 @@ class TaskRepository extends NestedTreeRepository
     public function findUserTasks(User $user): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        return $queryBuilder->getQuery()->getResult();
+        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
     }
 
     /**
@@ -76,9 +76,9 @@ class TaskRepository extends NestedTreeRepository
      */
     public function findUserReminders(User $user): array
     {
-        return $this->prepareUserTasksQueryBuilder($user)
-            ->andWhere("t.reminder < :time")
-            ->getQuery()->getResult();
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $queryBuilder->andWhere("t.reminder < :time");
+        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
     }
 
     /**
@@ -96,7 +96,7 @@ class TaskRepository extends NestedTreeRepository
         $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
         $queryBuilder->andWhere($where);
         $queryBuilder->setParameter('statusList', $statusList);
-        return $queryBuilder->getQuery()->getResult();
+        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
     }
 
     /**
@@ -107,7 +107,8 @@ class TaskRepository extends NestedTreeRepository
      */
     public function findUserTasksHierarchyByStatus(User $user, int $status): array
     {
-        return $this->findUserTasksHierarchyByStatusList($user, [$status]);
+        $tasks = $this->findUserTasksHierarchyByStatusList($user, [$status]);
+        return $this->checkRootTask($tasks, $user);
     }
 
     /**
@@ -120,9 +121,31 @@ class TaskRepository extends NestedTreeRepository
         if (null !== $root) {
             return $root;
         }
+        return $this->createRootTask($user);
+    }
+
+    /**
+     * @param array $tasks
+     * @param User $user
+     * @return array
+     */
+    private function checkRootTask(array $tasks, User $user): array
+    {
+        if (!empty($tasks)) {
+            return $tasks;
+        }
+        return [$this->createRootTask($user)];
+    }
+
+    /**
+     * @param User $user
+     * @return Task
+     */
+    private function createRootTask(User $user): Task
+    {
         $root = $this->taskBuilder->buildRootTask($user);
         $this->_em->persist($root);
         $this->_em->flush();
-        return $this->findOneBy(['user' => $user, 'parent' => null]);
+        return $root;
     }
 }
