@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
+use App\Entity\TaskTitleEditLog;
 use App\Repository\TaskRepository;
 use App\Builder\TaskResponseBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -98,7 +99,7 @@ class TaskController extends AbstractController
                 return new JsonResponse(['error' => 'Parent task not found.'], 400);
             }
             if (!$this->getUser()->equals($parent->getUser())) {
-                return new JsonResponse(['error' => 'Permission denied.'], 403);
+                return $this->getPermissionDeniedResponse();
             }
         } else {
             $parent = $this->taskRepository->findUserRootTask($this->getUser());
@@ -111,12 +112,53 @@ class TaskController extends AbstractController
     }
 
     /**
+     * @Route("/{id}/edit", name="app_api_task_edit", methods={"POST"})
+     */
+    public function edit(Task $task, Request $request): JsonResponse
+    {
+        if (!$task->getUser()->equals($this->getUser())) {
+            return $this->getPermissionDeniedResponse();
+        }
+        $entityManager = $this->getDoctrine()->getManager();
+        $changed = [];
+        if ($this->applyTitleEdit($task, $request)) {
+            $changed[] = 'title';
+        }
+        $entityManager->flush();
+        return new JsonResponse(['changed' => $changed]);
+    }
+
+    /**
+     * @param Task $task
+     * @param Request $request
+     * @return bool
+     */
+    private function applyTitleEdit(Task $task, Request $request): bool
+    {
+        // todo: refactor
+        if (!$request->request->has('title')) {
+            return false;
+        }
+        $title = $request->request->get('title');
+        if ($task->getTitle() === $title) {
+            return false;
+        }
+        $task->setTitle($title);
+        $taskTitleEditLog = new TaskTitleEditLog();
+        $taskTitleEditLog->setTask($task);
+        $taskTitleEditLog->setUser($this->getUser());
+        $taskTitleEditLog->setTitle($title);
+        $this->getDoctrine()->getManager()->persist($taskTitleEditLog);
+        return true;
+    }
+
+    /**
      * @Route("/{id}/delete", name="app_api_task_delete", methods={"POST"})
      */
     public function delete(Task $task): JsonResponse
     {
         if (!$this->canEditTask($task)) {
-            return new JsonResponse(['error' => 'Permission denied'], 403);
+            return $this->getPermissionDeniedResponse();
         }
 //        todo: stop period of task, maybe remove it also?
 //        todo: investigate adding csrf token validation
@@ -138,5 +180,13 @@ class TaskController extends AbstractController
     private function canEditTask(Task $task): bool
     {
         return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    private function getPermissionDeniedResponse(): JsonResponse
+    {
+        return new JsonResponse(['error' => 'Permission denied'], 403);
     }
 }

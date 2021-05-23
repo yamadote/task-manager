@@ -57,17 +57,45 @@ const App = () => {
     );
 }
 
+let timeoutStorage = {};
+const addTimeout = (id, func, timeout = 1000) => {
+    clearTimeout(timeoutStorage[id]);
+    timeoutStorage[id] = setTimeout(func, timeout);
+}
+
+const fetchJsonPost = (url, body) => {
+    return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    }).then(response => response.json())
+}
+
 const prepareTaskPageHandlers = () => {
     const [tasks, setTasks] = useState(undefined);
     const createNewTask = (parent = null) => {
-        fetch('/api/tasks/new', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                'parent': parent ? parent.id : null
-            })
-        })  .then(response => response.json())
+        fetchJsonPost('/api/tasks/new', {'parent': parent?.id})
             .then(task => setTasks(tasks => [task, ...tasks]))
+    }
+    const updateTask = (id, update) => {
+        setTasks(tasks => {
+            return tasks.map(task => {
+                if (task.id === id) {
+                    task = update(task);
+                }
+                return task;
+            });
+        })
+    }
+    const updateTaskTitle = (id, title) => {
+        updateTask(id, (task) => {
+            task.title = title;
+            return task;
+        })
+        addTimeout('task_title' + id, () => {
+            fetchJsonPost('/api/tasks/' + id + '/edit', {'title': title})
+                .then(task => setTasks(tasks => [task, ...tasks]))
+        });
     }
     const removeTask = (task) => {
         fetch('/api/tasks/' + task.id + '/delete', {method: 'POST'})
@@ -78,7 +106,8 @@ const prepareTaskPageHandlers = () => {
     }
     const events = {
         'createNewTask': createNewTask,
-        'removeTask': removeTask
+        'removeTask': removeTask,
+        'updateTaskTitle': updateTaskTitle
     }
     const renderTaskPage = (path, fetchFrom, nested = true) => {
         return (

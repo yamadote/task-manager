@@ -4,18 +4,19 @@ import TaskList from "../TaskList/TaskList";
 import './Task.scss';
 
 const Task = (props) => {
-    const link = props.task.link;
+    const task = props.task;
+    const onTitleChange = event => props.events.updateTaskTitle(task.id, event.target.value);
     return (
         <div className="task">
-            {!link ? null : <a href={link} target="_blank" className="float-right mt-2">link</a>}
-            <div className="pt-2 pb-2">{props.task.title}</div>
+            {!task.link ? null : <a href={task.link} target="_blank" className="float-right mt-2">link</a>}
+            <input className={"title"} type="text" value={task.title} onChange={onTitleChange} />
             <div className="mb-3">
-                <button onClick={() => {props.events.createNewTask(props.task)}}
+                <button onClick={() => {props.events.createNewTask(task)}}
                         className='btn btn-sm btn-secondary'>New Task</button>
-                <button onClick={() => {props.events.removeTask(props.task)}}
+                <button onClick={() => {props.events.removeTask(task)}}
                         className='btn btn-sm btn-danger'>Remove</button>
             </div>
-            <TaskList tasks={props.tasks} parent={props.task.id} events={props.events} />
+            <TaskList tasks={props.tasks} parent={task.id} events={props.events} />
         </div>
     );
 }

@@ -9,10 +9,19 @@
   font-size:  0.85rem;
 
   .btn {
+    font-size: .81rem;
     margin-right: 5px;
   }
 
   .btn:last-child {
     margin-right: 0;
+  }
+
+  .title {
+    margin: 10px 0;
+    background: transparent;
+    width: 100%;
+    border: none;
+    outline: none;
   }
 }
