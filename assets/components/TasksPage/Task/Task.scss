@@ -24,4 +24,9 @@
     border: none;
     outline: none;
   }
+
+  .title.changing {
+    background: lightyellow;
+    outline: 2px solid lightyellow;
+  }
 }

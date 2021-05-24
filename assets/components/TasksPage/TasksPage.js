@@ -47,15 +47,16 @@ const TaskPageHandlers = () => {
                         setTasks(tasks => tasks.filter(i => i.id !== task.id))
                     })
             },
-            updateTaskTitle: (id, title) => {
+            updateTaskTitle: (id, title, setTitleChanging) => {
+                setTitleChanging(true);
                 events.updateTask(id, (task) => {
                     task.title = title;
                     return task;
-                })
+                });
                 Helper.addTimeout('task_title' + id, () => {
                     const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                     Helper.fetchJsonPost(url, {'title': title})
-                        .then(task => setTasks(tasks => [task, ...tasks]))
+                        .then(() => setTitleChanging(false));
                 });
             }
         }
