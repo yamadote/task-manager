@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @IsGranted("ROLE_USER")
- * @Route("/api/tasks")
+ * @Route("/internal-api/tasks")
  */
 class TaskController extends AbstractController
 {
@@ -51,7 +51,8 @@ class TaskController extends AbstractController
     public function all(): JsonResponse
     {
         $tasks = $this->taskRepository->findUserTasks($this->getUser());
-        return $this->taskResponseBuilder->buildListResponse($tasks);
+        $root = $this->findRootTask($tasks);
+        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
 
     /**
@@ -60,7 +61,8 @@ class TaskController extends AbstractController
     public function reminders(): JsonResponse
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
-        return $this->taskResponseBuilder->buildListResponse($tasks);
+        $root = $this->findRootTask($tasks);
+        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
 
     /**
@@ -70,7 +72,8 @@ class TaskController extends AbstractController
     {
         $statusList = $this->taskStatusConfig->getTodoStatusIds();
         $tasks = $this->taskRepository->findUserTasksHierarchyByStatusList($this->getUser(), $statusList);
-        return $this->taskResponseBuilder->buildListResponse($tasks);
+        $root = $this->findRootTask($tasks);
+        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
 
     /**
@@ -84,7 +87,8 @@ class TaskController extends AbstractController
         }
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
         $tasks = $this->taskRepository->findUserTasksHierarchyByStatus($this->getUser(), $status->getId());
-        return $this->taskResponseBuilder->buildListResponse($tasks);
+        $root = $this->findRootTask($tasks);
+        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
 
     /**
@@ -92,23 +96,46 @@ class TaskController extends AbstractController
      */
     public function new(Request $request): JsonResponse
     {
-        // todo: implement status setting dependeds on page
-        if ($request->request->has('parent')) {
-            $parent = $this->taskRepository->findOneBy(['id' => $request->request->get('parent')]);
-            if (null === $parent) {
-                return new JsonResponse(['error' => 'Parent task not found.'], 400);
-            }
-            if (!$this->getUser()->equals($parent->getUser())) {
-                return $this->getPermissionDeniedResponse();
-            }
-        } else {
-            $parent = $this->taskRepository->findUserRootTask($this->getUser());
+        $parent = $this->getParentFromRequest($request);
+        if (null === $parent) {
+            return new JsonResponse(['error' => 'Parent task not found.'], 400);
         }
+        if (!$parent->getUser()->equals($this->getUser())) {
+            return $this->getPermissionDeniedResponse();
+        }
+        // todo: implement status setting depending on page
+        $root = $this->findRootTask([$parent]);
         $task = $this->taskBuilder->buildFromRequest($request, $this->getUser(), $parent);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($task);
         $entityManager->flush();
-        return $this->taskResponseBuilder->buildTaskResponse($task);
+        return $this->taskResponseBuilder->buildTaskResponse($task, $root);
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @return Task
+     */
+    private function findRootTask(array $tasks): Task
+    {
+        foreach ($tasks as $task) {
+            if ($task->getParent() === null) {
+                return $task;
+            }
+        }
+        return $this->taskRepository->findUserRootTask($this->getUser());
+    }
+
+    /**
+     * @param Request $request
+     * @return Task
+     */
+    private function getParentFromRequest(Request $request): Task
+    {
+        if (!$request->request->has('parent')) {
+            return $this->taskRepository->findUserRootTask($this->getUser());
+        }
+        return $this->taskRepository->findOneBy(['id' => $request->request->get('parent')]);
     }
 
     /**

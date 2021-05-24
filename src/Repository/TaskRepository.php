@@ -7,9 +7,11 @@ use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use DateTime;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Tree\TreeListener;
+use RuntimeException;
 
 /**
  * @method Task|null find($id, $lockMode = null, $lockVersion = null)
@@ -67,7 +69,7 @@ class TaskRepository extends NestedTreeRepository
     public function findUserTasks(User $user): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -78,7 +80,7 @@ class TaskRepository extends NestedTreeRepository
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         $queryBuilder->andWhere("t.reminder < :time");
-        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -96,7 +98,7 @@ class TaskRepository extends NestedTreeRepository
         $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
         $queryBuilder->andWhere($where);
         $queryBuilder->setParameter('statusList', $statusList);
-        return $this->checkRootTask($queryBuilder->getQuery()->getResult(), $user);
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -107,8 +109,7 @@ class TaskRepository extends NestedTreeRepository
      */
     public function findUserTasksHierarchyByStatus(User $user, int $status): array
     {
-        $tasks = $this->findUserTasksHierarchyByStatusList($user, [$status]);
-        return $this->checkRootTask($tasks, $user);
+        return $this->findUserTasksHierarchyByStatusList($user, [$status]);
     }
 
     /**
@@ -118,23 +119,7 @@ class TaskRepository extends NestedTreeRepository
     public function findUserRootTask(User $user): Task
     {
         $root = $this->findOneBy(['user' => $user, 'parent' => null]);
-        if (null !== $root) {
-            return $root;
-        }
-        return $this->createRootTask($user);
-    }
-
-    /**
-     * @param array $tasks
-     * @param User $user
-     * @return array
-     */
-    private function checkRootTask(array $tasks, User $user): array
-    {
-        if (!empty($tasks)) {
-            return $tasks;
-        }
-        return [$this->createRootTask($user)];
+        return $root ?? $this->createRootTask($user);
     }
 
     /**
@@ -144,8 +129,12 @@ class TaskRepository extends NestedTreeRepository
     private function createRootTask(User $user): Task
     {
         $root = $this->taskBuilder->buildRootTask($user);
-        $this->_em->persist($root);
-        $this->_em->flush();
+        try {
+            $this->_em->persist($root);
+            $this->_em->flush();
+        } catch (ORMException $e) {
+            throw new RuntimeException("Something went wrong!", 0, $e);
+        }
         return $root;
     }
 }
