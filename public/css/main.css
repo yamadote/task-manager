@@ -1,0 +1,20 @@
+body {
+    font-family: "Roboto",Arial,sans-serif;
+    background: #f7f6f3;
+}
+
+.container {
+    background: #fff;
+    box-shadow: 0 0 30px -20px rgba(0,0,0,0.5);
+    padding-top: 0.9rem;
+}
+
+.container.full-height {
+    min-height: 100vh;
+}
+
+.container.login, .container.register {
+    max-width: 460px;
+    padding: 30px 40px;
+    border-radius: 3px;
+}
