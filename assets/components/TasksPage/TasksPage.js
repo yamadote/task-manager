@@ -62,6 +62,14 @@ const TaskPageHandlers = () => {
                         .then(() => setLinkChanging(false));
                 }, Config.updateInputTimeout);
             },
+            updateTaskStatus: (id, status) => {
+                events.updateTask(id, (task) => {
+                    task.status = status;
+                    return task;
+                });
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                Helper.fetchJsonPost(url, {'status': status}).then();
+            },
             updateTaskChildrenViewSetting: (id, value) => {
                 events.updateTask(id, (task) => {
                     task.isChildrenOpen = value;
@@ -82,8 +90,8 @@ const TaskPageHandlers = () => {
             fetch(url)
                 .then(response => response.json())
                 .then(response => {
-                    setTasks(response.tasks);
                     setStatuses(response.statuses);
+                    setTasks(response.tasks);
                 });
         };
         const data = {tasks: tasks, statuses: statuses, nested: nested}
@@ -103,7 +111,7 @@ const TasksPage = ({data, init, fetchFrom, events}) => {
         return "loading ...";
     }
     if (tasks.length === 0) {
-        return "no tasks found, please create new task";
+        return "no records found";
     }
     const getChildren = (parent) => {
         if (nested === false) {

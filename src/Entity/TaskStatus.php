@@ -13,11 +13,22 @@ class TaskStatus
     /** @var string */
     private $slug;
 
-    public function __construct(int $id, string $title, string $slug)
+    /** @var string */
+    private $color;
+
+    /**
+     * TaskStatus constructor.
+     * @param int $id
+     * @param string $title
+     * @param string $slug
+     * @param string $color
+     */
+    public function __construct(int $id, string $title, string $slug, string $color)
     {
         $this->id = $id;
         $this->title = $title;
         $this->slug = $slug;
+        $this->color = $color;
     }
 
     /**
@@ -42,5 +53,13 @@ class TaskStatus
     public function getSlug(): string
     {
         return $this->slug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getColor(): string
+    {
+        return $this->color;
     }
 }

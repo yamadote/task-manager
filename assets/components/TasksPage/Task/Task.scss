@@ -20,4 +20,22 @@
   input {
     height: 22px;
   }
+
+  .status-badge {
+    position: absolute;
+    margin-left: -15px;
+    margin-top: -1px;
+    height: 15px;
+    width: 15px;
+    border-radius: 6px 0 0 0;
+    overflow: hidden;
+
+    div {
+      background: none;
+      width: 0;
+      height: 0;
+      border-right: 15px solid transparent;
+      border-top: 15px solid transparent;
+    }
+  }
 }

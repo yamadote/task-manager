@@ -11,7 +11,7 @@ const App = () => {
     const prefix = Config.apiUrlPrefix;
     return (
         <Router>
-            <Navbar events={events.createNewTask} />
+            <Navbar createNewTask={events.createNewTask} />
             <Switch>
                 {renderTaskPage("/tasks/reminders", prefix + "/tasks/reminders", false)}
                 {renderTaskPage("/tasks/todo", prefix + "/tasks/todo")}

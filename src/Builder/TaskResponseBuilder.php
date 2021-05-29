@@ -39,7 +39,8 @@ class TaskResponseBuilder
         foreach ($this->taskStatusConfig->getStatusList() as $status) {
             $statusesResponse[] = [
                 'id' => $status->getId(),
-                'title' => $status->getTitle()
+                'title' => $status->getTitle(),
+                'color' => $status->getColor()
             ];
         }
         return new JsonResponse([

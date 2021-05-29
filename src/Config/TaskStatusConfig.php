@@ -8,6 +8,7 @@ class TaskStatusConfig
 {
     private const TITLE_FIELD = 'title';
     private const SLUG_FIELD = 'slug';
+    private const COLOR_FIELD = 'color';
 
     public const NONE_STATUS_ID = 0;
     public const PENDING_STATUS_ID = 1;
@@ -28,31 +29,38 @@ class TaskStatusConfig
     private const STATUSES = [
         self::PENDING_STATUS_ID => [
             self::TITLE_FIELD => 'Pending',
-            self::SLUG_FIELD => self::PENDING_STATUS_SLUG
+            self::SLUG_FIELD => self::PENDING_STATUS_SLUG,
+            self::COLOR_FIELD => '#87AFFA'
         ],
         self::IN_PROGRESS_STATUS_ID => [
             self::TITLE_FIELD => 'In Progress',
-            self::SLUG_FIELD => self::IN_PROGRESS_STATUS_SLUG
+            self::SLUG_FIELD => self::IN_PROGRESS_STATUS_SLUG,
+            self::COLOR_FIELD => '#FFA900'
         ],
         self::FROZEN_STATUS_ID => [
             self::TITLE_FIELD => 'Frozen',
-            self::SLUG_FIELD => self::FROZEN_STATUS_SLUG
+            self::SLUG_FIELD => self::FROZEN_STATUS_SLUG,
+            self::COLOR_FIELD => '#0099CC'
         ],
         self::COMPLETED_STATUS_ID => [
             self::TITLE_FIELD => 'Completed',
-            self::SLUG_FIELD => self::COMPLETED_STATUS_SLUG
+            self::SLUG_FIELD => self::COMPLETED_STATUS_SLUG,
+            self::COLOR_FIELD => '#8FBC8F'
         ],
         self::POTENTIAL_STATUS_ID => [
             self::TITLE_FIELD => 'Potential',
-            self::SLUG_FIELD => self::POTENTIAL_STATUS_SLUG
+            self::SLUG_FIELD => self::POTENTIAL_STATUS_SLUG,
+            self::COLOR_FIELD => '#cc66ff'
         ],
         self::CANCELLED_STATUS_ID => [
             self::TITLE_FIELD => 'Cancelled',
-            self::SLUG_FIELD => self::CANCELLED_STATUS_SLUG
+            self::SLUG_FIELD => self::CANCELLED_STATUS_SLUG,
+            self::COLOR_FIELD => '#778899'
         ],
         self::NONE_STATUS_ID => [
             self::TITLE_FIELD => 'None',
-            self::SLUG_FIELD => 'none'
+            self::SLUG_FIELD => 'none',
+            self::COLOR_FIELD => 'transparent'
         ]
     ];
 
@@ -100,7 +108,8 @@ class TaskStatusConfig
         return new TaskStatus(
             $id,
             $raw[self::TITLE_FIELD],
-            $raw[self::SLUG_FIELD]
+            $raw[self::SLUG_FIELD],
+            $raw[self::COLOR_FIELD]
         );
     }
 

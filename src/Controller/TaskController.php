@@ -71,7 +71,7 @@ class TaskController extends AbstractController
     public function todo(): JsonResponse
     {
         $statusList = $this->taskStatusConfig->getTodoStatusIds();
-        $tasks = $this->taskRepository->findUserTasksHierarchyByStatusList($this->getUser(), $statusList);
+        $tasks = $this->taskRepository->findUserTasksByStatusList($this->getUser(), $statusList, true);
         $root = $this->findRootTask($tasks);
         return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
@@ -86,7 +86,8 @@ class TaskController extends AbstractController
             return new JsonResponse(null, 400);
         }
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
-        $tasks = $this->taskRepository->findUserTasksHierarchyByStatus($this->getUser(), $status->getId());
+        $fullHierarchy = $status->getId() !== TaskStatusConfig::IN_PROGRESS_STATUS_ID;
+        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
         $root = $this->findRootTask($tasks);
         return $this->taskResponseBuilder->buildListResponse($tasks, $root);
     }
@@ -147,12 +148,16 @@ class TaskController extends AbstractController
             return $this->getPermissionDeniedResponse();
         }
         $entityManager = $this->getDoctrine()->getManager();
+        // todo: refactor
         $changed = [];
         if ($this->applyTitleEdit($task, $request)) {
             $changed[] = 'title';
         }
         if ($this->applyLinkEdit($task, $request)) {
             $changed[] = 'link';
+        }
+        if ($this->applyStatusEdit($task, $request)) {
+            $changed[] = 'status';
         }
         $entityManager->flush();
         return new JsonResponse(['changed' => $changed]);
@@ -165,7 +170,6 @@ class TaskController extends AbstractController
      */
     private function applyTitleEdit(Task $task, Request $request): bool
     {
-        // todo: refactor
         if (!$request->request->has('title')) {
             return false;
         }
@@ -197,7 +201,24 @@ class TaskController extends AbstractController
             return false;
         }
         $task->setLink($link);
-        // todo: log
+        return true;
+    }
+
+    /**
+     * @param Task $task
+     * @param Request $request
+     * @return bool
+     */
+    private function applyStatusEdit(Task $task, Request $request): bool
+    {
+        if (!$request->request->has('status')) {
+            return false;
+        }
+        $status = $request->request->get('status');
+        if ($task->getStatus() === $status) {
+            return false;
+        }
+        $task->setStatus($status);
         return true;
     }
 

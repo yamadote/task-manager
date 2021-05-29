@@ -85,31 +85,35 @@ class TaskRepository extends NestedTreeRepository
 
     /**
      * @param User $user
-     * @param Task|null $parent
-     * @param int[] $statusList
+     * @param array $statusList
+     * @param bool $fullHierarchy
      * @return Task[]
      */
-    public function findUserTasksHierarchyByStatusList(User $user, array $statusList): array
+    public function findUserTasksByStatusList(User $user, array $statusList, bool $fullHierarchy = false): array
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        $queryBuilder->distinct();
-        $queryBuilder->join(Task::class, 'c', 'WITH', 'c.user = :user');
-        $queryBuilder->setParameter('user', $user);
-        $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
-        $queryBuilder->andWhere($where);
+        if ($fullHierarchy) {
+            $queryBuilder->distinct();
+            $queryBuilder->join(Task::class, 'c', 'WITH', 'c.user = :user');
+            $queryBuilder->setParameter('user', $user);
+            $where = "t.status IN (:statusList) OR (c.status IN (:statusList) AND t.lft < c.lft AND c.rgt < t.rgt)";
+            $queryBuilder->andWhere($where);
+        } else {
+            $queryBuilder->andWhere("t.status IN (:statusList)");
+        }
         $queryBuilder->setParameter('statusList', $statusList);
         return $queryBuilder->getQuery()->getResult();
     }
 
     /**
      * @param User $user
-     * @param Task|null $parent
      * @param int $status
+     * @param bool $fullHierarchy
      * @return Task[]
      */
-    public function findUserTasksHierarchyByStatus(User $user, int $status): array
+    public function findUserTasksByStatus(User $user, int $status, bool $fullHierarchy = false): array
     {
-        return $this->findUserTasksHierarchyByStatusList($user, [$status]);
+        return $this->findUserTasksByStatusList($user, [$status], $fullHierarchy);
     }
 
     /**
