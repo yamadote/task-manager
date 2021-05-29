@@ -3,8 +3,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 import './Navbar.scss';
 
-const Navbar = (props) => {
-    const events = props.events;
+const Navbar = ({events}) => {
     return (
         <nav className="navbar justify-content-between">
             <ul className="nav nav-tabs">

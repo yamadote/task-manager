@@ -2,15 +2,13 @@
 import React from 'react';
 import Task from "../Task/Task";
 
-const TaskList = (props) => {
-    if (props.children.length === 0) {
+const TaskList = ({tasks, children, nested, events}) => {
+    if (children.length === 0) {
         return null;
     }
     return (
         <div className="tasks">
-            {props.children.map(task => {
-                return <Task key={task.id} task={task} tasks={props.tasks} events={props.events}/>
-            })}
+            {children.map(task => <Task key={task.id} task={task} tasks={tasks} nested={nested} events={events}/>)}
         </div>
     );
 }

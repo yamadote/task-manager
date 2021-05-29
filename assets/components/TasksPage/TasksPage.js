@@ -42,7 +42,7 @@ const TaskPageHandlers = () => {
                     const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                     Helper.fetchJsonPost(url, {'title': title})
                         .then(() => setTitleChanging(false));
-                });
+                }, Config.updateTaskTitleTimeout);
             },
             updateTaskChildrenViewSetting: (id) => {
                 events.updateTask(id, (task) => {
@@ -62,41 +62,38 @@ const TaskPageHandlers = () => {
         return (
             <Route path={path}>
                 <TasksPage
-                    fetchFrom={fetchFrom}
-                    nested={nested}
                     tasks={tasks}
+                    nested={nested}
                     init={(url) => {
                         setTasks(undefined);
                         fetch(url)
                             .then(response => response.json())
                             .then(tasks => setTasks(tasks));
                     }}
+                    fetchFrom={fetchFrom}
                     events={events}
                 />
             </Route>
         )
     }
-    return [renderTaskPage, events];
+    return {renderTaskPage, events};
 }
 
-const TasksPage = (props) => {
-    const tasks = props.tasks;
-    useEffect(() => props.init(props.fetchFrom), [props.fetchFrom]);
+const TasksPage = ({tasks, nested, init, fetchFrom, events}) => {
+    useEffect(() => init(fetchFrom), [fetchFrom]);
     if (tasks === undefined) {
         return "loading ...";
     }
     if (tasks.length === 0) {
         return "no tasks found, please create new task";
     }
-    const getChildren = (id) => {
-        if (props.nested === false) {
+    const getChildren = (parent) => {
+        if (nested === false) {
             return tasks;
         }
-        return tasks.filter(task => {
-            return task.parent === id;
-        });
+        return tasks.filter(task => task.parent === parent);
     }
-    return (<TaskList tasks={tasks} children={getChildren(null)} nested={props.nested} events={props.events}/>);
+    return <TaskList tasks={tasks} children={getChildren(null)} nested={nested} events={events}/>;
 }
 
 export default TaskPageHandlers;

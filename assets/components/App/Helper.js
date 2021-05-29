@@ -2,7 +2,7 @@
 const Helper = new function () {
     const timeoutStorage = {};
     return {
-        addTimeout: (id, func, timeout = 1000) => {
+        addTimeout: (id, func, timeout) => {
             clearTimeout(timeoutStorage[id]);
             timeoutStorage[id] = setTimeout(func, timeout);
         },

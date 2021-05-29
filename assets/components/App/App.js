@@ -7,7 +7,7 @@ import TaskPageHandlers from "../TasksPage/TasksPage";
 import Navbar from "../Navbar/Navbar";
 
 const App = () => {
-    const [renderTaskPage, events] = TaskPageHandlers()
+    const {renderTaskPage, events} = TaskPageHandlers()
     return (
         <Router>
             <Navbar events={events} />
