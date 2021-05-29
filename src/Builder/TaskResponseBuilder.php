@@ -2,11 +2,24 @@
 
 namespace App\Builder;
 
+use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TaskResponseBuilder
 {
+    /** @var TaskStatusConfig */
+    private $taskStatusConfig;
+
+    /**
+     * TaskResponseBuilder constructor.
+     * @param TaskStatusConfig $taskStatusConfig
+     */
+    public function __construct(TaskStatusConfig  $taskStatusConfig)
+    {
+        $this->taskStatusConfig = $taskStatusConfig;
+    }
+
     /**
      * @param iterable $tasks
      * @param Task $root
@@ -14,15 +27,25 @@ class TaskResponseBuilder
      */
     public function buildListResponse(iterable $tasks, Task $root): JsonResponse
     {
-        $response = [];
+        $tasksResponse = [];
         /** @var Task $task */
         foreach ($tasks as $task) {
             if ($task->getParent() === null) {
                 continue;
             }
-            $response[] = $this->buildTaskArrayResponse($task, $root);
+            $tasksResponse[] = $this->buildTaskArrayResponse($task, $root);
         }
-        return new JsonResponse($response);
+        $statusesResponse = [];
+        foreach ($this->taskStatusConfig->getStatusList() as $status) {
+            $statusesResponse[] = [
+                'id' => $status->getId(),
+                'title' => $status->getTitle()
+            ];
+        }
+        return new JsonResponse([
+            'statuses' => $statusesResponse,
+            'tasks' => $tasksResponse
+        ]);
     }
 
     /**
@@ -47,6 +70,7 @@ class TaskResponseBuilder
             'title' => $task->getTitle(),
             'parent' => $this->getParentId($task, $root),
             'link' => $task->getLink(),
+            'status' => $task->getStatus(),
             'isAdditionalPanelOpen' => false,
             'isChildrenOpen' => false
         ];

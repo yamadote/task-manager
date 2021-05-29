@@ -7,6 +7,7 @@ import Helper from "./../App/Helper";
 
 const TaskPageHandlers = () => {
     const [tasks, setTasks] = useState(undefined);
+    const [statuses, setStatuses] = useState(undefined);
     const events = new function () {
         return {
             updateTask: (id, update) => {
@@ -76,28 +77,28 @@ const TaskPageHandlers = () => {
         }
     }
     const renderTaskPage = (path, fetchFrom, nested = true) => {
+        const init = (url) => {
+            setTasks(undefined);
+            fetch(url)
+                .then(response => response.json())
+                .then(response => {
+                    setTasks(response.tasks);
+                    setStatuses(response.statuses);
+                });
+        };
+        const data = {tasks: tasks, statuses: statuses, nested: nested}
         return (
             <Route path={path}>
-                <TasksPage
-                    tasks={tasks}
-                    nested={nested}
-                    init={(url) => {
-                        setTasks(undefined);
-                        fetch(url)
-                            .then(response => response.json())
-                            .then(tasks => setTasks(tasks));
-                    }}
-                    fetchFrom={fetchFrom}
-                    events={events}
-                />
+                <TasksPage data={data} init={init} fetchFrom={fetchFrom} events={events}/>
             </Route>
         )
     }
     return {renderTaskPage, events};
 }
 
-const TasksPage = ({tasks, nested, init, fetchFrom, events}) => {
+const TasksPage = ({data, init, fetchFrom, events}) => {
     useEffect(() => init(fetchFrom), [fetchFrom]);
+    const {tasks, nested} = data;
     if (tasks === undefined) {
         return "loading ...";
     }
@@ -110,7 +111,7 @@ const TasksPage = ({tasks, nested, init, fetchFrom, events}) => {
         }
         return tasks.filter(task => task.parent === parent);
     }
-    return <TaskList tasks={tasks} children={getChildren(null)} nested={nested} events={events}/>;
+    return <TaskList data={data} children={getChildren(null)} events={events}/>;
 }
 
 export default TaskPageHandlers;
