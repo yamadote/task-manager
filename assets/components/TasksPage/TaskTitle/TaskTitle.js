@@ -8,7 +8,7 @@ const TaskTitle = ({task, children, events}) => {
     const onTitleChange = event => events.updateTaskTitle(task.id, event.target.value, setTitleChanging);
 
     const renderChildrenViewButton = () => {
-        const onButtonClick = () => events.updateTaskChildrenViewSetting(task.id);
+        const onButtonClick = () => events.updateTaskChildrenViewSetting(task.id, !task.isChildrenOpen);
         const iconClassName = task.isChildrenOpen ? "oi oi-chevron-top" : "oi oi-chevron-bottom";
         return (
             <button onClick={onButtonClick} className='title-button mr-1'>
@@ -24,7 +24,7 @@ const TaskTitle = ({task, children, events}) => {
         );
     }
     const renderAdditionalPanelViewButton = () => {
-        const onButtonClick = () => events.updateTaskAdditionalPanelViewSetting(task.id)
+        const onButtonClick = () => events.updateTaskAdditionalPanelViewSetting(task.id, !task.isAdditionalPanelOpen)
         const iconClassName = task.isAdditionalPanelOpen ? "oi oi-chevron-top" : "oi oi-chevron-bottom";
         return (
             <button onClick={onButtonClick} className='title-button'>

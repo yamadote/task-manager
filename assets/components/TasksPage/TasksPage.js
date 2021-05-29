@@ -22,7 +22,12 @@ const TaskPageHandlers = () => {
             createNewTask: (parent = null) => {
                 const url = Config.apiUrlPrefix + '/tasks/new';
                 Helper.fetchJsonPost(url, {'parent': parent?.id})
-                    .then(task => setTasks(tasks => [task, ...tasks]))
+                    .then(task => {
+                        setTasks(tasks => [task, ...tasks])
+                        if (parent !== null) {
+                            events.updateTaskChildrenViewSetting(parent.id, true);
+                        }
+                    });
             },
             removeTask: (task) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + task.id + '/delete';
@@ -56,15 +61,15 @@ const TaskPageHandlers = () => {
                         .then(() => setLinkChanging(false));
                 }, Config.updateInputTimeout);
             },
-            updateTaskChildrenViewSetting: (id) => {
+            updateTaskChildrenViewSetting: (id, value) => {
                 events.updateTask(id, (task) => {
-                    task.isChildrenOpen = !task.isChildrenOpen;
+                    task.isChildrenOpen = value;
                     return task;
                 })
             },
-            updateTaskAdditionalPanelViewSetting: (id) => {
+            updateTaskAdditionalPanelViewSetting: (id, value) => {
                 events.updateTask(id, (task) => {
-                    task.isAdditionalPanelOpen = !task.isAdditionalPanelOpen;
+                    task.isAdditionalPanelOpen = value;
                     return task;
                 })
             }
