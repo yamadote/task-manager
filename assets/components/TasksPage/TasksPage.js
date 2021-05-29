@@ -5,21 +5,6 @@ import {Route} from "react-router-dom";
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 
-const TasksPage = (props) => {
-    const tasks = props.tasks;
-    useEffect(() => {
-        props.init(props.fetchFrom);
-    }, [props.fetchFrom]);
-
-    if (tasks === undefined) {
-        return "loading ...";
-    }
-    if (tasks.length === 0) {
-        return "no records found";
-    }
-    return (<TaskList tasks={tasks} parent={null} nested={props.nested} events={props.events}/>);
-}
-
 const TaskPageHandlers = () => {
     const [tasks, setTasks] = useState(undefined);
     const events = new function () {
@@ -58,6 +43,18 @@ const TaskPageHandlers = () => {
                     Helper.fetchJsonPost(url, {'title': title})
                         .then(() => setTitleChanging(false));
                 });
+            },
+            updateTaskChildrenViewSetting: (id) => {
+                events.updateTask(id, (task) => {
+                    task.isChildrenOpen = !task.isChildrenOpen;
+                    return task;
+                })
+            },
+            updateTaskAdditionalPanelViewSetting: (id) => {
+                events.updateTask(id, (task) => {
+                    task.isAdditionalPanelOpen = !task.isAdditionalPanelOpen;
+                    return task;
+                })
             }
         }
     }
@@ -80,6 +77,26 @@ const TaskPageHandlers = () => {
         )
     }
     return [renderTaskPage, events];
+}
+
+const TasksPage = (props) => {
+    const tasks = props.tasks;
+    useEffect(() => props.init(props.fetchFrom), [props.fetchFrom]);
+    if (tasks === undefined) {
+        return "loading ...";
+    }
+    if (tasks.length === 0) {
+        return "no tasks found, please create new task";
+    }
+    const getChildren = (id) => {
+        if (props.nested === false) {
+            return tasks;
+        }
+        return tasks.filter(task => {
+            return task.parent === id;
+        });
+    }
+    return (<TaskList tasks={tasks} children={getChildren(null)} nested={props.nested} events={props.events}/>);
 }
 
 export default TaskPageHandlers;

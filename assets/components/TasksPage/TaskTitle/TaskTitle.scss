@@ -1,0 +1,23 @@
+.task {
+  .title-group {
+    display: flex;
+
+    .title {
+      padding: 1px 4px;
+      margin: 10px 0;
+      background: transparent;
+      width: 100%;
+      border: none;
+      outline: none;
+    }
+
+    .title:focus, .title.changing {
+      border-radius: 1px;
+      box-shadow: 0 0 3px -1px black;
+    }
+
+    .title.changing {
+      background: lightyellow;
+    }
+  }
+}

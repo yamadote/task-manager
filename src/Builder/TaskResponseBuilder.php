@@ -46,7 +46,9 @@ class TaskResponseBuilder
             'id' => $task->getId(),
             'title' => $task->getTitle(),
             'parent' => $this->getParentId($task, $root),
-            'link' => $task->getLink()
+            'link' => $task->getLink(),
+            'isAdditionalPanelOpen' => false,
+            'isChildrenOpen' => false
         ];
     }
 

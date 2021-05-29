@@ -16,17 +16,4 @@
   .btn:last-child {
     margin-right: 0;
   }
-
-  .title {
-    margin: 10px 0;
-    background: transparent;
-    width: 100%;
-    border: none;
-    outline: none;
-  }
-
-  .title.changing {
-    background: lightyellow;
-    outline: 2px solid lightyellow;
-  }
 }
