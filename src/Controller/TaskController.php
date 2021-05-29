@@ -151,6 +151,9 @@ class TaskController extends AbstractController
         if ($this->applyTitleEdit($task, $request)) {
             $changed[] = 'title';
         }
+        if ($this->applyLinkEdit($task, $request)) {
+            $changed[] = 'link';
+        }
         $entityManager->flush();
         return new JsonResponse(['changed' => $changed]);
     }
@@ -176,6 +179,25 @@ class TaskController extends AbstractController
         $taskTitleEditLog->setUser($this->getUser());
         $taskTitleEditLog->setTitle($title);
         $this->getDoctrine()->getManager()->persist($taskTitleEditLog);
+        return true;
+    }
+
+    /**
+     * @param Task $task
+     * @param Request $request
+     * @return bool
+     */
+    private function applyLinkEdit(Task $task, Request $request): bool
+    {
+        if (!$request->request->has('link')) {
+            return false;
+        }
+        $link = $request->request->get('link');
+        if ($task->getLink() === $link) {
+            return false;
+        }
+        $task->setLink($link);
+        // todo: log
         return true;
     }
 

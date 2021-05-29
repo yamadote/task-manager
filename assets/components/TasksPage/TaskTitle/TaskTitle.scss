@@ -4,8 +4,8 @@
     height: 42px;
 
     .title {
-      padding: 3px 6px;
-      margin: 8px 2px;
+      padding: 3px 0;
+      margin: 10px 0;
       background: transparent;
       width: 100%;
       border: none;
@@ -13,7 +13,7 @@
     }
 
     .title.changing {
-      background: lightyellow;
+      background: var(--changing-color);
     }
 
     .title-link {

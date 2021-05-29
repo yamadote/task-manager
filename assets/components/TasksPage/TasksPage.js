@@ -42,7 +42,19 @@ const TaskPageHandlers = () => {
                     const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                     Helper.fetchJsonPost(url, {'title': title})
                         .then(() => setTitleChanging(false));
-                }, Config.updateTaskTitleTimeout);
+                }, Config.updateInputTimeout);
+            },
+            updateTaskLink: (id, link, setLinkChanging) => {
+                setLinkChanging(true);
+                events.updateTask(id, (task) => {
+                    task.link = link;
+                    return task;
+                });
+                Helper.addTimeout('task_link' + id, () => {
+                    const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                    Helper.fetchJsonPost(url, {'link': link})
+                        .then(() => setLinkChanging(false));
+                }, Config.updateInputTimeout);
             },
             updateTaskChildrenViewSetting: (id) => {
                 events.updateTask(id, (task) => {

@@ -2,7 +2,7 @@
 const Config = new function () {
     return {
         apiUrlPrefix: "/internal-api",
-        updateTaskTitleTimeout: 1200
+        updateInputTimeout: 1200
     }
 }
 

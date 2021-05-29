@@ -11,7 +11,7 @@ const TaskTitle = ({task, children, events}) => {
         const onChildrenViewButton = () => events.updateTaskChildrenViewSetting(task.id);
         const iconClassName = task.isChildrenOpen ? "oi oi-chevron-top" : "oi oi-chevron-bottom";
         return (
-            <button onClick={onChildrenViewButton} className='title-button'>
+            <button onClick={onChildrenViewButton} className='title-button mr-1'>
                 <span className={iconClassName}/>
             </button>
         );

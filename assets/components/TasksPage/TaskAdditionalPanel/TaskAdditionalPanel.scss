@@ -1,0 +1,31 @@
+
+.task {
+  .field {
+    margin: 8px 0;
+    display: flex;
+
+    span {
+      padding-top: 2px;
+      font-weight: 700;
+      font-size: .81rem;
+      margin-right: 5px;
+    }
+
+    input {
+      padding: 3px 0;
+      line-height: 14px;
+      border: none;
+      background: none;
+      outline: none;
+      width: 100%;
+    }
+
+    input.changing {
+      background: var(--changing-color);
+    }
+  }
+
+  .field:first-child {
+    margin-top: 0;
+  }
+}
