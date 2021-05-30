@@ -6,7 +6,7 @@
     .title {
       padding: 3px 0;
       margin: 10px .25rem 10px 0;
-      background: transparent;
+      background: none;
       width: 100%;
       border: none;
       outline: none;
@@ -14,6 +14,7 @@
 
     .title:focus, .title.changing {
       box-shadow: rgb(0 0 0 / 20%) 0 0 0 1px;
+      background: ghostwhite;
     }
 
     .title.changing {

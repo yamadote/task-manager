@@ -43,6 +43,7 @@
 
     input:focus, input.changing {
       box-shadow: rgb(0 0 0 / 20%) 0 0 0 1px;
+      background: ghostwhite;
     }
 
     input.changing {
