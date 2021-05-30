@@ -11,7 +11,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @Gedmo\Tree(type="nested")
- * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
 class Task
@@ -69,12 +68,6 @@ class Task
      * @var DateTimeInterface
      */
     private $updatedAt;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @var DateTimeInterface
-     */
-    private $deletedAt;
 
     /**
      * @Gedmo\TreeLeft
@@ -201,16 +194,6 @@ class Task
             return false;
         }
         return $this->reminder->getTimestamp() < (new DateTime())->getTimestamp();
-    }
-
-    public function getDeletedAt(): ?DateTimeInterface
-    {
-        return $this->deletedAt;
-    }
-
-    public function setDeletedAt(?DateTimeInterface $deletedAt): void
-    {
-        $this->deletedAt = $deletedAt;
     }
 
     /**
