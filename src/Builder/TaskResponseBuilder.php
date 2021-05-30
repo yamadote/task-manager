@@ -4,6 +4,9 @@ namespace App\Builder;
 
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
+use App\Entity\User;
+use App\Entity\UserTaskSettings;
+use App\Repository\UserTaskSettingsRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TaskResponseBuilder
@@ -11,29 +14,43 @@ class TaskResponseBuilder
     /** @var TaskStatusConfig */
     private $taskStatusConfig;
 
+    /** @var UserTaskSettingsRepository */
+    private $settingsRepository;
+
+    /** @var UserTaskSettingsBuilder */
+    private $settingsBuilder;
+
     /**
      * TaskResponseBuilder constructor.
      * @param TaskStatusConfig $taskStatusConfig
      */
-    public function __construct(TaskStatusConfig  $taskStatusConfig)
-    {
+    public function __construct(
+        TaskStatusConfig  $taskStatusConfig,
+        UserTaskSettingsRepository $settingsRepository,
+        UserTaskSettingsBuilder $settingsBuilder
+    ) {
         $this->taskStatusConfig = $taskStatusConfig;
+        $this->settingsRepository = $settingsRepository;
+        $this->settingsBuilder = $settingsBuilder;
     }
 
     /**
+     * @param User $user
      * @param iterable $tasks
      * @param Task $root
      * @return JsonResponse
      */
-    public function buildListResponse(iterable $tasks, Task $root): JsonResponse
+    public function buildListResponse(User $user, iterable $tasks, Task $root): JsonResponse
     {
+        $settings = $this->settingsRepository->findByTasks($tasks);
         $tasksResponse = [];
         /** @var Task $task */
         foreach ($tasks as $task) {
             if ($task->getParent() === null) {
                 continue;
             }
-            $tasksResponse[] = $this->buildTaskArrayResponse($task, $root);
+            $setting = $settings[$task->getId()] ?? $this->settingsBuilder->buildDefaultSettings($user, $task);
+            $tasksResponse[] = $this->buildTaskArrayResponse($task, $setting, $root);
         }
         $statusesResponse = [];
         foreach ($this->taskStatusConfig->getStatusList() as $status) {
@@ -51,20 +68,22 @@ class TaskResponseBuilder
 
     /**
      * @param Task $task
+     * @param UserTaskSettingsBuilder $userSettings
      * @param Task $root
      * @return JsonResponse
      */
-    public function buildTaskResponse(Task $task, Task $root): JsonResponse
+    public function buildTaskResponse(Task $task, UserTaskSettings $userSettings, Task $root): JsonResponse
     {
-        return new JsonResponse($this->buildTaskArrayResponse($task, $root));
+        return new JsonResponse($this->buildTaskArrayResponse($task, $userSettings, $root));
     }
 
     /**
      * @param Task $task
+     * @param UserTaskSettingsBuilder $userSettings
      * @param Task $root
      * @return array
      */
-    private function buildTaskArrayResponse(Task $task, Task $root): array
+    private function buildTaskArrayResponse(Task $task, UserTaskSettings $userSettings, Task $root): array
     {
         $reminder = $task->getReminder();
         $createdAt = $task->getCreatedAt();
@@ -76,8 +95,8 @@ class TaskResponseBuilder
             'reminder' => $reminder ? $reminder->getTimestamp() : null,
             'createdAt' => $createdAt ? $createdAt->getTimestamp() : null,
             'status' => $task->getStatus(),
-            'isAdditionalPanelOpen' => false,
-            'isChildrenOpen' => false
+            'isAdditionalPanelOpen' => $userSettings->getIsAdditionalPanelOpen(),
+            'isChildrenOpen' => $userSettings->getIsChildrenOpen()
         ];
     }
 

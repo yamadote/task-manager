@@ -93,12 +93,16 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     task.isChildrenOpen = value;
                     return task;
                 })
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
+                Helper.fetchJsonPost(url, {'isChildrenOpen': value}).then();
             },
             updateTaskAdditionalPanelViewSetting: (id, value) => {
                 events.updateTask(id, (task) => {
                     task.isAdditionalPanelOpen = value;
                     return task;
                 })
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
+                Helper.fetchJsonPost(url, {'isAdditionalPanelOpen': value}).then();
             }
         }
     }

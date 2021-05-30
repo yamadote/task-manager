@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Builder\TaskBuilder;
+use App\Builder\UserTaskSettingsBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Builder\TaskResponseBuilder;
+use App\Repository\UserTaskSettingsRepository;
 use DateTime;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -53,7 +55,7 @@ class TaskController extends AbstractController
     {
         $tasks = $this->taskRepository->findUserTasks($this->getUser());
         $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
+        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
     }
 
     /**
@@ -63,7 +65,7 @@ class TaskController extends AbstractController
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
         $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
+        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
     }
 
     /**
@@ -74,7 +76,7 @@ class TaskController extends AbstractController
         $statusList = $this->taskStatusConfig->getTodoStatusIds();
         $tasks = $this->taskRepository->findUserTasksByStatusList($this->getUser(), $statusList, true);
         $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
+        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
     }
 
     /**
@@ -90,13 +92,13 @@ class TaskController extends AbstractController
         $fullHierarchy = $status->getId() !== TaskStatusConfig::IN_PROGRESS_STATUS_ID;
         $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
         $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($tasks, $root);
+        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
     }
 
     /**
      * @Route("/new", name="app_api_task_new", methods={"POST"})
      */
-    public function new(Request $request): JsonResponse
+    public function new(Request $request, UserTaskSettingsBuilder $settingsBuilder): JsonResponse
     {
         $parent = $this->getParentFromRequest($request);
         if (null === $parent) {
@@ -105,13 +107,13 @@ class TaskController extends AbstractController
         if (!$parent->getUser()->equals($this->getUser())) {
             return $this->getPermissionDeniedResponse();
         }
-        // todo: implement status setting depending on page
         $root = $this->findRootTask([$parent]);
         $task = $this->taskBuilder->buildFromRequest($request, $this->getUser(), $parent);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($task);
         $entityManager->flush();
-        return $this->taskResponseBuilder->buildTaskResponse($task, $root);
+        $settings = $settingsBuilder->buildDefaultSettings($this->getUser(), $task);
+        return $this->taskResponseBuilder->buildTaskResponse($task, $settings, $root);
     }
 
     /**
@@ -143,6 +145,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}/edit", name="app_api_task_edit", methods={"POST"})
      * @throws Exception
+     * todo: refactor
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
@@ -150,7 +153,6 @@ class TaskController extends AbstractController
             return $this->getPermissionDeniedResponse();
         }
         $entityManager = $this->getDoctrine()->getManager();
-        // todo: refactor
         $changed = [];
         if ($request->request->has('title')) {
             $task->setTitle($request->request->get('title'));
@@ -176,6 +178,32 @@ class TaskController extends AbstractController
             $changed[] = 'status';
         }
         $entityManager->flush();
+        return new JsonResponse(['changed' => $changed]);
+    }
+
+    /**
+     * @Route("/{id}/edit/settings", name="app_api_task_edit", methods={"POST"})
+     * @throws Exception
+     * todo: refactor
+     */
+    public function editSettings(
+        Task $task,
+        Request $request,
+        UserTaskSettingsRepository $settingsRepository
+    ): JsonResponse {
+        $changed = [];
+        $setting = $settingsRepository->findByUserAndTask($this->getUser(), $task);
+        if ($request->request->has('isChildrenOpen')) {
+            $setting->setIsChildrenOpen($request->request->get('isChildrenOpen'));
+            $changed[] = 'isChildrenOpen';
+        }
+        if ($request->request->has('isAdditionalPanelOpen')) {
+            $setting->setIsAdditionalPanelOpen($request->request->get('isAdditionalPanelOpen'));
+            $changed[] = 'isAdditionalPanelOpen';
+        }
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($setting);
+        $manager->flush();
         return new JsonResponse(['changed' => $changed]);
     }
 
