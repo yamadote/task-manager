@@ -24,7 +24,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 setTasks(tasks => {
                     return tasks.map(task => {
                         if (task.id === id) {
-                            task = update(task);
+                            task = {...task, ...update};
                         }
                         return task;
                     });
@@ -36,10 +36,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     .then(task => {
                         setTasks(tasks => [task, ...tasks])
                         if (parent !== null) {
-                            events.updateTask(parent, (task) => {
-                                task.isChildrenOpen = true;
-                                return task;
-                            })
+                            events.updateTask(parent, {isChildrenOpen: true})
                         }
                     });
             },
@@ -53,10 +50,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             },
             updateTaskTitle: (id, title, setTitleChanging) => {
                 setTitleChanging(true);
-                events.updateTask(id, (task) => {
-                    task.title = title;
-                    return task;
-                });
+                events.updateTask(id, {title: title});
                 Helper.addTimeout('task_title' + id, () => {
                     const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                     Helper.fetchJsonPost(url, {'title': title})
@@ -65,10 +59,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             },
             updateTaskLink: (id, link, setLinkChanging) => {
                 setLinkChanging(true);
-                events.updateTask(id, (task) => {
-                    task.link = link;
-                    return task;
-                });
+                events.updateTask(id, {link: link});
                 Helper.addTimeout('task_link' + id, () => {
                     const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                     Helper.fetchJsonPost(url, {'link': link})
@@ -76,34 +67,22 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 }, Config.updateInputTimeout);
             },
             updateTaskReminder: (id, reminder) => {
-                events.updateTask(id, (task) => {
-                    task.reminder = reminder;
-                    return task;
-                });
+                events.updateTask(id, {reminder: reminder});
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                 Helper.fetchJsonPost(url, {'reminder': reminder}).then();
             },
             updateTaskStatus: (id, status) => {
-                events.updateTask(id, (task) => {
-                    task.status = status;
-                    return task;
-                });
+                events.updateTask(id, {status: status});
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
                 Helper.fetchJsonPost(url, {'status': status}).then();
             },
             updateTaskChildrenViewSetting: (id, value) => {
-                events.updateTask(id, (task) => {
-                    task.isChildrenOpen = value;
-                    return task;
-                })
+                events.updateTask(id, {isChildrenOpen: value})
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
                 Helper.fetchJsonPost(url, {'isChildrenOpen': value}).then();
             },
             updateTaskAdditionalPanelViewSetting: (id, value) => {
-                events.updateTask(id, (task) => {
-                    task.isAdditionalPanelOpen = value;
-                    return task;
-                })
+                events.updateTask(id, {isAdditionalPanelOpen: value})
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
                 Helper.fetchJsonPost(url, {'isAdditionalPanelOpen': value}).then();
             }

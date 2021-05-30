@@ -7,7 +7,7 @@ class TaskConfig
     private const NEW_TASK_TITLE = 'New task!';
     private const NEW_TASK_DEFAULT_STATUS = TaskStatusConfig::PENDING_STATUS_ID;
     private const ROOT_TASK_DEFAULT_STATUS = TaskStatusConfig::NONE_STATUS_ID;
-    private const ROOT_TASK_TITLE = "User root task!";
+    private const ROOT_TASK_TITLE = "";
 
     private const MINIMUM_TRACKED_TIME = 60;
 

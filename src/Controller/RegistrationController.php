@@ -23,6 +23,7 @@ class RegistrationController extends AbstractController
         GuardAuthenticatorHandler $guardHandler,
         LoginFormAuthenticator $authenticator
     ): Response {
+        // todo: implement email check
         throw $this->createNotFoundException();
 
         $user = new User();
