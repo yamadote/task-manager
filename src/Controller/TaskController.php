@@ -215,7 +215,11 @@ class TaskController extends AbstractController
 //        todo: stop period of task, maybe remove it also?
 //        todo: investigate adding csrf token validation
 //        $this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))
+        $children = $this->taskRepository->findChildren($task);
         $entityManager = $this->getDoctrine()->getManager();
+        foreach ($children as $child) {
+            $entityManager->remove($child);
+        }
         $entityManager->remove($task);
         $entityManager->flush();
         return new JsonResponse();
