@@ -3,7 +3,7 @@ import React from 'react';
 import {Link} from "react-router-dom";
 import './Navbar.scss';
 
-const Navbar = ({createNewTask}) => {
+const Navbar = ({events}) => {
     return (
         <nav className="navbar justify-content-between">
             <ul className="nav nav-tabs">
@@ -33,7 +33,7 @@ const Navbar = ({createNewTask}) => {
             </ul>
             <ul className="nav nav-tabs">
                 <li className="nav-item nav-item-new-task">
-                    <button className="nav-link" onClick={createNewTask}>New Task</button>
+                    <button className="nav-link" onClick={() => events.createNewTask()}>New Task</button>
                 </li>
                 <li className="nav-item">
                     <a href="/logout" className="nav-link">Logout</a>

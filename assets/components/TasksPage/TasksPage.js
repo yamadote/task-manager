@@ -1,13 +1,24 @@
 
 import React, {useEffect, useState} from 'react';
 import TaskList from './TaskList/TaskList'
-import {Route} from "react-router-dom";
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
+import Navbar from "./Navbar/Navbar";
 
-const TaskPageHandlers = () => {
+const TasksPage = ({fetchFrom, nested = true}) => {
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
+
+    useEffect(() => {
+        setTasks(undefined);
+        fetch(fetchFrom)
+            .then(response => response.json())
+            .then(response => {
+                setStatuses(response.statuses);
+                setTasks(response.tasks);
+            });
+    }, [fetchFrom]);
+
     const events = new function () {
         return {
             updateTask: (id, update) => {
@@ -22,20 +33,20 @@ const TaskPageHandlers = () => {
             },
             createNewTask: (parent = null) => {
                 const url = Config.apiUrlPrefix + '/tasks/new';
-                Helper.fetchJsonPost(url, {'parent': parent?.id})
+                Helper.fetchJsonPost(url, {'parent': parent})
                     .then(task => {
                         setTasks(tasks => [task, ...tasks])
                         if (parent !== null) {
-                            events.updateTaskChildrenViewSetting(parent.id, true);
+                            events.updateTaskChildrenViewSetting(parent, true);
                         }
                     });
             },
-            removeTask: (task) => {
-                const url = Config.apiUrlPrefix + '/tasks/' + task.id + '/delete';
+            removeTask: (id) => {
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/delete';
                 fetch(url, {method: 'POST'})
                     .then(() => {
                         // todo: remove task children
-                        setTasks(tasks => tasks.filter(i => i.id !== task.id))
+                        setTasks(tasks => tasks.filter(i => i.id !== id))
                     })
             },
             updateTaskTitle: (id, title, setTitleChanging) => {
@@ -84,42 +95,30 @@ const TaskPageHandlers = () => {
             }
         }
     }
-    const renderTaskPage = (path, fetchFrom, nested = true) => {
-        const init = (url) => {
-            setTasks(undefined);
-            fetch(url)
-                .then(response => response.json())
-                .then(response => {
-                    setStatuses(response.statuses);
-                    setTasks(response.tasks);
-                });
-        };
-        const data = {tasks: tasks, statuses: statuses, nested: nested}
-        return (
-            <Route path={path}>
-                <TasksPage data={data} init={init} fetchFrom={fetchFrom} events={events}/>
-            </Route>
-        )
-    }
-    return {renderTaskPage, events};
-}
 
-const TasksPage = ({data, init, fetchFrom, events}) => {
-    useEffect(() => init(fetchFrom), [fetchFrom]);
-    const {tasks, nested} = data;
-    if (tasks === undefined) {
-        return "loading ...";
-    }
-    if (tasks.length === 0) {
-        return "no records found";
-    }
-    const getChildren = (parent) => {
-        if (nested === false) {
-            return tasks;
+    const renderTaskList = () => {
+        if (tasks === undefined) {
+            return "loading ..."
         }
-        return tasks.filter(task => task.parent === parent);
+        if (tasks.length === 0) {
+            return "no records found";
+        }
+        const getChildren = (parent) => {
+            if (nested === false) {
+                return tasks;
+            }
+            return tasks.filter(task => task.parent === parent);
+        }
+        const data = {tasks: tasks, statuses: statuses, nested: nested};
+        return <TaskList data={data} children={getChildren(null)} events={events}/>;
     }
-    return <TaskList data={data} children={getChildren(null)} events={events}/>;
+
+    return (
+        <div>
+            <Navbar events={events} />
+            {renderTaskList()}
+        </div>
+    );
 }
 
-export default TaskPageHandlers;
+export default TasksPage;
