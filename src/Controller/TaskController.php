@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
-use App\Entity\TaskTitleEditLog;
 use App\Repository\TaskRepository;
 use App\Builder\TaskResponseBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -178,11 +177,6 @@ class TaskController extends AbstractController
             return false;
         }
         $task->setTitle($title);
-        $taskTitleEditLog = new TaskTitleEditLog();
-        $taskTitleEditLog->setTask($task);
-        $taskTitleEditLog->setUser($this->getUser());
-        $taskTitleEditLog->setTitle($title);
-        $this->getDoctrine()->getManager()->persist($taskTitleEditLog);
         return true;
     }
 
