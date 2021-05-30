@@ -36,7 +36,10 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     .then(task => {
                         setTasks(tasks => [task, ...tasks])
                         if (parent !== null) {
-                            events.updateTaskChildrenViewSetting(parent, true);
+                            events.updateTask(parent, (task) => {
+                                task.isChildrenOpen = true;
+                                return task;
+                            })
                         }
                     });
             },

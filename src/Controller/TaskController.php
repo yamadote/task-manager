@@ -36,16 +36,26 @@ class TaskController extends AbstractController
     /** @var TaskBuilder */
     private $taskBuilder;
 
+    /** @var UserTaskSettingsRepository */
+    private $userTaskSettingsRepository;
+
+    /** @var UserTaskSettingsBuilder */
+    private $userTaskSettingsBuilder;
+
     public function __construct(
         TaskRepository $taskRepository,
         TaskResponseBuilder $taskResponseBuilder,
         TaskStatusConfig $taskStatusConfig,
-        TaskBuilder $taskBuilder
+        TaskBuilder $taskBuilder,
+        UserTaskSettingsRepository $userTaskSettingsRepository,
+        UserTaskSettingsBuilder $userTaskSettingsBuilder
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskResponseBuilder = $taskResponseBuilder;
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskBuilder = $taskBuilder;
+        $this->userTaskSettingsRepository = $userTaskSettingsRepository;
+        $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
     }
 
     /**
@@ -98,21 +108,27 @@ class TaskController extends AbstractController
     /**
      * @Route("/new", name="app_api_task_new", methods={"POST"})
      */
-    public function new(Request $request, UserTaskSettingsBuilder $settingsBuilder): JsonResponse
+    public function new(Request $request): JsonResponse
     {
         $parent = $this->getParentFromRequest($request);
         if (null === $parent) {
             return new JsonResponse(['error' => 'Parent task not found.'], 400);
         }
-        if (!$parent->getUser()->equals($this->getUser())) {
+        $user = $this->getUser();
+        if (!$parent->getUser()->equals($user)) {
             return $this->getPermissionDeniedResponse();
         }
         $root = $this->findRootTask([$parent]);
-        $task = $this->taskBuilder->buildFromRequest($request, $this->getUser(), $parent);
+        $task = $this->taskBuilder->buildFromRequest($request, $user, $parent);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($task);
+
+        $parentSettings = $this->userTaskSettingsRepository->findByUserAndTask($user, $parent);
+        $parentSettings->setIsChildrenOpen(true);
+        $entityManager->persist($parentSettings);
+
         $entityManager->flush();
-        $settings = $settingsBuilder->buildDefaultSettings($this->getUser(), $task);
+        $settings = $this->userTaskSettingsBuilder->buildDefaultSettings($user, $task);
         return $this->taskResponseBuilder->buildTaskResponse($task, $settings, $root);
     }
 
@@ -152,33 +168,21 @@ class TaskController extends AbstractController
         if (!$task->getUser()->equals($this->getUser())) {
             return $this->getPermissionDeniedResponse();
         }
-        $entityManager = $this->getDoctrine()->getManager();
-        $changed = [];
         if ($request->request->has('title')) {
             $task->setTitle($request->request->get('title'));
-            $changed[] = 'title';
         }
         if ($request->request->has('link')) {
             $task->setLink($request->request->get('link'));
-            $changed[] = 'link';
         }
         if ($request->request->has('reminder')) {
             $reminder = $request->request->get('reminder');
-            if (null === $reminder) {
-                $task->setReminder(null);
-            } else {
-                $date = new DateTime();
-                $date->setTimestamp($request->request->get('reminder'));
-                $task->setReminder($date);
-            }
-            $changed[] = 'reminder';
+            $task->setReminder($reminder ? (new DateTime())->setTimestamp($reminder) : null);
         }
         if ($request->request->has('status')) {
             $task->setStatus($request->request->get('status'));
-            $changed[] = 'status';
         }
-        $entityManager->flush();
-        return new JsonResponse(['changed' => $changed]);
+        $this->getDoctrine()->getManager()->flush();
+        return new JsonResponse();
     }
 
     /**
@@ -186,30 +190,18 @@ class TaskController extends AbstractController
      * @throws Exception
      * todo: refactor
      */
-    public function editSettings(
-        Task $task,
-        Request $request,
-        UserTaskSettingsRepository $settingsRepository
-    ): JsonResponse {
-        $changed = [];
-        $setting = $settingsRepository->findByUserAndTask($this->getUser(), $task);
+    public function editSettings(Task $task, Request $request): JsonResponse {
+        $setting = $this->userTaskSettingsRepository->findByUserAndTask($this->getUser(), $task);
         if ($request->request->has('isChildrenOpen')) {
             $setting->setIsChildrenOpen($request->request->get('isChildrenOpen'));
-            $changed[] = 'isChildrenOpen';
         }
         if ($request->request->has('isAdditionalPanelOpen')) {
             $setting->setIsAdditionalPanelOpen($request->request->get('isAdditionalPanelOpen'));
-            $changed[] = 'isAdditionalPanelOpen';
         }
-        $manager = $this->getDoctrine()->getManager();
-        if (null === $setting->getId()) {
-            $manager->persist($setting);
-        }
-        if (!$setting->getIsChildrenOpen() && !$setting->getIsAdditionalPanelOpen()) {
-            $manager->remove($setting);
-        }
-        $manager->flush();
-        return new JsonResponse(['changed' => $changed]);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($setting);
+        $entityManager->flush();
+        return new JsonResponse();
     }
 
     /**
@@ -224,11 +216,7 @@ class TaskController extends AbstractController
 //        todo: investigate adding csrf token validation
 //        $this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))
         $entityManager = $this->getDoctrine()->getManager();
-        $children = $this->taskRepository->findChildren($task);
         $entityManager->remove($task);
-        foreach ($children as $child) {
-            $entityManager->remove($child);
-        }
         $entityManager->flush();
         return new JsonResponse();
     }
