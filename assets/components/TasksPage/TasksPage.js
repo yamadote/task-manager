@@ -73,6 +73,14 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                         .then(() => setLinkChanging(false));
                 }, Config.updateInputTimeout);
             },
+            updateTaskReminder: (id, reminder) => {
+                events.updateTask(id, (task) => {
+                    task.reminder = reminder;
+                    return task;
+                });
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                Helper.fetchJsonPost(url, {'reminder': reminder}).then();
+            },
             updateTaskStatus: (id, status) => {
                 events.updateTask(id, (task) => {
                     task.status = status;

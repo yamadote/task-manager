@@ -23,6 +23,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "moment": "^2.29.1",
         "react-router-dom": "^5.2.0"
     }
 }

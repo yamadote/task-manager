@@ -66,11 +66,13 @@ class TaskResponseBuilder
      */
     private function buildTaskArrayResponse(Task $task, Task $root): array
     {
+        $reminder = $task->getReminder();
         return [
             'id' => $task->getId(),
             'title' => $task->getTitle(),
             'parent' => $this->getParentId($task, $root),
             'link' => $task->getLink(),
+            'reminder' => $reminder ? $reminder->getTimestamp() : null,
             'status' => $task->getStatus(),
             'isAdditionalPanelOpen' => false,
             'isChildrenOpen' => false

@@ -7,6 +7,8 @@ use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Builder\TaskResponseBuilder;
+use DateTime;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,6 +142,7 @@ class TaskController extends AbstractController
 
     /**
      * @Route("/{id}/edit", name="app_api_task_edit", methods={"POST"})
+     * @throws Exception
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
@@ -149,71 +152,26 @@ class TaskController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         // todo: refactor
         $changed = [];
-        if ($this->applyTitleEdit($task, $request)) {
+        if ($request->request->has('title')) {
+            $task->setTitle($request->request->get('title'));
             $changed[] = 'title';
         }
-        if ($this->applyLinkEdit($task, $request)) {
+        if ($request->request->has('link')) {
+            $task->setLink($request->request->get('link'));
             $changed[] = 'link';
         }
-        if ($this->applyStatusEdit($task, $request)) {
+        if ($request->request->has('reminder')) {
+            $date = new DateTime();
+            $date->setTimestamp($request->request->get('reminder'));
+            $task->setReminder($date);
+            $changed[] = 'reminder';
+        }
+        if ($request->request->has('status')) {
+            $task->setStatus($request->request->get('status'));
             $changed[] = 'status';
         }
         $entityManager->flush();
         return new JsonResponse(['changed' => $changed]);
-    }
-
-    /**
-     * @param Task $task
-     * @param Request $request
-     * @return bool
-     */
-    private function applyTitleEdit(Task $task, Request $request): bool
-    {
-        if (!$request->request->has('title')) {
-            return false;
-        }
-        $title = $request->request->get('title');
-        if ($task->getTitle() === $title) {
-            return false;
-        }
-        $task->setTitle($title);
-        return true;
-    }
-
-    /**
-     * @param Task $task
-     * @param Request $request
-     * @return bool
-     */
-    private function applyLinkEdit(Task $task, Request $request): bool
-    {
-        if (!$request->request->has('link')) {
-            return false;
-        }
-        $link = $request->request->get('link');
-        if ($task->getLink() === $link) {
-            return false;
-        }
-        $task->setLink($link);
-        return true;
-    }
-
-    /**
-     * @param Task $task
-     * @param Request $request
-     * @return bool
-     */
-    private function applyStatusEdit(Task $task, Request $request): bool
-    {
-        if (!$request->request->has('status')) {
-            return false;
-        }
-        $status = $request->request->get('status');
-        if ($task->getStatus() === $status) {
-            return false;
-        }
-        $task->setStatus($status);
-        return true;
     }
 
     /**

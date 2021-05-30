@@ -5,6 +5,7 @@
   }
 
   .field {
+    height: 24px;
     margin: 2px 0;
     display: flex;
 
@@ -26,6 +27,13 @@
       width: 100%;
       line-height: 14px;
       padding: 3px 0;
+    }
+
+    input[type=datetime-local] {
+      width: 190px;
+      font-size: .81rem;
+      box-shadow: none;
+      color: black;
     }
 
     select {
