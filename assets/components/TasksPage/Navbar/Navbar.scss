@@ -2,6 +2,10 @@
   padding: 0;
   margin-bottom: 1rem;
 
+  button, button:hover, button:focus {
+    outline: none;
+  }
+
   .nav-tabs {
     border: none;
 
@@ -42,7 +46,6 @@
       background-color: #6c757d;
       button, button:hover, button:focus {
         background: transparent;
-        outline: none;
         color: white;
       }
     }

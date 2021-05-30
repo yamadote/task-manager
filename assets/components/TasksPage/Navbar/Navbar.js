@@ -32,6 +32,10 @@ const Navbar = ({events}) => {
                 </li>
             </ul>
             <ul className="nav nav-tabs">
+                <li className="nav-item">
+                    <button className="nav-link" onClick={() => events.reload()}>Reload</button>
+                </li>
+
                 <li className="nav-item nav-item-new-task">
                     <button className="nav-link" onClick={() => events.createNewTask()}>New Task</button>
                 </li>

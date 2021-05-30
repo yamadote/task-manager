@@ -9,18 +9,17 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
 
-    useEffect(() => {
-        setTasks(undefined);
-        fetch(fetchFrom)
-            .then(response => response.json())
-            .then(response => {
-                setStatuses(response.statuses);
-                setTasks(response.tasks);
-            });
-    }, [fetchFrom]);
-
     const events = new function () {
         return {
+            reload: () => {
+                setTasks(undefined);
+                fetch(fetchFrom)
+                    .then(response => response.json())
+                    .then(response => {
+                        setStatuses(response.statuses);
+                        setTasks(response.tasks);
+                    });
+            },
             updateTask: (id, update) => {
                 setTasks(tasks => {
                     return tasks.map(task => {
@@ -103,6 +102,8 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             }
         }
     }
+
+    useEffect(events.reload, [fetchFrom]);
 
     const renderTaskList = () => {
         if (tasks === undefined) {
