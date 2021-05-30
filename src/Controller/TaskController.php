@@ -182,7 +182,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit/settings", name="app_api_task_edit", methods={"POST"})
+     * @Route("/{id}/edit/settings", name="app_api_task_edit_settings", methods={"POST"})
      * @throws Exception
      * todo: refactor
      */
