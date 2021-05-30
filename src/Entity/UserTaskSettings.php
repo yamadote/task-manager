@@ -24,7 +24,7 @@ class UserTaskSettings
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="userSettings")
+     * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="usersSettings")
      * @ORM\JoinColumn(nullable=false)
      */
     private $task;

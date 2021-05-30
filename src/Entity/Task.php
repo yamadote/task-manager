@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -107,11 +108,27 @@ class Task
     private $parent;
 
     /**
-     * @ORM\OneToMany(targetEntity="Task", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="parent", cascade={"remove"})
      * @ORM\OrderBy({"lft" = "ASC"})
      * @var Collection|Task[]
      */
     private $children;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserTaskSettings::class, mappedBy="task", orphanRemoval=true)
+     */
+    private $usersSettings;
+
+    /**
+     * @ORM\OneToMany(targetEntity=TrackedPeriod::class, mappedBy="task", orphanRemoval=true)
+     */
+    private $trackedPeriods;
+
+    public function __construct()
+    {
+        $this->usersSettings = new ArrayCollection();
+        $this->trackedPeriods = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -299,5 +316,21 @@ class Task
     public function equals(Task $task): bool
     {
         return $this->id === $task->getId();
+    }
+
+    /**
+     * @return Collection|UserTaskSettings[]
+     */
+    public function getUsersSettings(): Collection
+    {
+        return $this->usersSettings;
+    }
+
+    /**
+     * @return Collection|TrackedPeriod[]
+     */
+    public function getTrackedPeriods(): Collection
+    {
+        return $this->trackedPeriods;
     }
 }

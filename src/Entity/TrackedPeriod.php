@@ -19,7 +19,7 @@ class TrackedPeriod
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Task::class)
+     * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="trackedPeriods")
      * @ORM\JoinColumn(nullable=false)
      */
     private $task;
