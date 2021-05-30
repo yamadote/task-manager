@@ -5,11 +5,15 @@
 
     .title {
       padding: 3px 0;
-      margin: 10px 0;
+      margin: 10px .25rem 10px 0;
       background: transparent;
       width: 100%;
       border: none;
       outline: none;
+    }
+
+    .title:focus, .title.changing {
+      box-shadow: rgb(0 0 0 / 20%) 0 0 0 1px;
     }
 
     .title.changing {
@@ -19,7 +23,7 @@
     .title-link {
       color: #000;
       width: 20px;
-      margin: 0 8px;
+      margin: 0 8px 0 4px;
       line-height: 42px;
       font-size: 16px;
     }
