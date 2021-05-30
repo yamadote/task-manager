@@ -134,7 +134,7 @@ class TaskController extends AbstractController
      */
     private function getParentFromRequest(Request $request): Task
     {
-        if (!$request->request->has('parent')) {
+        if (empty($request->request->get('parent'))) {
             return $this->taskRepository->findUserRootTask($this->getUser());
         }
         return $this->taskRepository->findOneBy(['id' => $request->request->get('parent')]);
