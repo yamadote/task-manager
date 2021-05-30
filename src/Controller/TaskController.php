@@ -161,9 +161,14 @@ class TaskController extends AbstractController
             $changed[] = 'link';
         }
         if ($request->request->has('reminder')) {
-            $date = new DateTime();
-            $date->setTimestamp($request->request->get('reminder'));
-            $task->setReminder($date);
+            $reminder = $request->request->get('reminder');
+            if (null === $reminder) {
+                $task->setReminder(null);
+            } else {
+                $date = new DateTime();
+                $date->setTimestamp($request->request->get('reminder'));
+                $task->setReminder($date);
+            }
             $changed[] = 'reminder';
         }
         if ($request->request->has('status')) {
