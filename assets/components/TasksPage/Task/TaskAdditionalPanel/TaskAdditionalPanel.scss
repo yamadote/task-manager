@@ -49,4 +49,12 @@
   .field:first-child {
     margin-top: -4px;
   }
+
+  .created-at {
+    float: right;
+    font-size: .75rem;
+    line-height: 18px;
+    margin-right: 8px;
+    margin-top: 12px;
+  }
 }
