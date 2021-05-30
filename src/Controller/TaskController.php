@@ -202,7 +202,12 @@ class TaskController extends AbstractController
             $changed[] = 'isAdditionalPanelOpen';
         }
         $manager = $this->getDoctrine()->getManager();
-        $manager->persist($setting);
+        if (null === $setting->getId()) {
+            $manager->persist($setting);
+        }
+        if (!$setting->getIsChildrenOpen() && !$setting->getIsAdditionalPanelOpen()) {
+            $manager->remove($setting);
+        }
         $manager->flush();
         return new JsonResponse(['changed' => $changed]);
     }
