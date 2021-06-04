@@ -22,6 +22,10 @@ class IndexController extends AbstractController
      * @Route("/tasks", name="app_task_index", methods={"GET"})
      * @Route("/tasks/todo", name="app_task_todo", methods={"GET"})
      * @Route("/tasks/reminders", name="app_task_reminders", methods={"GET"})
+     * @Route("/{parent}", name="app_parent_index", methods={"GET"}, requirements={"parent"="\d+"})
+     * @Route("/{parent}/tasks", name="app_parent_task_index", methods={"GET"}, requirements={"parent"="\d+"})
+     * @Route("/{parent}/tasks/todo", name="app_parent_task_todo", methods={"GET"}, requirements={"parent"="\d+"})
+     * @Route("/{parent}/tasks/reminders", name="app_parent_task_reminders", methods={"GET"}, requirements={"parent"="\d+"})
      * @IsGranted("ROLE_USER")
      */
     public function index(): Response
@@ -31,6 +35,7 @@ class IndexController extends AbstractController
 
     /**
      * @Route("/tasks/status/{status}", name="app_task_status", methods={"GET"})
+     * @Route("/{parent}/tasks/status/{status}", name="app_parent_task_status", methods={"GET"}, requirements={"parent"="\d+"})
      * @IsGranted("ROLE_USER")
      */
     public function status(String $status): Response

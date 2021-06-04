@@ -17,6 +17,11 @@
       font-size: .81rem;
     }
 
+    .nav-link {
+      padding-right: 0.75rem !important;
+      padding-top: 0.35rem !important;
+    }
+
     .nav-item:last-child {
       margin-right: 0;
     }
@@ -28,6 +33,14 @@
     .nav-item.show .nav-link, .nav-link.active {
       background: transparent;
       color: black;
+    }
+
+    .nav-item-all {
+      background: #6c757d;
+
+      a, a:hover {
+        color: white;
+      }
     }
 
     .nav-item-todo {

@@ -2,16 +2,13 @@
 
 namespace App\Repository;
 
-use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use DateTime;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Tree\TreeListener;
-use RuntimeException;
 
 /**
  * @method Task|null find($id, $lockMode = null, $lockVersion = null)
