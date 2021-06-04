@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Builder\TaskBuilder;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
