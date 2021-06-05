@@ -1,5 +1,5 @@
 
-import React, {useEffect, useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
@@ -108,8 +108,8 @@ const TasksPage = ({fetchFrom, nested = true}) => {
         }
     }
 
-    useEffect(events.reload, [fetchFrom]);
-    useEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
+    useLayoutEffect(events.reload, [fetchFrom]);
+    useLayoutEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
 
     return (
         <div>
