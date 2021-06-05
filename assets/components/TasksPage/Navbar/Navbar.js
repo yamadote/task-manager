@@ -41,7 +41,7 @@ const Navbar = ({events, root, tasks}) => {
                     <button className="nav-link" onClick={() => events.reload()}>Reload</button>
                 </li>
                 <li className="nav-item nav-item-new-task">
-                    <button className="nav-link" onClick={() => events.createNewTask(parent)}>New Task</button>
+                    <button className="nav-link" onClick={() => events.createNewTask(root)}>New Task</button>
                 </li>
                 <li className="nav-item">
                     <a href="/logout" className="nav-link">Logout</a>
