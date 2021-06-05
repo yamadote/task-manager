@@ -2,9 +2,10 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import './Navbar.scss';
+import NavbarRootPanel from "./NavbarRootPanel/NavbarRootPanel";
 
-const Navbar = ({events, parent}) => {
-    const prefix = parent === null ? '' : '/' + parent;
+const Navbar = ({events, root, tasks}) => {
+    const prefix = root === null ? '' : '/' + root;
     return (
         <nav className="navbar justify-content-between">
             <ul className="nav nav-tabs">
@@ -35,11 +36,7 @@ const Navbar = ({events, parent}) => {
                 </li>
             </ul>
             <ul className="nav nav-tabs">
-                { parent ? (
-                    <li className="nav-item">
-                        <Link to="/tasks" className="nav-link">Back</Link>
-                    </li>
-                ) : null }
+                { root ? <NavbarRootPanel root={root} tasks={tasks}/> : null }
                 <li className="nav-item">
                     <button className="nav-link" onClick={() => events.reload()}>Reload</button>
                 </li>

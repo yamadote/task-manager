@@ -6,11 +6,14 @@ import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 import Navbar from "./Navbar/Navbar";
 
-const TasksPage = ({fetchFrom, nested = true}) => {
+const getRootParam = () => {
     const params = useParams();
     const isInteger = new RegExp('^[0-9]+$');
-    const parent = params.parent && params.parent.match(isInteger) ? parseInt(params.parent) : null;
+    return params.root && params.root.match(isInteger) ? parseInt(params.root) : null;
+}
 
+const TasksPage = ({fetchFrom, nested = true}) => {
+    const root = getRootParam();
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
 
@@ -110,12 +113,12 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             return tasks.filter(task => task.parent === parent);
         }
         const data = {tasks: tasks, statuses: statuses, nested: nested};
-        return <TaskList data={data} children={getChildren(parent)} events={events}/>;
+        return <TaskList data={data} children={getChildren(root)} events={events}/>;
     }
 
     return (
         <div>
-            <Navbar events={events} parent={parent} />
+            <Navbar events={events} root={root} tasks={tasks} />
             {renderTaskList()}
         </div>
     );
