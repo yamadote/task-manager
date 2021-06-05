@@ -7,9 +7,6 @@ const TaskListWrapper = ({data, events}) => {
     if (tasks === undefined) {
         return "loading ..."
     }
-    if (tasks.length === 0) {
-        return "no records found";
-    }
     const getChildren = () => {
         if (nested === false) {
             return tasks;
@@ -17,7 +14,11 @@ const TaskListWrapper = ({data, events}) => {
         const rootId = root?.id || null;
         return tasks.filter(task => task.parent === rootId);
     }
-    return <TaskList children={getChildren()} data={data} events={events}/>;
+    const children = getChildren();
+    if (children.length === 0) {
+        return "no records found";
+    }
+    return <TaskList children={children} data={data} events={events}/>;
 }
 
 export default TaskListWrapper;
