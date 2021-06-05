@@ -9,10 +9,7 @@ import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
 const TasksPage = ({fetchFrom, nested = true}) => {
 
     const findRootTask = (params, tasks, oldRootTask) => {
-        if (!params.root) {
-            return null;
-        }
-        if (!params.root.match(new RegExp('^[0-9]+$'))) {
+        if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
             return null;
         }
         const id = parseInt(params.root);
