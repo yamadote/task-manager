@@ -1,19 +1,30 @@
 
 import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import TaskList from './TaskList/TaskList'
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 import Navbar from "./Navbar/Navbar";
-
-const getRootParam = () => {
-    const params = useParams();
-    const isInteger = new RegExp('^[0-9]+$');
-    return params.root && params.root.match(isInteger) ? parseInt(params.root) : null;
-}
+import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
 
 const TasksPage = ({fetchFrom, nested = true}) => {
-    const root = getRootParam();
+
+    const findRootTask = (params, tasks, oldRootTask) => {
+        if (!params.root) {
+            return null;
+        }
+        if (!params.root.match(new RegExp('^[0-9]+$'))) {
+            return null;
+        }
+        const id = parseInt(params.root);
+        return {
+            id: id,
+            ...oldRootTask,
+            ...tasks?.find(task => task.id === id)
+        };
+    }
+
+    const params = useParams();
+    const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
 
@@ -21,11 +32,11 @@ const TasksPage = ({fetchFrom, nested = true}) => {
         return {
             reload: () => {
                 setTasks(undefined);
-                fetch(fetchFrom)
-                    .then(response => response.json())
+                Helper.fetchJson(fetchFrom)
                     .then(response => {
                         setStatuses(response.statuses);
                         setTasks(response.tasks);
+                        setRoot(findRootTask(params, response.tasks, root));
                     });
             },
             updateTask: (id, update) => {
@@ -98,28 +109,17 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     }
 
     useEffect(events.reload, [fetchFrom]);
-
-    const renderTaskList = () => {
-        if (tasks === undefined) {
-            return "loading ..."
-        }
-        if (tasks.length === 0) {
-            return "no records found";
-        }
-        const getChildren = (parent) => {
-            if (nested === false) {
-                return tasks;
-            }
-            return tasks.filter(task => task.parent === parent);
-        }
-        const data = {tasks: tasks, statuses: statuses, nested: nested};
-        return <TaskList data={data} children={getChildren(root)} events={events}/>;
-    }
+    useEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
 
     return (
         <div>
-            <Navbar events={events} root={root} tasks={tasks} />
-            {renderTaskList()}
+            <Navbar events={events} root={root}/>
+            <TaskListWrapper data={{
+                root: root,
+                tasks: tasks,
+                statuses: statuses,
+                nested: nested
+            }} events={events} />
         </div>
     );
 }

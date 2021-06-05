@@ -4,8 +4,8 @@ import {Link} from "react-router-dom";
 import './Navbar.scss';
 import NavbarRootPanel from "./NavbarRootPanel/NavbarRootPanel";
 
-const Navbar = ({events, root, tasks}) => {
-    const prefix = root === null ? '' : '/' + root;
+const Navbar = ({events, root}) => {
+    const prefix = root === null ? '' : '/' + root.id;
     return (
         <nav className="navbar justify-content-between">
             <ul className="nav nav-tabs">
@@ -36,12 +36,12 @@ const Navbar = ({events, root, tasks}) => {
                 </li>
             </ul>
             <ul className="nav nav-tabs">
-                { root ? <NavbarRootPanel root={root} tasks={tasks}/> : null }
+                { root ? <NavbarRootPanel root={root}/> : null }
                 <li className="nav-item">
                     <button className="nav-link" onClick={() => events.reload()}>Reload</button>
                 </li>
                 <li className="nav-item nav-item-new-task">
-                    <button className="nav-link" onClick={() => events.createNewTask(root)}>New Task</button>
+                    <button className="nav-link" onClick={() => events.createNewTask(root?.id)}>New Task</button>
                 </li>
                 <li className="nav-item">
                     <a href="/logout" className="nav-link">Logout</a>

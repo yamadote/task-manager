@@ -15,7 +15,7 @@ const Task = ({task, data, events}) => {
             <TaskStatusBadge task={task} statuses={statuses}/>
             <TaskHeader task={task} children={children} events={events}/>
             { task.isAdditionalPanelOpen ? <TaskAdditionalPanel task={task} statuses={statuses} events={events}/> : null }
-            { showChildren ? <TaskList data={data} children={children} events={events} /> : null}
+            { showChildren ? <TaskList children={children} data={data} events={events} /> : null}
         </div>
     )
 }
