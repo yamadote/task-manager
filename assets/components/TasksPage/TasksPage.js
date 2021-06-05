@@ -60,6 +60,10 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     });
             },
             removeTask: (id) => {
+                const task = tasks.find(task => task.id === id);
+                if (!confirm("Are you sure, you want to remove '" + task.title + "'?")) {
+                    return;
+                }
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/delete';
                 fetch(url, {method: 'POST'})
                     .then(() => {
