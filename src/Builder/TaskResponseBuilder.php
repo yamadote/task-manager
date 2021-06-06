@@ -4,8 +4,11 @@ namespace App\Builder;
 
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
+use App\Entity\TaskStatus;
+use App\Entity\TrackedPeriod;
 use App\Entity\User;
 use App\Entity\UserTaskSettings;
+use App\Repository\TrackedPeriodRepository;
 use App\Repository\UserTaskSettingsRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -20,6 +23,9 @@ class TaskResponseBuilder
     /** @var UserTaskSettingsBuilder */
     private $settingsBuilder;
 
+    /** @var TrackedPeriodRepository */
+    private $trackedPeriodRepository;
+
     /**
      * TaskResponseBuilder constructor.
      * @param TaskStatusConfig $taskStatusConfig
@@ -27,11 +33,13 @@ class TaskResponseBuilder
     public function __construct(
         TaskStatusConfig  $taskStatusConfig,
         UserTaskSettingsRepository $settingsRepository,
-        UserTaskSettingsBuilder $settingsBuilder
+        UserTaskSettingsBuilder $settingsBuilder,
+        TrackedPeriodRepository $trackedPeriodRepository
     ) {
         $this->taskStatusConfig = $taskStatusConfig;
         $this->settingsRepository = $settingsRepository;
         $this->settingsBuilder = $settingsBuilder;
+        $this->trackedPeriodRepository = $trackedPeriodRepository;
     }
 
     /**
@@ -54,15 +62,13 @@ class TaskResponseBuilder
         }
         $statusesResponse = [];
         foreach ($this->taskStatusConfig->getStatusList() as $status) {
-            $statusesResponse[] = [
-                'id' => $status->getId(),
-                'title' => $status->getTitle(),
-                'color' => $status->getColor()
-            ];
+            $statusesResponse[] = $this->buildStatusArrayResponse($status);
         }
+        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
         return new JsonResponse([
             'statuses' => $statusesResponse,
-            'tasks' => $tasksResponse
+            'tasks' => $tasksResponse,
+            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null
         ]);
     }
 
@@ -114,5 +120,30 @@ class TaskResponseBuilder
             return null;
         }
         return $task->getParent()->getId();
+    }
+
+    /**
+     * @param TaskStatus $status
+     * @return array
+     */
+    private function buildStatusArrayResponse(TaskStatus $status): array
+    {
+        return [
+            'id' => $status->getId(),
+            'title' => $status->getTitle(),
+            'color' => $status->getColor()
+        ];
+    }
+
+    /**
+     * @param TrackedPeriod $activePeriod
+     * @return array
+     */
+    private function buildActivePeriodResponse(TrackedPeriod $activePeriod): array
+    {
+        return [
+            'task' => $activePeriod->getTask()->getId(),
+            'startedAt' => $activePeriod->getStartedAt()->getTimestamp()
+        ];
     }
 }

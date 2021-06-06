@@ -25,7 +25,7 @@ class TrackedPeriodRepository extends ServiceEntityRepository
      * @param User $user
      * @return TrackedPeriod|null
      */
-    public function getActivePeriod(User $user): ?TrackedPeriod
+    public function findActivePeriod(User $user): ?TrackedPeriod
     {
         return $this->findOneBy(['user' => $user, 'finishedAt' => null]);
     }

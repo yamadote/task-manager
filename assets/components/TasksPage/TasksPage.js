@@ -5,6 +5,7 @@ import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 import Navbar from "./Navbar/Navbar";
 import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
+import moment from "moment";
 
 const TasksPage = ({fetchFrom, nested = true}) => {
 
@@ -24,6 +25,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
+    const [activeTask, setActiveTask] = useState(undefined);
 
     const events = new function () {
         return {
@@ -34,6 +36,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                         setStatuses(response.statuses);
                         setTasks(response.tasks);
                         setRoot(findRootTask(params, response.tasks, root));
+                        setActiveTask(response.activeTask);
                     });
             },
             updateTask: (id, update) => {
@@ -58,11 +61,16 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             },
             startTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/start';
-                Helper.fetchJsonPost(url);
+                Helper.fetchJsonPost(url)
+                    .then(() => setActiveTask({
+                        task: id,
+                        startedAt: moment().unix()
+                    }));
             },
             finishTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/finish';
-                Helper.fetchJsonPost(url);
+                Helper.fetchJsonPost(url)
+                    .then(() => setActiveTask(undefined));
             },
             removeTask: (id) => {
                 const task = tasks.find(task => task.id === id);
@@ -126,6 +134,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             <TaskListWrapper data={{
                 root: root,
                 tasks: tasks,
+                activeTask: activeTask,
                 statuses: statuses,
                 nested: nested
             }} events={events} />
