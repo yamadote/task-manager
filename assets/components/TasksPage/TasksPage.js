@@ -56,6 +56,14 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                         }
                     });
             },
+            startTask: (id) => {
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/start';
+                Helper.fetchJsonPost(url);
+            },
+            finishTask: (id) => {
+                const url = Config.apiUrlPrefix + '/tasks/' + id + '/finish';
+                Helper.fetchJsonPost(url);
+            },
             removeTask: (id) => {
                 const task = tasks.find(task => task.id === id);
                 if (!confirm("Are you sure, you want to remove '" + task.title + "'?")) {
