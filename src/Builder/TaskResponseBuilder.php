@@ -2,6 +2,7 @@
 
 namespace App\Builder;
 
+use App\Config\TaskConfig;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\TaskStatus;
@@ -14,6 +15,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TaskResponseBuilder
 {
+    /** @var TaskConfig */
+    private $taskConfig;
+
     /** @var TaskStatusConfig */
     private $taskStatusConfig;
 
@@ -28,14 +32,20 @@ class TaskResponseBuilder
 
     /**
      * TaskResponseBuilder constructor.
+     * @param TaskConfig $taskConfig
      * @param TaskStatusConfig $taskStatusConfig
+     * @param UserTaskSettingsRepository $settingsRepository
+     * @param UserTaskSettingsBuilder $settingsBuilder
+     * @param TrackedPeriodRepository $trackedPeriodRepository
      */
     public function __construct(
+        TaskConfig $taskConfig,
         TaskStatusConfig  $taskStatusConfig,
         UserTaskSettingsRepository $settingsRepository,
         UserTaskSettingsBuilder $settingsBuilder,
         TrackedPeriodRepository $trackedPeriodRepository
     ) {
+        $this->taskConfig = $taskConfig;
         $this->taskStatusConfig = $taskStatusConfig;
         $this->settingsRepository = $settingsRepository;
         $this->settingsBuilder = $settingsBuilder;
@@ -68,7 +78,11 @@ class TaskResponseBuilder
         return new JsonResponse([
             'statuses' => $statusesResponse,
             'tasks' => $tasksResponse,
-            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null
+            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null,
+            'trackingStatus' => [
+                'start' => $this->taskConfig->getStartTaskStatus(),
+                'finish' => $this->taskConfig->getFinishTaskStatus()
+            ]
         ]);
     }
 

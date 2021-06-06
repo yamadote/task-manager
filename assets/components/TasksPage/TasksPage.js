@@ -24,6 +24,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     const params = useParams();
     const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
+    const [trackingStatus, setTrackingStatus] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
     const [activeTask, setActiveTask] = useState(undefined);
 
@@ -35,6 +36,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     .then(response => {
                         setStatuses(response.statuses);
                         setTasks(response.tasks);
+                        setTrackingStatus(response.trackingStatus)
                         setRoot(findRootTask(params, response.tasks, root));
                         setActiveTask(response.activeTask);
                     });
@@ -62,15 +64,34 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             startTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/start';
                 Helper.fetchJsonPost(url)
-                    .then(() => setActiveTask({
-                        task: id,
-                        startedAt: moment().unix()
-                    }));
+                    .then(() => {
+                        setTasks(tasks => tasks.map(task => {
+                            if (task.id === id) {
+                                task.status = trackingStatus.start;
+                            }
+                            if (activeTask && activeTask.task === task.id) {
+                                task.status = trackingStatus.finish;
+                            }
+                            return task;
+                        }));
+                        setActiveTask({
+                            task: id,
+                            startedAt: moment().unix()
+                        });
+                    });
             },
             finishTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/finish';
                 Helper.fetchJsonPost(url)
-                    .then(() => setActiveTask(undefined));
+                    .then(() => {
+                        setTasks(tasks => tasks.map(task => {
+                            if (task.id === id) {
+                                task.status = trackingStatus.finish;
+                            }
+                            return task;
+                        }));
+                        setActiveTask(undefined)
+                    });
             },
             removeTask: (id) => {
                 const task = tasks.find(task => task.id === id);
