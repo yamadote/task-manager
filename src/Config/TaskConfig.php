@@ -50,4 +50,20 @@ class TaskConfig
     {
         return self::MINIMUM_TRACKED_TIME;
     }
+
+    /**
+     * @return int
+     */
+    public function getStartTaskStatus(): int
+    {
+        return TaskStatusConfig::IN_PROGRESS_STATUS_ID;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFinishTaskStatus(): int
+    {
+        return TaskStatusConfig::PENDING_STATUS_ID;
+    }
 }
