@@ -9,6 +9,10 @@
       margin-right: 18px;
       margin-top: 8px;
       font-size: 15px;
+      max-width: 400px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 }
