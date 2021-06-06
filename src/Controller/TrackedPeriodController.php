@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * @Route("internal-api/tasks")
  * @IsGranted("ROLE_USER")
  */
-class TrackingPeriodController extends AbstractController
+class TrackedPeriodController extends AbstractController
 {
     /** @var TrackedPeriodRepository */
     private $trackedPeriodRepository;
@@ -73,7 +73,7 @@ class TrackingPeriodController extends AbstractController
      */
     public function finish(Task $task): JsonResponse
     {
-        $activePeriod = $this->trackedPeriodRepository->getActivePeriod($this->getUser());
+        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
         if (is_null($activePeriod) || !$activePeriod->getTask()->equals($task)) {
             // todo: error message
             return new JsonResponse();
@@ -89,11 +89,11 @@ class TrackingPeriodController extends AbstractController
     private function finishPeriod(TrackedPeriod $period): void
     {
         $entityManager = $this->getDoctrine()->getManager();
-        if (!$this->hasMinimumTrackedTime($period)) {
-            $entityManager->remove($period);
-        } else {
+//        if (!$this->hasMinimumTrackedTime($period)) {
+//            $entityManager->remove($period);
+//        } else {
             $period->setFinishedAt(new DateTime());
-        }
+//        }
         $entityManager->flush();
     }
 
