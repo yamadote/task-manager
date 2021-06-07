@@ -43,13 +43,17 @@ class TaskController extends AbstractController
     /** @var UserTaskSettingsBuilder */
     private $userTaskSettingsBuilder;
 
+    /** @var TrackedPeriodRepository */
+    private $trackedPeriodRepository;
+
     public function __construct(
         TaskRepository $taskRepository,
         TaskResponseBuilder $taskResponseBuilder,
         TaskStatusConfig $taskStatusConfig,
         TaskBuilder $taskBuilder,
         UserTaskSettingsRepository $userTaskSettingsRepository,
-        UserTaskSettingsBuilder $userTaskSettingsBuilder
+        UserTaskSettingsBuilder $userTaskSettingsBuilder,
+        TrackedPeriodRepository $trackedPeriodRepository
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskResponseBuilder = $taskResponseBuilder;
@@ -57,6 +61,7 @@ class TaskController extends AbstractController
         $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
+        $this->trackedPeriodRepository = $trackedPeriodRepository;
     }
 
     /**
@@ -93,7 +98,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/status/{status}", name="app_api_task_status", methods={"GET"})
      */
-    public function status(Request $request, TrackedPeriodRepository $trackedPeriodRepository): JsonResponse
+    public function status(Request $request): JsonResponse
     {
         $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
@@ -102,17 +107,39 @@ class TaskController extends AbstractController
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
         $isProgressStatus = $status->getId() === TaskStatusConfig::IN_PROGRESS_STATUS_ID;
         $fullHierarchy = !$isProgressStatus;
+
         $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
         $root = $this->findRootTask($tasks);
 
         if ($isProgressStatus) {
-            $activePeriod = $trackedPeriodRepository->findActivePeriod($this->getUser());
-            if (null !== $activePeriod) {
-                $tasks[] = $activePeriod->getTask();
-            }
+            $tasks = $this->addActiveTask($tasks);
         }
 
         return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @return Task[]
+     */
+    private function addActiveTask(array $tasks): array
+    {
+        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
+        if (null === $activePeriod) {
+            return $tasks;
+        }
+        $hasTask = false;
+        $activeTask = $activePeriod->getTask();
+        foreach ($tasks as $task) {
+            if ($task->equals($activeTask)) {
+                $hasTask = true;
+                break;
+            }
+        }
+        if (!$hasTask) {
+            $tasks[] = $activeTask;
+        }
+        return $tasks;
     }
 
     /**
