@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import './Navbar.scss';
 import NavbarRootPanel from "./NavbarRootPanel/NavbarRootPanel";
 
@@ -13,13 +13,19 @@ const Navbar = ({events, root}) => {
                     <Link to={prefix + "/tasks"} className="nav-link">All</Link>
                 </li>
                 <li className="nav-item nav-item-todo">
-                    <Link to={prefix + "/tasks/todo"} className="nav-link">Todo</Link>
+                    <NavLink to={prefix + "/tasks/todo"}
+                             className="nav-link"
+                             activeClassName="nav-link active-tab">Todo</NavLink>
                 </li>
                 <li className="nav-item nav-item-reminders">
-                    <Link to={prefix + "/tasks/reminders"} className="nav-link">Reminders</Link>
+                    <NavLink to={prefix + "/tasks/reminders"}
+                             className="nav-link"
+                             activeClassName="nav-link active-tab">Reminders</NavLink>
                 </li>
                 <li className="nav-item nav-item-progress">
-                    <Link to={prefix + "/tasks/status/progress"} className="nav-link">In Progress</Link>
+                    <NavLink to={prefix + "/tasks/status/progress"}
+                             className="nav-link"
+                             activeClassName="nav-link active-tab">In Progress</NavLink>
                 </li>
                 <li className="nav-item dropdown nav-item-tasks">
                     <a className="nav-link dropdown-toggle"
