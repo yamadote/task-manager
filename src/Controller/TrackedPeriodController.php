@@ -47,14 +47,12 @@ class TrackedPeriodController extends AbstractController
                 // todo: add error message: you can't start active task
                 return new JsonResponse();
             }
-            $lastPeriod->getTask()->setStatus($this->taskConfig->getFinishTaskStatus());
             $this->finishPeriod($lastPeriod);
         }
         $entityManager = $this->getDoctrine()->getManager();
         // todo: check case when removed active period is the last
         if (!is_null($lastPeriod) && $this->canContinuePeriod($task, $lastPeriod)) {
             $lastPeriod->setFinishedAt(null);
-            $task->setStatus($this->taskConfig->getStartTaskStatus());
             $entityManager->flush();
             // todo: success message
             return new JsonResponse();
@@ -63,7 +61,6 @@ class TrackedPeriodController extends AbstractController
         $period->setUser($this->getUser());
         $period->setStartedAt(new DateTime());
         $period->setTask($task);
-        $task->setStatus($this->taskConfig->getStartTaskStatus());
         $entityManager->persist($period);
         $entityManager->flush();
         // todo: success message
@@ -80,7 +77,6 @@ class TrackedPeriodController extends AbstractController
             // todo: error message
             return new JsonResponse();
         }
-        $task->setStatus($this->taskConfig->getFinishTaskStatus());
         $this->finishPeriod($activePeriod);
         $this->getDoctrine()->getManager()->flush();
         // todo: success message

@@ -8,6 +8,7 @@ use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Builder\TaskResponseBuilder;
+use App\Repository\TrackedPeriodRepository;
 use App\Repository\UserTaskSettingsRepository;
 use DateTime;
 use Exception;
@@ -92,16 +93,25 @@ class TaskController extends AbstractController
     /**
      * @Route("/status/{status}", name="app_api_task_status", methods={"GET"})
      */
-    public function status(Request $request): JsonResponse
+    public function status(Request $request, TrackedPeriodRepository $trackedPeriodRepository): JsonResponse
     {
         $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
             return new JsonResponse(null, 400);
         }
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
-        $fullHierarchy = $status->getId() !== TaskStatusConfig::IN_PROGRESS_STATUS_ID;
+        $isProgressStatus = $status->getId() === TaskStatusConfig::IN_PROGRESS_STATUS_ID;
+        $fullHierarchy = !$isProgressStatus;
         $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
         $root = $this->findRootTask($tasks);
+
+        if ($isProgressStatus) {
+            $activePeriod = $trackedPeriodRepository->findActivePeriod($this->getUser());
+            if (null !== $activePeriod) {
+                $tasks[] = $activePeriod->getTask();
+            }
+        }
+
         return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
     }
 

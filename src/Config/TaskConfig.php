@@ -54,16 +54,8 @@ class TaskConfig
     /**
      * @return int
      */
-    public function getStartTaskStatus(): int
+    public function getActiveTaskStatus(): int
     {
         return TaskStatusConfig::IN_PROGRESS_STATUS_ID;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFinishTaskStatus(): int
-    {
-        return TaskStatusConfig::PENDING_STATUS_ID;
     }
 }

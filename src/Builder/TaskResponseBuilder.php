@@ -79,10 +79,7 @@ class TaskResponseBuilder
             'statuses' => $statusesResponse,
             'tasks' => $tasksResponse,
             'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null,
-            'trackingStatus' => [
-                'start' => $this->taskConfig->getStartTaskStatus(),
-                'finish' => $this->taskConfig->getFinishTaskStatus()
-            ]
+            'activeTaskStatus' => $this->taskConfig->getActiveTaskStatus()
         ]);
     }
 
