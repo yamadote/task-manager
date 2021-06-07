@@ -26,7 +26,6 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
     const [activeTask, setActiveTask] = useState(undefined);
-    const [activeTaskStatus, setActiveTaskStatus] = useState(undefined);
 
     const events = new function () {
         return {
@@ -34,7 +33,6 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 setTasks(undefined);
                 Helper.fetchJson(fetchFrom)
                     .then(response => {
-                        setActiveTaskStatus(response.activeTaskStatus);
                         setStatuses(response.statuses);
                         setTasks(response.tasks);
                         setRoot(findRootTask(params, response.tasks, root));
@@ -134,7 +132,6 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 root: root,
                 tasks: tasks,
                 activeTask: activeTask,
-                activeTaskStatus: activeTaskStatus,
                 statuses: statuses,
                 nested: nested
             }} events={events} />

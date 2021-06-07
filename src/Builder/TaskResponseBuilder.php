@@ -78,8 +78,7 @@ class TaskResponseBuilder
         return new JsonResponse([
             'statuses' => $statusesResponse,
             'tasks' => $tasksResponse,
-            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null,
-            'activeTaskStatus' => $this->taskConfig->getActiveTaskStatus()
+            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null
         ]);
     }
 

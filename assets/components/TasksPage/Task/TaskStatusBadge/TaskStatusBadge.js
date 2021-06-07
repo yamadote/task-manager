@@ -2,11 +2,17 @@
 import React from 'react';
 import './TaskStatusBadge.scss';
 
-const TaskStatusBadge = ({isReminder, status}) => {
-    const statusBadgeColor = isReminder ? 'rgb(255, 99, 71)' : status.color;
+const TaskStatusBadge = ({isReminder, isActive, status}) => {
+    let color = status.color;
+    if (isActive) {
+        color = '#ffb6c1';
+    }
+    if (isReminder) {
+        color = 'rgb(255, 99, 71)';
+    }
     return (
         <div className="status-badge">
-            <div style={{borderTopColor: statusBadgeColor}}/>
+            <div style={{borderTopColor: color}}/>
         </div>
     )
 }

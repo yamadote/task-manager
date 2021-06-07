@@ -8,17 +8,16 @@ import moment from "moment";
 import './Task.scss';
 
 const Task = ({task, data, events}) => {
-    const {tasks, activeTask, activeTaskStatus, statuses, nested} = data;
+    const {tasks, activeTask, statuses, nested} = data;
     const isActive = activeTask && activeTask.task === task.id;
     const children = tasks.filter(e => e.parent === task.id);
     const showChildren = nested && task.isChildrenOpen && children.length > 0;
 
     const isReminder = task.reminder && task.reminder < moment().unix();
-    const badgeStatusId = isActive ? activeTaskStatus : task.status;
-    const badgeStatus = statuses.find((status) => status.id === badgeStatusId);
+    const status = statuses.find((status) => status.id === task.status);
     return (
         <div className="task">
-            <TaskStatusBadge isReminder={isReminder} status={badgeStatus}/>
+            <TaskStatusBadge isReminder={isReminder} isActive={isActive} status={status}/>
             <TaskHeader task={task} children={children} events={events}/>
             { task.isAdditionalPanelOpen ? <TaskAdditionalPanel
                 task={task} isActive={isActive} statuses={statuses} events={events}/> : null }

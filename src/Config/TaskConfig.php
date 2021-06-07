@@ -50,12 +50,4 @@ class TaskConfig
     {
         return self::MINIMUM_TRACKED_TIME;
     }
-
-    /**
-     * @return int
-     */
-    public function getActiveTaskStatus(): int
-    {
-        return TaskStatusConfig::IN_PROGRESS_STATUS_ID;
-    }
 }
