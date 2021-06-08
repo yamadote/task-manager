@@ -22,12 +22,9 @@
       padding-top: 0.35rem !important;
     }
 
-    .nav-link.active-tab {
-      outline: 1px solid #8e8e8e;
-    }
-
-    .nav-link.active-tab:focus {
-      outline-offset: 0;
+    .nav-item .active-tab {
+      box-shadow: 0 0 0 1px #8e8e8e;
+      border-radius: .25rem;
     }
 
     .nav-item:last-child {
