@@ -1,4 +1,6 @@
 
+import {useLocation, useParams} from "react-router-dom";
+
 const Helper = new function () {
     const timeoutStorage = {};
     return {
@@ -29,6 +31,21 @@ const Helper = new function () {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body)
             }).then(response => response.json());
+        },
+        getTaskPageUrl(taskId) {
+            const params = useParams();
+            const location = useLocation();
+            let url = location.pathname;
+            if (params.root) {
+                const parts = url.split('/');
+                parts.shift();
+                parts.shift();
+                url = '/' + parts.join('/');
+            }
+            if (taskId) {
+                url = '/' + taskId + url;
+            }
+            return url;
         }
     }
 }

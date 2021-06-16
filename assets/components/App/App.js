@@ -30,7 +30,10 @@ const App = () => {
                 <Route path="/:root?/tasks/status/completed">
                     <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/completed"}/>
                 </Route>
-                <Route path="/:root?/">
+                <Route path="/:root?/tasks">
+                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}/>
+                </Route>
+                <Route path="/">
                     <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}/>
                 </Route>
             </Switch>

@@ -2,6 +2,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import './NavbarRootPanel.scss';
+import Helper from "../../../App/Helper";
 
 const NavbarRootPanel = ({root}) => {
     return (
@@ -10,7 +11,7 @@ const NavbarRootPanel = ({root}) => {
                 { root?.title }
             </span>
             <li className="nav-item">
-                <Link to="/tasks" className="nav-link">Back</Link>
+                <Link to={Helper.getTaskPageUrl(root?.parent)} className="nav-link">Back</Link>
             </li>
         </div>
     )
