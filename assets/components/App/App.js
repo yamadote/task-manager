@@ -33,9 +33,6 @@ const App = () => {
                 <Route path="/:root?/tasks">
                     <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}/>
                 </Route>
-                <Route path="/">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}/>
-                </Route>
             </Switch>
         </Router>
     );

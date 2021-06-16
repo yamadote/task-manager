@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Config\TaskStatusConfig;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -19,6 +20,14 @@ class IndexController extends AbstractController
 
     /**
      * @Route("", name="app_index", methods={"GET"})
+     * @IsGranted("ROLE_USER")
+     */
+    public function index(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_task_index');
+    }
+
+    /**
      * @Route("/tasks", name="app_task_index", methods={"GET"})
      * @Route("/tasks/todo", name="app_task_todo", methods={"GET"})
      * @Route("/tasks/reminders", name="app_task_reminders", methods={"GET"})
@@ -28,7 +37,7 @@ class IndexController extends AbstractController
      * @Route("/{parent}/tasks/reminders", name="app_parent_task_reminders", methods={"GET"}, requirements={"parent"="\d+"})
      * @IsGranted("ROLE_USER")
      */
-    public function index(): Response
+    public function tasks(): Response
     {
         return $this->render('index.html.twig');
     }
