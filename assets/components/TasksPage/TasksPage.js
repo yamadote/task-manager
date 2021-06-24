@@ -6,6 +6,7 @@ import Helper from "./../App/Helper";
 import Navbar from "./Navbar/Navbar";
 import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
 import moment from "moment";
+import Footer from "./Footer/Footer";
 
 const TasksPage = ({fetchFrom, nested = true}) => {
 
@@ -135,6 +136,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 statuses: statuses,
                 nested: nested
             }} events={events} />
+            <Footer tasks={tasks}/>
         </div>
     );
 }
