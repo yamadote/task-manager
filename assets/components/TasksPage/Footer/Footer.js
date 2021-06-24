@@ -1,27 +1,10 @@
 
 import React from 'react';
-import './Footer.scss';
-
+import TasksAmount from "./TasksAmount/TasksAmount";
 
 const Footer = ({tasks, root, nested}) => {
-    if (!tasks) {
-        return null;
-    }
-    const count = (tasks, parent) => {
-        let amount = 0;
-        tasks.forEach(task => {
-            if (task.parent === parent) {
-                amount += count(tasks, task.id) + 1;
-            }
-        });
-        return amount;
-    }
-    let amount = root && nested ? count(tasks, root.id) : tasks.length;
-    if (amount === 0) {
-        return null;
-    }
     return (
-        <div className='task-amount'>Tasks Amount: {amount}</div>
+        <TasksAmount tasks={tasks} root={root} nested={nested}/>
     );
 }
 
