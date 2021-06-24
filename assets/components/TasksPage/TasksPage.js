@@ -136,7 +136,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 statuses: statuses,
                 nested: nested
             }} events={events} />
-            <Footer tasks={tasks}/>
+            <Footer tasks={tasks} root={root} nested={nested}/>
         </div>
     );
 }
