@@ -2,7 +2,7 @@
 initialize project dependencies
 ```
 composer install
-npm install
+npm install --force
 ```
 
 create env files
