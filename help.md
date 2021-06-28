@@ -14,7 +14,8 @@ cp ./.env ./.env.local
 start dev environment
 ```
 npm run watch  
-docker-compose -f docker/docker-compose.yml up
+cd docker
+docker-compose up
 ```
 
 setup database
