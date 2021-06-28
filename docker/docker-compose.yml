@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+    mysql:
+        image: mysql:5.7.25
+        ports:
+            - "3306:3306"
+        volumes:
+            - "./.data/mysql:/var/lib/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DATABASE_NAME}
+            MYSQL_USER: ${DATABASE_USER}
+            MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    php:
+        build:
+            context: php
+        volumes:
+            - ..:/var/www/symfony
+    nginx:
+        build: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+            - ..:/var/www/symfony
+        depends_on:
+            - php
