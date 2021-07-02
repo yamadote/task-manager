@@ -16,7 +16,7 @@ class TrackedPeriod
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private ?int $id;
+    private ?int $id = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="trackedPeriods")
@@ -38,7 +38,7 @@ class TrackedPeriod
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private ?DateTimeInterface $finishedAt;
+    private ?DateTimeInterface $finishedAt = null;
 
     public function getId(): ?int
     {

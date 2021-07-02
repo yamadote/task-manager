@@ -2,8 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use Exception;
-use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -21,11 +19,11 @@ class JsonRequestBodySubscriber implements EventSubscriberInterface
 
     private function getRequestContentData(Request $request): array
     {
-        try {
-            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (Exception $e) {
-            throw new RuntimeException('Something went wrong with json decode!', $e);
+        $content = $request->getContent();
+        if (empty($content)) {
+            return [];
         }
+        $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         return is_array($data) ? $data : [];
     }
 

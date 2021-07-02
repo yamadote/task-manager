@@ -31,12 +31,12 @@ class Task
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $link;
+    private ?string $link = null;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private ?DateTimeInterface $reminder;
+    private ?DateTimeInterface $reminder = null;
 
     /**
      *
