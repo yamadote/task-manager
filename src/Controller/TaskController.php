@@ -156,7 +156,7 @@ class TaskController extends AbstractController
             return $this->getPermissionDeniedResponse();
         }
         $root = $this->findRootTask([$parent]);
-        $task = $this->taskBuilder->buildFromRequest($request, $user, $parent);
+        $task = $this->taskBuilder->buildNewTask($user, $parent);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($task);
 
