@@ -20,92 +20,79 @@ class Task
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @var string
      */
-    private $title;
+    private string $title;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @var string
      */
-    private $link;
+    private ?string $link;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @var DateTimeInterface
      */
-    private $reminder;
+    private ?DateTimeInterface $reminder;
 
     /**
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
-     * @var DateTimeInterface
      */
-    private $createdAt;
+    private DateTimeInterface $createdAt;
 
     /**
      * @ORM\Column(type="smallint")
-     * @var int
      */
-    private $status;
+    private int $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="tasks")
      * @ORM\JoinColumn(nullable=false)
-     * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
-     * @var DateTimeInterface
      */
-    private $updatedAt;
+    private DateTimeInterface $updatedAt;
 
     /**
      * @Gedmo\TreeLeft
      * @ORM\Column(name="lft", type="integer")
-     * @var int
      */
-    private $lft;
+    private int $lft;
 
     /**
      * @Gedmo\TreeLevel
      * @ORM\Column(name="lvl", type="integer")
-     * @var int
      */
-    private $lvl;
+    private int $lvl;
 
     /**
      * @Gedmo\TreeRight
      * @ORM\Column(name="rgt", type="integer")
-     * @var int
      */
-    private $rgt;
+    private int $rgt;
 
     /**
      * @Gedmo\TreeRoot
      * @ORM\ManyToOne(targetEntity="Task")
      * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     * @var Task
      */
-    private $root;
+    private Task $root;
 
     /**
      * @Gedmo\TreeParent
      * @ORM\ManyToOne(targetEntity="Task", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     * @var Task|null
      */
-    private $parent;
+    private ?Task $parent;
 
     /**
      * @ORM\OneToMany(targetEntity="Task", mappedBy="parent", cascade={"remove"})
@@ -116,13 +103,15 @@ class Task
 
     /**
      * @ORM\OneToMany(targetEntity=UserTaskSettings::class, mappedBy="task", orphanRemoval=true)
+     * @var Collection|UserTaskSettings[]
      */
-    private $usersSettings;
+    private Collection $usersSettings;
 
     /**
      * @ORM\OneToMany(targetEntity=TrackedPeriod::class, mappedBy="task", orphanRemoval=true)
+     * @var Collection|TrackedPeriod[]
      */
-    private $trackedPeriods;
+    private Collection $trackedPeriods;
 
     public function __construct()
     {
@@ -213,106 +202,66 @@ class Task
         return $this->reminder->getTimestamp() < (new DateTime())->getTimestamp();
     }
 
-    /**
-     * @return int
-     */
     public function getLft(): int
     {
         return $this->lft;
     }
 
-    /**
-     * @param int $lft
-     */
     public function setLft(int $lft): void
     {
         $this->lft = $lft;
     }
 
-    /**
-     * @return int
-     */
     public function getLvl(): int
     {
         return $this->lvl;
     }
 
-    /**
-     * @param int $lvl
-     */
     public function setLvl(int $lvl): void
     {
         $this->lvl = $lvl;
     }
 
-    /**
-     * @return int
-     */
     public function getRgt(): int
     {
         return $this->rgt;
     }
 
-    /**
-     * @param int $rgt
-     */
     public function setRgt(int $rgt): void
     {
         $this->rgt = $rgt;
     }
 
-    /**
-     * @return Task
-     */
     public function getRoot(): Task
     {
         return $this->root;
     }
 
-    /**
-     * @param Task $root
-     */
     public function setRoot(Task $root): void
     {
         $this->root = $root;
     }
 
-    /**
-     * @return Task|null
-     */
     public function getParent(): ?Task
     {
         return $this->parent;
     }
 
-    /**
-     * @param Task|null $parent
-     */
     public function setParent(?Task $parent): void
     {
         $this->parent = $parent;
     }
 
-    /**
-     * @return Task[]|Collection
-     */
     public function getChildren()
     {
         return $this->children;
     }
 
-    /**
-     * @return bool
-     */
     public function hasChildren(): bool
     {
         return !$this->getChildren()->isEmpty();
     }
 
-    /**
-     * @param Task $task
-     * @return bool
-     */
     public function equals(Task $task): bool
     {
         return $this->id === $task->getId();

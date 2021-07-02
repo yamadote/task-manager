@@ -19,38 +19,37 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @var string
      */
-    private $email;
+    private string $email;
 
     /**
      * @ORM\Column(type="json")
      * @var string[]
      */
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @var string
      */
-    private $password;
+    private string $password;
 
     /**
      * @ORM\OneToMany(targetEntity=Task::class, mappedBy="user", orphanRemoval=true)
+     * @var Collection|Task[]
      */
-    private $tasks;
+    private Collection $tasks;
 
     /**
      * @ORM\OneToMany(targetEntity=TrackedPeriod::class, mappedBy="user", orphanRemoval=true)
+     * @var Collection|TrackedPeriod[]
      */
-    private $trackedPeriods;
+    private Collection $trackedPeriods;
 
     public function __construct()
     {
@@ -75,7 +74,6 @@ class User implements UserInterface
 
     /**
      * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
     public function getUsername(): string
@@ -157,10 +155,6 @@ class User implements UserInterface
         }
     }
 
-    /**
-     * @param User $task
-     * @return bool
-     */
     public function equals(User $task): bool
     {
         return $this->getId() === $task->getId();

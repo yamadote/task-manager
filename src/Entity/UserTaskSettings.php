@@ -15,29 +15,29 @@ class UserTaskSettings
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private User $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="usersSettings")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $task;
+    private Task $task;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isAdditionalPanelOpen;
+    private ?bool $isAdditionalPanelOpen;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $isChildrenOpen;
+    private ?bool $isChildrenOpen;
 
     public function getId(): ?int
     {
@@ -49,11 +49,9 @@ class UserTaskSettings
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): void
     {
         $this->user = $user;
-
-        return $this;
     }
 
     public function getTask(): Task
@@ -61,11 +59,9 @@ class UserTaskSettings
         return $this->task;
     }
 
-    public function setTask(?Task $task): self
+    public function setTask(Task $task): void
     {
         $this->task = $task;
-
-        return $this;
     }
 
     public function getIsAdditionalPanelOpen(): ?bool
@@ -73,11 +69,9 @@ class UserTaskSettings
         return $this->isAdditionalPanelOpen;
     }
 
-    public function setIsAdditionalPanelOpen(bool $isAdditionalPanelOpen): self
+    public function setIsAdditionalPanelOpen(bool $isAdditionalPanelOpen): void
     {
         $this->isAdditionalPanelOpen = $isAdditionalPanelOpen;
-
-        return $this;
     }
 
     public function getIsChildrenOpen(): ?bool
@@ -85,10 +79,8 @@ class UserTaskSettings
         return $this->isChildrenOpen;
     }
 
-    public function setIsChildrenOpen(bool $isChildrenOpen): self
+    public function setIsChildrenOpen(bool $isChildrenOpen): void
     {
         $this->isChildrenOpen = $isChildrenOpen;
-
-        return $this;
     }
 }

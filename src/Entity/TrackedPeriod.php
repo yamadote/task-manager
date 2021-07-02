@@ -16,29 +16,29 @@ class TrackedPeriod
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Task::class, inversedBy="trackedPeriods")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $task;
+    private Task $task;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="trackedPeriods")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private User $user;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $startedAt;
+    private DateTimeInterface $startedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $finishedAt;
+    private ?DateTimeInterface $finishedAt;
 
     public function getId(): ?int
     {
@@ -50,11 +50,9 @@ class TrackedPeriod
         return $this->task;
     }
 
-    public function setTask(Task $task): self
+    public function setTask(Task $task): void
     {
         $this->task = $task;
-
-        return $this;
     }
 
     public function getUser(): User
@@ -62,11 +60,9 @@ class TrackedPeriod
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(User $user): void
     {
         $this->user = $user;
-
-        return $this;
     }
 
     public function getStartedAt(): DateTimeInterface
@@ -74,11 +70,9 @@ class TrackedPeriod
         return $this->startedAt;
     }
 
-    public function setStartedAt(DateTimeInterface $startedAt): self
+    public function setStartedAt(DateTimeInterface $startedAt): void
     {
         $this->startedAt = $startedAt;
-
-        return $this;
     }
 
     public function getFinishedAt(): ?DateTimeInterface
@@ -86,16 +80,11 @@ class TrackedPeriod
         return $this->finishedAt;
     }
 
-    public function setFinishedAt(?DateTimeInterface $finishedAt): self
+    public function setFinishedAt(?DateTimeInterface $finishedAt): void
     {
         $this->finishedAt = $finishedAt;
-
-        return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isActive(): bool
     {
         return $this->finishedAt === null;
