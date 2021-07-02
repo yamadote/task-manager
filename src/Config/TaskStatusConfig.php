@@ -98,11 +98,6 @@ class TaskStatusConfig
         return $list;
     }
 
-    /**
-     * @param int $id
-     * @param array $raw
-     * @return TaskStatus
-     */
     private function createStatusEntity(int $id, array $raw): TaskStatus
     {
         return new TaskStatus(
@@ -124,10 +119,6 @@ class TaskStatusConfig
         ];
     }
 
-    /**
-     * @param string $statusSlug
-     * @return string
-     */
     private function getStatusIdBySlug(string $statusSlug): string
     {
         foreach (self::STATUSES as $id => $raw) {
@@ -146,19 +137,11 @@ class TaskStatusConfig
         return self::TASKS_LIST_STATUS_ORDER;
     }
 
-    /**
-     * @param string $statusSlug
-     * @return TaskStatus
-     */
     public function getStatusBySlug(string $statusSlug): TaskStatus
     {
         return $this->getStatusById($this->getStatusIdBySlug($statusSlug));
     }
 
-    /**
-     * @param $slug
-     * @return bool
-     */
     public function isStatusSlugExisting($slug): bool
     {
         foreach (self::STATUSES as $status) {
@@ -169,10 +152,6 @@ class TaskStatusConfig
         return false;
     }
 
-    /**
-     * @param int $id
-     * @return TaskStatus
-     */
     public function getStatusById(int $id): TaskStatus
     {
         return $this->createStatusEntity($id, self::STATUSES[$id]);

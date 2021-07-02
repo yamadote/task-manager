@@ -7,6 +7,8 @@ use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
 use DateTime;
+use Doctrine\ORM\ORMException;
+use RuntimeException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Tree\TreeListener;
@@ -20,11 +22,8 @@ use Gedmo\Tree\TreeListener;
  */
 class TaskRepository extends NestedTreeRepository
 {
-    /** @var TaskStatusConfig */
-    private $taskStatusConfig;
-
-    /** @var TaskBuilder */
-    private $taskBuilder;
+    private TaskStatusConfig $taskStatusConfig;
+    private TaskBuilder $taskBuilder;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -37,10 +36,6 @@ class TaskRepository extends NestedTreeRepository
         $this->taskBuilder = $taskBuilder;
     }
 
-    /**
-     * @param User $user
-     * @return QueryBuilder
-     */
     private function prepareUserTasksQueryBuilder(User $user): QueryBuilder
     {
         $statusOrder = $this->taskStatusConfig->getTasksListStatusOrder();
@@ -61,7 +56,6 @@ class TaskRepository extends NestedTreeRepository
 
     /**
      * @param User $user
-     * @param Task|null $parent
      * @return Task[]
      */
     public function findUserTasks(User $user): array
@@ -71,7 +65,7 @@ class TaskRepository extends NestedTreeRepository
     }
 
     /**
-     * @param User $getUser
+     * @param User $user
      * @return Task[]
      */
     public function findUserReminders(User $user): array
@@ -114,20 +108,12 @@ class TaskRepository extends NestedTreeRepository
         return $this->findUserTasksByStatusList($user, [$status], $fullHierarchy);
     }
 
-    /**
-     * @param User $user
-     * @return Task
-     */
     public function findUserRootTask(User $user): Task
     {
         $root = $this->findOneBy(['user' => $user, 'parent' => null]);
         return $root ?? $this->createRootTask($user);
     }
 
-    /**
-     * @param User $user
-     * @return Task
-     */
     private function createRootTask(User $user): Task
     {
         $root = $this->taskBuilder->buildRootTask($user);

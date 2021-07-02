@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Task;
 use App\Entity\TrackedPeriod;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -21,20 +20,11 @@ class TrackedPeriodRepository extends ServiceEntityRepository
         parent::__construct($registry, TrackedPeriod::class);
     }
 
-    /**
-     * @param User $user
-     * @return TrackedPeriod|null
-     */
     public function findActivePeriod(User $user): ?TrackedPeriod
     {
         return $this->findOneBy(['user' => $user, 'finishedAt' => null]);
     }
 
-    /**
-     * @param User $getUser
-     * @param Task $task
-     * @return TrackedPeriod|null
-     */
     public function findLastTrackedPeriod(User $user): ?TrackedPeriod
     {
         return $this->findOneBy(['user' => $user], ['id' => 'DESC']);

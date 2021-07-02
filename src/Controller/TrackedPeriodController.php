@@ -17,11 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TrackedPeriodController extends AbstractController
 {
-    /** @var TrackedPeriodRepository */
-    private $trackedPeriodRepository;
-
-    /** @var TaskConfig */
-    private $taskConfig;
+    private TrackedPeriodRepository $trackedPeriodRepository;
+    private TaskConfig $taskConfig;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
@@ -83,42 +80,17 @@ class TrackedPeriodController extends AbstractController
         return new JsonResponse();
     }
 
-    /**
-     * @param TrackedPeriod $period
-     */
     private function finishPeriod(TrackedPeriod $period): void
     {
-//        if (!$this->hasMinimumTrackedTime($period)) {
-//            $entityManager->remove($period);
-//        } else {
-            $period->setFinishedAt(new DateTime());
-//        }
+        // todo: remove if period has minimum tracked time
+        $period->setFinishedAt(new DateTime());
     }
 
-    /**
-     * @param Task $task
-     * @return bool
-     */
     private function canTrackTask(Task $task): bool
     {
         return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
     }
 
-    /**
-     * @param TrackedPeriod $period
-     * @return bool
-     */
-    private function hasMinimumTrackedTime(TrackedPeriod $period): bool
-    {
-        $finishedTime = $period->getFinishedAt() ?? new DateTime();
-        $diff = $finishedTime->getTimestamp() - $period->getStartedAt()->getTimestamp();
-        return $diff < $this->taskConfig->getMinimumTrackedTime();
-    }
-
-    /**
-     * @param TrackedPeriod $period
-     * @return bool
-     */
     private function canContinuePeriod(Task $task, TrackedPeriod $period): bool
     {
         if ($period->getFinishedAt() === null) {

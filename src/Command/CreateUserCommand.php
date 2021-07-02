@@ -17,17 +17,9 @@ class CreateUserCommand extends Command
 
     protected static $defaultName = 'app:create-user';
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+    private UserPasswordEncoderInterface $passwordEncoder;
 
-    /** @var UserPasswordEncoderInterface */
-    private $passwordEncoder;
-
-    /**
-     * ChangePasswordCommand constructor.
-     * @param EntityManagerInterface $entityManager
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $passwordEncoder
@@ -43,24 +35,10 @@ class CreateUserCommand extends Command
         $this->addArgument(self::PASSWORD_ARGUMENT, InputArgument::REQUIRED);
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $email = $input->getArgument(self::EMAIL_ARGUMENT);
         $plainPassword = $input->getArgument(self::PASSWORD_ARGUMENT);
-
-        if (empty($email)) {
-            $output->writeln("Email is empty!");
-            return Command::FAILURE;
-        }
-        if (empty($plainPassword)) {
-            $output->writeln("Password is empty!");
-            return Command::FAILURE;
-        }
         $user = new User();
         $user->setEmail($email);
         $password = $this->passwordEncoder->encodePassword($user, $plainPassword);

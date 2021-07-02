@@ -25,26 +25,13 @@ class TaskController extends AbstractController
 {
     private const STATUS_REQUEST_FIELD = 'status';
 
-    /** @var TaskRepository */
-    private $taskRepository;
-
-    /** @var TaskResponseBuilder */
-    private $taskResponseBuilder;
-
-    /** @var TaskStatusConfig */
-    private $taskStatusConfig;
-
-    /** @var TaskBuilder */
-    private $taskBuilder;
-
-    /** @var UserTaskSettingsRepository */
-    private $userTaskSettingsRepository;
-
-    /** @var UserTaskSettingsBuilder */
-    private $userTaskSettingsBuilder;
-
-    /** @var TrackedPeriodRepository */
-    private $trackedPeriodRepository;
+    private TaskRepository $taskRepository;
+    private TaskResponseBuilder $taskResponseBuilder;
+    private TaskStatusConfig $taskStatusConfig;
+    private TaskBuilder $taskBuilder;
+    private UserTaskSettingsRepository $userTaskSettingsRepository;
+    private UserTaskSettingsBuilder $userTaskSettingsBuilder;
+    private TrackedPeriodRepository $trackedPeriodRepository;
 
     public function __construct(
         TaskRepository $taskRepository,
@@ -183,10 +170,6 @@ class TaskController extends AbstractController
         return $this->taskRepository->findUserRootTask($this->getUser());
     }
 
-    /**
-     * @param Request $request
-     * @return Task
-     */
     private function getParentFromRequest(Request $request): Task
     {
         if (empty($request->request->get('parent'))) {
@@ -262,18 +245,11 @@ class TaskController extends AbstractController
         return new JsonResponse();
     }
 
-    /**
-     * @param Task $task
-     * @return bool
-     */
     private function canEditTask(Task $task): bool
     {
         return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
     }
 
-    /**
-     * @return JsonResponse
-     */
     private function getPermissionDeniedResponse(): JsonResponse
     {
         return new JsonResponse(['error' => 'Permission denied'], 403);

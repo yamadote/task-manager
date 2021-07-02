@@ -10,8 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class IndexController extends AbstractController
 {
-    /** @var TaskStatusConfig */
-    private $taskStatusConfig;
+    private TaskStatusConfig $taskStatusConfig;
 
     public function __construct(TaskStatusConfig $taskStatusConfig)
     {

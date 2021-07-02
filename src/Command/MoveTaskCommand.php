@@ -13,11 +13,8 @@ class MoveTaskCommand extends Command
 {
     protected static $defaultName = 'app:move-task';
 
-    /** @var TaskRepository */
-    private $taskRepository;
-
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private TaskRepository $taskRepository;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(TaskRepository $taskRepository, EntityManagerInterface $entityManager)
     {
@@ -32,11 +29,6 @@ class MoveTaskCommand extends Command
         $this->addArgument('parent', InputArgument::REQUIRED, 'The task that will be parent.');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $task = $this->taskRepository->find((int) $input->getArgument('task'));

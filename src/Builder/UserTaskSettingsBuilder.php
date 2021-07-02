@@ -8,11 +8,6 @@ use App\Entity\UserTaskSettings;
 
 class UserTaskSettingsBuilder
 {
-    /**
-     * @param User $user
-     * @param Task $task
-     * @return UserTaskSettingsBuilder
-     */
     public function buildDefaultSettings(User $user, Task $task): UserTaskSettings
     {
         $settings = new UserTaskSettings();

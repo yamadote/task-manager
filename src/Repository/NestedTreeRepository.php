@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Exception\InvalidArgumentException;
@@ -16,8 +17,7 @@ use Gedmo\Tree\TreeListener;
  */
 abstract class NestedTreeRepository extends ServiceEntityRepository
 {
-    /** @var TreeListener */
-    private $treeListener;
+    private TreeListener $treeListener;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -29,12 +29,7 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param null $node
-     * @param false $direct
-     * @param null $sortByField
-     * @param string $direction
-     * @param false $includeNode
-     * @return array
+     * @throws MappingException
      */
     public function findChildren(
         $node = null,
@@ -48,14 +43,14 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * @return QueryBuilder
-     */
     protected function getQueryBuilder(): QueryBuilder
     {
         return $this->getEntityManager()->createQueryBuilder();
     }
 
+    /**
+     * @throws MappingException
+     */
     protected function getChildrenQueryBuilder(
         $node = null,
         $direct = false,
@@ -99,10 +94,8 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
             } else {
                 throw new \InvalidArgumentException('Node is not related to this repository');
             }
-        } else {
-            if ($direct) {
-                $qb->where($qb->expr()->isNull('node.'.$config['parent']));
-            }
+        } else if ($direct) {
+            $qb->where($qb->expr()->isNull('node.'.$config['parent']));
         }
         if (!$sortByField) {
             $qb->orderBy('node.'.$config['left'], 'ASC');
@@ -113,12 +106,11 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
             }
             $fields = rtrim($fields, ',');
             $qb->orderBy($fields, $direction);
+        } else if ($meta->hasField($sortByField) && in_array(strtolower($direction), ['asc', 'desc'])) {
+            $qb->orderBy('node.'.$sortByField, $direction);
         } else {
-            if ($meta->hasField($sortByField) && in_array(strtolower($direction), ['asc', 'desc'])) {
-                $qb->orderBy('node.'.$sortByField, $direction);
-            } else {
-                throw new InvalidArgumentException("Invalid sort options specified: field - {$sortByField}, direction - {$direction}");
-            }
+            $message = "Invalid sort options specified: field - $sortByField, direction - $direction";
+            throw new InvalidArgumentException($message);
         }
 
         return $qb;
@@ -126,14 +118,9 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
 
     /**
      * Get the Tree path query builder by given $node
-     *
-     * @param object $node
-     *
-     * @return QueryBuilder
      * @throws InvalidArgumentException - if input is not valid
-     *
      */
-    protected function getPathQueryBuilder($node): QueryBuilder
+    protected function getPathQueryBuilder(object $node): QueryBuilder
     {
         $meta = $this->getClassMetadata();
         if (!$node instanceof $meta->name) {
@@ -164,12 +151,9 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
 
     /**
      * Get the Tree path of Nodes by given $node
-     *
-     * @param object $node
-     *
-     * @return array - list of Nodes in path
+     * returns list of Nodes in path
      */
-    public function getPath($node): array
+    public function getPath(object $node): array
     {
         return $this->getPathQueryBuilder($node)->getQuery()->getResult();
     }

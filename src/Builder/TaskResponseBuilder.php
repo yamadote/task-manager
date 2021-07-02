@@ -2,7 +2,6 @@
 
 namespace App\Builder;
 
-use App\Config\TaskConfig;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\TaskStatus;
@@ -15,50 +14,24 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TaskResponseBuilder
 {
-    /** @var TaskConfig */
-    private $taskConfig;
+    private TaskStatusConfig $taskStatusConfig;
+    private UserTaskSettingsRepository $settingsRepository;
+    private UserTaskSettingsBuilder $settingsBuilder;
+    private TrackedPeriodRepository $trackedPeriodRepository;
 
-    /** @var TaskStatusConfig */
-    private $taskStatusConfig;
-
-    /** @var UserTaskSettingsRepository */
-    private $settingsRepository;
-
-    /** @var UserTaskSettingsBuilder */
-    private $settingsBuilder;
-
-    /** @var TrackedPeriodRepository */
-    private $trackedPeriodRepository;
-
-    /**
-     * TaskResponseBuilder constructor.
-     * @param TaskConfig $taskConfig
-     * @param TaskStatusConfig $taskStatusConfig
-     * @param UserTaskSettingsRepository $settingsRepository
-     * @param UserTaskSettingsBuilder $settingsBuilder
-     * @param TrackedPeriodRepository $trackedPeriodRepository
-     */
     public function __construct(
-        TaskConfig $taskConfig,
         TaskStatusConfig  $taskStatusConfig,
         UserTaskSettingsRepository $settingsRepository,
         UserTaskSettingsBuilder $settingsBuilder,
         TrackedPeriodRepository $trackedPeriodRepository
     ) {
-        $this->taskConfig = $taskConfig;
         $this->taskStatusConfig = $taskStatusConfig;
         $this->settingsRepository = $settingsRepository;
         $this->settingsBuilder = $settingsBuilder;
         $this->trackedPeriodRepository = $trackedPeriodRepository;
     }
 
-    /**
-     * @param User $user
-     * @param iterable $tasks
-     * @param Task $root
-     * @return JsonResponse
-     */
-    public function buildListResponse(User $user, iterable $tasks, Task $root): JsonResponse
+    public function buildListResponse(User $user, array $tasks, Task $root): JsonResponse
     {
         $settings = $this->settingsRepository->findByTasks($tasks);
         $tasksResponse = [];
@@ -82,23 +55,11 @@ class TaskResponseBuilder
         ]);
     }
 
-    /**
-     * @param Task $task
-     * @param UserTaskSettingsBuilder $userSettings
-     * @param Task $root
-     * @return JsonResponse
-     */
     public function buildTaskResponse(Task $task, UserTaskSettings $userSettings, Task $root): JsonResponse
     {
         return new JsonResponse($this->buildTaskArrayResponse($task, $userSettings, $root));
     }
 
-    /**
-     * @param Task $task
-     * @param UserTaskSettingsBuilder $userSettings
-     * @param Task $root
-     * @return array
-     */
     private function buildTaskArrayResponse(Task $task, UserTaskSettings $userSettings, Task $root): array
     {
         $reminder = $task->getReminder();
@@ -116,11 +77,6 @@ class TaskResponseBuilder
         ];
     }
 
-    /**
-     * @param Task $task
-     * @param Task $root
-     * @return int|null
-     */
     private function getParentId(Task $task, Task $root): ?int
     {
         if (null === $task->getParent()) {
@@ -132,10 +88,6 @@ class TaskResponseBuilder
         return $task->getParent()->getId();
     }
 
-    /**
-     * @param TaskStatus $status
-     * @return array
-     */
     private function buildStatusArrayResponse(TaskStatus $status): array
     {
         return [
@@ -145,10 +97,6 @@ class TaskResponseBuilder
         ];
     }
 
-    /**
-     * @param TrackedPeriod $activePeriod
-     * @return array
-     */
     private function buildActivePeriodResponse(TrackedPeriod $activePeriod): array
     {
         return [

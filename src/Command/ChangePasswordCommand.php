@@ -17,21 +17,10 @@ class ChangePasswordCommand extends Command
 
     protected static $defaultName = 'app:change-password';
 
-    /** @var UserRepository */
-    private $userRepository;
+    private UserRepository $userRepository;
+    private EntityManagerInterface $entityManager;
+    private UserPasswordEncoderInterface $passwordEncoder;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var UserPasswordEncoderInterface */
-    private $passwordEncoder;
-
-    /**
-     * ChangePasswordCommand constructor.
-     * @param UserRepository $userRepository
-     * @param EntityManagerInterface $entityManager
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     */
     public function __construct(
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
@@ -49,11 +38,6 @@ class ChangePasswordCommand extends Command
         $this->addArgument(self::PASSWORD_ARGUMENT, InputArgument::REQUIRED);
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $userId = (int) $input->getArgument(self::USER_ID_ARGUMENT);

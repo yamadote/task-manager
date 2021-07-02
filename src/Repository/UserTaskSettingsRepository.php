@@ -17,14 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserTaskSettingsRepository extends ServiceEntityRepository
 {
-    /** @var UserTaskSettingsBuilder */
-    private $settingsBuilder;
+    private UserTaskSettingsBuilder $settingsBuilder;
 
-    /**
-     * UserTaskSettingsRepository constructor.
-     * @param ManagerRegistry $registry
-     * @param UserTaskSettingsBuilder $settingsBuilder
-     */
     public function __construct(ManagerRegistry $registry, UserTaskSettingsBuilder $settingsBuilder)
     {
         parent::__construct($registry, UserTaskSettings::class);
@@ -35,7 +29,7 @@ class UserTaskSettingsRepository extends ServiceEntityRepository
      * @param Task[] $tasks
      * @return UserTaskSettings[]
      */
-    public function findByTasks(iterable $tasks): iterable
+    public function findByTasks(array $tasks): array
     {
         $raw = $this->findBy(['task' => $tasks]);
         $settings = [];
@@ -45,11 +39,6 @@ class UserTaskSettingsRepository extends ServiceEntityRepository
         return $settings;
     }
 
-    /**
-     * @param User $user
-     * @param Task $task
-     * @return UserTaskSettings
-     */
     public function findByUserAndTask(User $user, Task $task): UserTaskSettings
     {
         $setting = $this->findOneBy(['user' => $user, 'task' => $task]);
