@@ -42,6 +42,6 @@ class UserTaskSettingsRepository extends ServiceEntityRepository
     public function findByUserAndTask(User $user, Task $task): UserTaskSettings
     {
         $setting = $this->findOneBy(['user' => $user, 'task' => $task]);
-        return $setting ?? $this->settingsBuilder->buildDefaultSettings($user, $task);
+        return $setting ?? $this->settingsBuilder->buildDefaultSettings($task);
     }
 }

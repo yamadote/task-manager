@@ -2,65 +2,76 @@
 
 namespace App\Builder;
 
-use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\TaskStatus;
 use App\Entity\TrackedPeriod;
-use App\Entity\User;
 use App\Entity\UserTaskSettings;
-use App\Repository\TrackedPeriodRepository;
-use App\Repository\UserTaskSettingsRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class TaskResponseBuilder
 {
-    private TaskStatusConfig $taskStatusConfig;
-    private UserTaskSettingsRepository $settingsRepository;
     private UserTaskSettingsBuilder $settingsBuilder;
-    private TrackedPeriodRepository $trackedPeriodRepository;
+    private JsonResponseBuilder $jsonResponseBuilder;
 
     public function __construct(
-        TaskStatusConfig  $taskStatusConfig,
-        UserTaskSettingsRepository $settingsRepository,
         UserTaskSettingsBuilder $settingsBuilder,
-        TrackedPeriodRepository $trackedPeriodRepository
+        JsonResponseBuilder $jsonResponseBuilder
     ) {
-        $this->taskStatusConfig = $taskStatusConfig;
-        $this->settingsRepository = $settingsRepository;
         $this->settingsBuilder = $settingsBuilder;
-        $this->trackedPeriodRepository = $trackedPeriodRepository;
+        $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
 
-    public function buildListResponse(User $user, array $tasks, Task $root): JsonResponse
+    /**
+     * @param TaskStatus[] $statusList
+     * @return array
+     */
+    public function buildStatusListResponse(array $statusList): array
     {
-        $settings = $this->settingsRepository->findByTasks($tasks);
-        $tasksResponse = [];
-        /** @var Task $task */
+        $statusListResponse = [];
+        foreach ($statusList as $status) {
+            $statusListResponse[] = $this->buildStatusResponse($status);
+        }
+        return $statusListResponse;
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @param UserTaskSettings[] $settings
+     * @param Task $root
+     * @return array
+     */
+    public function buildTaskListResponse(array $tasks, array $settings, Task $root): array
+    {
+        $taskListResponse = [];
         foreach ($tasks as $task) {
             if ($task->getParent() === null) {
                 continue;
             }
-            $setting = $settings[$task->getId()] ?? $this->settingsBuilder->buildDefaultSettings($user, $task);
-            $tasksResponse[] = $this->buildTaskArrayResponse($task, $setting, $root);
+            $setting = $this->findTaskSetting($task, $settings);
+            $taskListResponse[] = $this->buildTaskResponse($task, $setting, $root);
         }
-        $statusesResponse = [];
-        foreach ($this->taskStatusConfig->getStatusList() as $status) {
-            $statusesResponse[] = $this->buildStatusArrayResponse($status);
-        }
-        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
-        return new JsonResponse([
-            'statuses' => $statusesResponse,
-            'tasks' => $tasksResponse,
-            'activeTask' => $activePeriod ? $this->buildActivePeriodResponse($activePeriod) : null
-        ]);
+        return $taskListResponse;
     }
 
-    public function buildTaskResponse(Task $task, UserTaskSettings $userSettings, Task $root): JsonResponse
+    /**
+     * @param Task $task
+     * @param UserTaskSettings[] $settings
+     * @return UserTaskSettings
+     */
+    private function findTaskSetting(Task $task, array $settings): UserTaskSettings
     {
-        return new JsonResponse($this->buildTaskArrayResponse($task, $userSettings, $root));
+        if (array_key_exists($task->getId(), $settings)) {
+            return $settings[$task->getId()];
+        }
+        return $this->settingsBuilder->buildDefaultSettings($task);
     }
 
-    private function buildTaskArrayResponse(Task $task, UserTaskSettings $userSettings, Task $root): array
+    public function buildTaskJsonResponse(Task $task, UserTaskSettings $userSettings, Task $root): JsonResponse
+    {
+        return $this->jsonResponseBuilder->build($this->buildTaskResponse($task, $userSettings, $root));
+    }
+
+    private function buildTaskResponse(Task $task, UserTaskSettings $userSettings, Task $root): array
     {
         $reminder = $task->getReminder();
         $createdAt = $task->getCreatedAt();
@@ -88,7 +99,7 @@ class TaskResponseBuilder
         return $task->getParent()->getId();
     }
 
-    private function buildStatusArrayResponse(TaskStatus $status): array
+    private function buildStatusResponse(TaskStatus $status): array
     {
         return [
             'id' => $status->getId(),
@@ -97,7 +108,7 @@ class TaskResponseBuilder
         ];
     }
 
-    private function buildActivePeriodResponse(TrackedPeriod $activePeriod): array
+    public function buildActiveTaskResponse(TrackedPeriod $activePeriod): array
     {
         return [
             'task' => $activePeriod->getTask()->getId(),

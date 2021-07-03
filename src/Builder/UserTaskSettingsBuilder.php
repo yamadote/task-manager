@@ -8,10 +8,10 @@ use App\Entity\UserTaskSettings;
 
 class UserTaskSettingsBuilder
 {
-    public function buildDefaultSettings(User $user, Task $task): UserTaskSettings
+    public function buildDefaultSettings(Task $task): UserTaskSettings
     {
         $settings = new UserTaskSettings();
-        $settings->setUser($user);
+        $settings->setUser($task->getUser());
         $settings->setTask($task);
         $settings->setIsAdditionalPanelOpen(false);
         $settings->setIsChildrenOpen(false);

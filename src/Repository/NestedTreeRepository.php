@@ -28,9 +28,6 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
         $this->treeListener = $treeListener;
     }
 
-    /**
-     * @throws MappingException
-     */
     public function findChildren(
         $node = null,
         $direct = false,
@@ -48,9 +45,6 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
         return $this->getEntityManager()->createQueryBuilder();
     }
 
-    /**
-     * @throws MappingException
-     */
     protected function getChildrenQueryBuilder(
         $node = null,
         $direct = false,
@@ -87,7 +81,13 @@ abstract class NestedTreeRepository extends ServiceEntityRepository
                     $qb->setParameter('rid', $wrapped->getPropertyValue($config['root']));
                 }
                 if ($includeNode) {
-                    $idField = $meta->getSingleIdentifierFieldName();
+                    try {
+                        $idField = $meta->getSingleIdentifierFieldName();
+                    } catch (MappingException $e) {
+                        $name = $this->_class->getName();
+                        $message = "Class '$name' doesn't have an identifier or it has a composite primary key.";
+                        throw new \RuntimeException($message);
+                    }
                     $qb->where('('.$qb->getDqlPart('where').') OR node.'.$idField.' = :rootNode');
                     $qb->setParameter('rootNode', $node);
                 }

@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Builder\JsonResponseBuilder;
 use App\Builder\TaskBuilder;
 use App\Builder\UserTaskSettingsBuilder;
+use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
-use App\Builder\TaskResponseBuilder;
 use App\Repository\TrackedPeriodRepository;
 use App\Repository\UserTaskSettingsRepository;
 use DateTime;
@@ -26,29 +27,32 @@ class TaskController extends AbstractController
     private const STATUS_REQUEST_FIELD = 'status';
 
     private TaskRepository $taskRepository;
-    private TaskResponseBuilder $taskResponseBuilder;
+    private TaskResponseComposer $taskResponseComposer;
     private TaskStatusConfig $taskStatusConfig;
     private TaskBuilder $taskBuilder;
     private UserTaskSettingsRepository $userTaskSettingsRepository;
     private UserTaskSettingsBuilder $userTaskSettingsBuilder;
     private TrackedPeriodRepository $trackedPeriodRepository;
+    private JsonResponseBuilder $jsonResponseBuilder;
 
     public function __construct(
         TaskRepository $taskRepository,
-        TaskResponseBuilder $taskResponseBuilder,
+        TaskResponseComposer $taskResponseComposer,
         TaskStatusConfig $taskStatusConfig,
         TaskBuilder $taskBuilder,
         UserTaskSettingsRepository $userTaskSettingsRepository,
         UserTaskSettingsBuilder $userTaskSettingsBuilder,
-        TrackedPeriodRepository $trackedPeriodRepository
+        TrackedPeriodRepository $trackedPeriodRepository,
+        JsonResponseBuilder $jsonResponseBuilder
     ) {
         $this->taskRepository = $taskRepository;
-        $this->taskResponseBuilder = $taskResponseBuilder;
+        $this->taskResponseComposer = $taskResponseComposer;
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
         $this->trackedPeriodRepository = $trackedPeriodRepository;
+        $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
 
     /**
@@ -57,8 +61,7 @@ class TaskController extends AbstractController
     public function all(): JsonResponse
     {
         $tasks = $this->taskRepository->findUserTasks($this->getUser());
-        $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
+        return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
     /**
@@ -67,8 +70,7 @@ class TaskController extends AbstractController
     public function reminders(): JsonResponse
     {
         $tasks = $this->taskRepository->findUserReminders($this->getUser());
-        $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
+        return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
     /**
@@ -78,8 +80,7 @@ class TaskController extends AbstractController
     {
         $statusList = $this->taskStatusConfig->getTodoStatusIds();
         $tasks = $this->taskRepository->findUserTasksByStatusList($this->getUser(), $statusList, true);
-        $root = $this->findRootTask($tasks);
-        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
+        return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
     /**
@@ -89,20 +90,17 @@ class TaskController extends AbstractController
     {
         $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
-            return new JsonResponse(null, 400);
+            return $this->jsonResponseBuilder->build(null, 400);
         }
         $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
         $isProgressStatus = $status->getId() === TaskStatusConfig::IN_PROGRESS_STATUS_ID;
         $fullHierarchy = !$isProgressStatus;
 
         $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
-        $root = $this->findRootTask($tasks);
-
         if ($isProgressStatus) {
             $tasks = $this->addActiveTask($tasks);
         }
-
-        return $this->taskResponseBuilder->buildListResponse($this->getUser(), $tasks, $root);
+        return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
     /**
@@ -136,13 +134,12 @@ class TaskController extends AbstractController
     {
         $parent = $this->getParentFromRequest($request);
         if (null === $parent) {
-            return new JsonResponse(['error' => 'Parent task not found.'], 400);
+            return $this->jsonResponseBuilder->build(['error' => 'Parent task not found.'], 400);
         }
         $user = $this->getUser();
         if (!$parent->getUser()->equals($user)) {
             return $this->getPermissionDeniedResponse();
         }
-        $root = $this->findRootTask([$parent]);
         $task = $this->taskBuilder->buildNewTask($user, $parent);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($task);
@@ -152,22 +149,8 @@ class TaskController extends AbstractController
         $entityManager->persist($parentSettings);
 
         $entityManager->flush();
-        $settings = $this->userTaskSettingsBuilder->buildDefaultSettings($user, $task);
-        return $this->taskResponseBuilder->buildTaskResponse($task, $settings, $root);
-    }
-
-    /**
-     * @param Task[] $tasks
-     * @return Task
-     */
-    private function findRootTask(array $tasks): Task
-    {
-        foreach ($tasks as $task) {
-            if ($task->getParent() === null) {
-                return $task;
-            }
-        }
-        return $this->taskRepository->findUserRootTask($this->getUser());
+        $settings = $this->userTaskSettingsBuilder->buildDefaultSettings($task);
+        return $this->taskResponseComposer->composeTaskResponse($user, $task, $settings);
     }
 
     private function getParentFromRequest(Request $request): Task
@@ -202,7 +185,7 @@ class TaskController extends AbstractController
             $task->setStatus($request->request->get('status'));
         }
         $this->getDoctrine()->getManager()->flush();
-        return new JsonResponse();
+        return $this->jsonResponseBuilder->build();
     }
 
     /**
@@ -221,7 +204,7 @@ class TaskController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($setting);
         $entityManager->flush();
-        return new JsonResponse();
+        return $this->jsonResponseBuilder->build();
     }
 
     /**
@@ -242,7 +225,7 @@ class TaskController extends AbstractController
         }
         $entityManager->remove($task);
         $entityManager->flush();
-        return new JsonResponse();
+        return $this->jsonResponseBuilder->build();
     }
 
     private function canEditTask(Task $task): bool
@@ -252,6 +235,6 @@ class TaskController extends AbstractController
 
     private function getPermissionDeniedResponse(): JsonResponse
     {
-        return new JsonResponse(['error' => 'Permission denied'], 403);
+        return $this->jsonResponseBuilder->build(['error' => 'Permission denied'], 403);
     }
 }
