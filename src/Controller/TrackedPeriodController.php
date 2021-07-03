@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Builder\JsonResponseBuilder;
 use App\Config\TaskConfig;
 use App\Entity\Task;
 use App\Entity\TrackedPeriod;
@@ -19,13 +20,16 @@ class TrackedPeriodController extends AbstractController
 {
     private TrackedPeriodRepository $trackedPeriodRepository;
     private TaskConfig $taskConfig;
+    private JsonResponseBuilder $jsonResponseBuilder;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
-        TaskConfig $taskConfig
+        TaskConfig $taskConfig,
+        JsonResponseBuilder $jsonResponseBuilder
     ) {
         $this->trackedPeriodRepository = $trackedPeriodRepository;
         $this->taskConfig = $taskConfig;
+        $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
 
     /**
@@ -35,14 +39,14 @@ class TrackedPeriodController extends AbstractController
     {
         if (!$this->canTrackTask($task)) {
             // todo: error message
-            return new JsonResponse();
+            return $this->jsonResponseBuilder->build();
         }
         // todo: check if small diff reactivate period
         $lastPeriod = $this->trackedPeriodRepository->findLastTrackedPeriod($this->getUser());
         if (!is_null($lastPeriod) && $lastPeriod->isActive()) {
             if ($lastPeriod->getTask()->equals($task)) {
                 // todo: add error message: you can't start active task
-                return new JsonResponse();
+                return $this->jsonResponseBuilder->build();
             }
             $this->finishPeriod($lastPeriod);
         }
@@ -52,7 +56,7 @@ class TrackedPeriodController extends AbstractController
             $lastPeriod->setFinishedAt(null);
             $entityManager->flush();
             // todo: success message
-            return new JsonResponse();
+            return $this->jsonResponseBuilder->build();
         }
         $period = new TrackedPeriod();
         $period->setUser($this->getUser());
@@ -61,7 +65,7 @@ class TrackedPeriodController extends AbstractController
         $entityManager->persist($period);
         $entityManager->flush();
         // todo: success message
-        return new JsonResponse();
+        return $this->jsonResponseBuilder->build();
     }
 
     /**
@@ -72,12 +76,12 @@ class TrackedPeriodController extends AbstractController
         $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
         if (is_null($activePeriod) || !$activePeriod->getTask()->equals($task)) {
             // todo: error message
-            return new JsonResponse();
+            return $this->jsonResponseBuilder->build();
         }
         $this->finishPeriod($activePeriod);
         $this->getDoctrine()->getManager()->flush();
         // todo: success message
-        return new JsonResponse();
+        return $this->jsonResponseBuilder->build();
     }
 
     private function finishPeriod(TrackedPeriod $period): void

@@ -113,6 +113,11 @@ class Task
      */
     private Collection $trackedPeriods;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private ?string $description = null;
+
     public function __construct()
     {
         $this->usersSettings = new ArrayCollection();
@@ -281,5 +286,15 @@ class Task
     public function getTrackedPeriods(): Collection
     {
         return $this->trackedPeriods;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
     }
 }

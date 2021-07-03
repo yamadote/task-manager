@@ -5,6 +5,7 @@ import TaskLinkField from "./TaskLinkField/TaskLinkField";
 import TaskReminderField from "./TaskReminderField/TaskReminderField";
 import './TaskAdditionalPanel.scss';
 import moment from "moment";
+import TaskDescriptionEditor from "./TaskDescriptionEditor/TaskDescriptionEditor";
 
 const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
     return (
@@ -21,6 +22,7 @@ const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
             <button onClick={() => {events.createNewTask(task.id)}} className='btn btn-sm btn-secondary'>New Task</button>
             <button onClick={() => {events.removeTask(task.id)}} className='btn btn-sm btn-danger'>Remove</button>
             <span className="created-at">{moment.unix(task.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+            <TaskDescriptionEditor task={task} events={events}/>
         </div>
     );
 }

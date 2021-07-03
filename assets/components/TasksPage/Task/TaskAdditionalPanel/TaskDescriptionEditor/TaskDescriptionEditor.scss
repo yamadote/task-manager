@@ -1,0 +1,11 @@
+
+.task {
+  .task-description-editor {
+    margin-top: 15px;
+    overflow: hidden;
+  }
+
+  .task-description-editor.changing .mde-text {
+    background: var(--changing-color);
+  }
+}
