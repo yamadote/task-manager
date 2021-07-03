@@ -158,7 +158,7 @@ class TaskController extends AbstractController
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
-        if ($this->canEditTask($task)) {
+        if (!$this->canEditTask($task)) {
             return $this->getPermissionDeniedResponse();
         }
         if ($request->request->has('title')) {
