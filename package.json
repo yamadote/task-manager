@@ -24,6 +24,8 @@
     },
     "dependencies": {
         "moment": "^2.29.1",
-        "react-router-dom": "^5.2.0"
+        "react-mde": "^11.5.0",
+        "react-router-dom": "^5.2.0",
+        "showdown": "^1.9.1"
     }
 }

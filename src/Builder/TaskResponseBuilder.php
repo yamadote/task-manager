@@ -61,6 +61,7 @@ class TaskResponseBuilder
         return [
             'id' => $task->getId(),
             'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
             'parent' => $this->getParentId($task, $root),
             'link' => $task->getLink(),
             'reminder' => $reminder ? $reminder->getTimestamp() : null,

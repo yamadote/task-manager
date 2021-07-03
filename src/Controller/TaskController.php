@@ -174,6 +174,9 @@ class TaskController extends AbstractController
         if ($request->request->has('status')) {
             $task->setStatus($request->request->get('status'));
         }
+        if ($request->request->has('description')) {
+            $task->setDescription($request->request->get('description'));
+        }
         $this->getDoctrine()->getManager()->flush();
         return $this->jsonResponseBuilder->build();
     }

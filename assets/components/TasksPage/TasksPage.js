@@ -119,6 +119,15 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                 events.updateTask(id, {isAdditionalPanelOpen: value})
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
                 Helper.fetchJsonPost(url, {'isAdditionalPanelOpen': value}).then();
+            },
+            updateTaskDescription: (id, description, setDescriptionChanging) => {
+                setDescriptionChanging(true);
+                events.updateTask(id, {description: description})
+                Helper.addTimeout('task_description' + id, () => {
+                    const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                    Helper.fetchJsonPost(url, {'description': description})
+                        .then(() => setDescriptionChanging(false));
+                }, Config.updateInputTimeout);
             }
         }
     }

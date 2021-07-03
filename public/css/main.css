@@ -26,3 +26,7 @@ body {
     box-shadow: none !important;
     outline: none !important;
 }
+
+.btn, button:focus, textarea:focus {
+    outline: none !important;
+}
