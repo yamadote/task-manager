@@ -22,6 +22,7 @@ const TaskDescriptionEditor = ({task, events}) => {
                 selectedTab={selectedTab}
                 onTabChange={setSelectedTab}
                 minEditorHeight={210}
+                minPreviewHeight={32}
                 generateMarkdownPreview={markdown =>
                     Promise.resolve(converter.makeHtml(markdown))
                 }

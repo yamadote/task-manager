@@ -5,6 +5,10 @@
     overflow: hidden;
   }
 
+  .task-description-editor .mde-preview {
+    background: #f3f3f3;
+  }
+
   .task-description-editor.changing .mde-text {
     background: var(--changing-color);
   }
