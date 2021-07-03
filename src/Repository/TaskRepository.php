@@ -3,8 +3,11 @@
 namespace App\Repository;
 
 use App\Builder\TaskBuilder;
+use App\Collection\TaskCollection;
+use App\Collection\TaskStatusCollection;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
+use App\Entity\TaskStatus;
 use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\ORMException;
@@ -54,35 +57,24 @@ class TaskRepository extends NestedTreeRepository
         ;
     }
 
-    /**
-     * @param User $user
-     * @return Task[]
-     */
-    public function findUserTasks(User $user): array
+    public function findUserTasks(User $user): TaskCollection
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
-        return $queryBuilder->getQuery()->getResult();
+        return new TaskCollection($queryBuilder->getQuery()->getResult());
     }
 
-    /**
-     * @param User $user
-     * @return Task[]
-     */
-    public function findUserReminders(User $user): array
+    public function findUserReminders(User $user): TaskCollection
     {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         $queryBuilder->andWhere("t.reminder < :time");
-        return $queryBuilder->getQuery()->getResult();
+        return new TaskCollection($queryBuilder->getQuery()->getResult());
     }
 
-    /**
-     * @param User $user
-     * @param array $statusList
-     * @param bool $fullHierarchy
-     * @return Task[]
-     */
-    public function findUserTasksByStatusList(User $user, array $statusList, bool $fullHierarchy = false): array
-    {
+    public function findUserTasksByStatusList(
+        User $user,
+        TaskStatusCollection $taskStatusCollection,
+        bool $fullHierarchy = false
+    ): TaskCollection {
         $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
         if ($fullHierarchy) {
             $queryBuilder->distinct();
@@ -93,19 +85,13 @@ class TaskRepository extends NestedTreeRepository
         } else {
             $queryBuilder->andWhere("t.status IN (:statusList)");
         }
-        $queryBuilder->setParameter('statusList', $statusList);
-        return $queryBuilder->getQuery()->getResult();
+        $queryBuilder->setParameter('statusList', $taskStatusCollection->getIds());
+        return new TaskCollection($queryBuilder->getQuery()->getResult());
     }
 
-    /**
-     * @param User $user
-     * @param int $status
-     * @param bool $fullHierarchy
-     * @return Task[]
-     */
-    public function findUserTasksByStatus(User $user, int $status, bool $fullHierarchy = false): array
+    public function findUserTasksByStatus(User $user, TaskStatus $status, bool $fullHierarchy = false): TaskCollection
     {
-        return $this->findUserTasksByStatusList($user, [$status], $fullHierarchy);
+        return $this->findUserTasksByStatusList($user, new TaskStatusCollection([$status]), $fullHierarchy);
     }
 
     public function findUserRootTask(User $user): Task

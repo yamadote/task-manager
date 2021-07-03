@@ -4,6 +4,7 @@ namespace App\Composer;
 
 use App\Builder\JsonResponseBuilder;
 use App\Builder\TaskResponseBuilder;
+use App\Collection\TaskCollection;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
@@ -38,23 +39,18 @@ class TaskResponseComposer
         $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
 
-    /**
-     * @param User $user
-     * @param Task[] $tasks
-     * @return JsonResponse
-     */
-    public function composeListResponse(User $user, array $tasks): JsonResponse
+    public function composeListResponse(User $user, TaskCollection $tasks): JsonResponse
     {
         $root = $this->findRootTask($user, $tasks);
         $settings = $this->settingsRepository->findByTasks($tasks);
         $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
-        $statusList = $this->taskStatusConfig->getStatusList();
+        $statusCollection = $this->taskStatusConfig->getStatusCollection();
         $activeTask = null;
         if ($activePeriod) {
             $activeTask = $this->taskResponseBuilder->buildActiveTaskResponse($activePeriod);
         }
         return $this->jsonResponseBuilder->build([
-            'statuses' => $this->taskResponseBuilder->buildStatusListResponse($statusList),
+            'statuses' => $this->taskResponseBuilder->buildStatusListResponse($statusCollection),
             'tasks' => $this->taskResponseBuilder->buildTaskListResponse($tasks, $settings, $root),
             'activeTask' => $activeTask
         ]);
@@ -66,14 +62,9 @@ class TaskResponseComposer
         return $this->taskResponseBuilder->buildTaskJsonResponse($task, $settings, $root);
     }
 
-    /**
-     * @param User $user
-     * @param Task[] $tasks
-     * @return Task
-     */
-    private function findRootTask(User $user, array $tasks): Task
+    private function findRootTask(User $user, TaskCollection $tasks): Task
     {
-        foreach ($tasks as $task) {
+        foreach ($tasks->getIterator() as $task) {
             if ($task->getParent() === null) {
                 return $task;
             }

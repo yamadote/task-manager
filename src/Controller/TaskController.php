@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Builder\JsonResponseBuilder;
 use App\Builder\TaskBuilder;
 use App\Builder\UserTaskSettingsBuilder;
+use App\Collection\TaskCollection;
 use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
@@ -78,8 +79,8 @@ class TaskController extends AbstractController
      */
     public function todo(): JsonResponse
     {
-        $statusList = $this->taskStatusConfig->getTodoStatusIds();
-        $tasks = $this->taskRepository->findUserTasksByStatusList($this->getUser(), $statusList, true);
+        $statusCollection = $this->taskStatusConfig->getTodoStatusCollection();
+        $tasks = $this->taskRepository->findUserTasksByStatusList($this->getUser(), $statusCollection, true);
         return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
@@ -96,33 +97,22 @@ class TaskController extends AbstractController
         $isProgressStatus = $status->getId() === TaskStatusConfig::IN_PROGRESS_STATUS_ID;
         $fullHierarchy = !$isProgressStatus;
 
-        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status->getId(), $fullHierarchy);
+        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status, $fullHierarchy);
         if ($isProgressStatus) {
             $tasks = $this->addActiveTask($tasks);
         }
         return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
     }
 
-    /**
-     * @param Task[] $tasks
-     * @return Task[]
-     */
-    private function addActiveTask(array $tasks): array
+    private function addActiveTask(TaskCollection $tasks): TaskCollection
     {
         $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
         if (null === $activePeriod) {
             return $tasks;
         }
-        $hasTask = false;
         $activeTask = $activePeriod->getTask();
-        foreach ($tasks as $task) {
-            if ($task->equals($activeTask)) {
-                $hasTask = true;
-                break;
-            }
-        }
-        if (!$hasTask) {
-            $tasks[] = $activeTask;
+        if (!$tasks->has($activeTask)) {
+            $tasks->add($activeTask);
         }
         return $tasks;
     }
@@ -168,7 +158,7 @@ class TaskController extends AbstractController
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
-        if (!$task->getUser()->equals($this->getUser())) {
+        if ($this->canEditTask($task)) {
             return $this->getPermissionDeniedResponse();
         }
         if ($request->request->has('title')) {

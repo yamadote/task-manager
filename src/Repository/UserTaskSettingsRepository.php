@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Builder\UserTaskSettingsBuilder;
+use App\Collection\TaskCollection;
+use App\Collection\UserTaskSettingsCollection;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Entity\UserTaskSettings;
@@ -25,18 +27,14 @@ class UserTaskSettingsRepository extends ServiceEntityRepository
         $this->settingsBuilder = $settingsBuilder;
     }
 
-    /**
-     * @param Task[] $tasks
-     * @return UserTaskSettings[]
-     */
-    public function findByTasks(array $tasks): array
+    public function findByTasks(TaskCollection $tasks): UserTaskSettingsCollection
     {
-        $raw = $this->findBy(['task' => $tasks]);
+        $raw = $this->findBy(['task' => $tasks->toArray()]);
         $settings = [];
         foreach ($raw as $setting) {
             $settings[$setting->getTask()->getId()] = $setting;
         }
-        return $settings;
+        return new UserTaskSettingsCollection($settings);
     }
 
     public function findByUserAndTask(User $user, Task $task): UserTaskSettings

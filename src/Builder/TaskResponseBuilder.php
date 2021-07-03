@@ -2,6 +2,9 @@
 
 namespace App\Builder;
 
+use App\Collection\TaskCollection;
+use App\Collection\TaskStatusCollection;
+use App\Collection\UserTaskSettingsCollection;
 use App\Entity\Task;
 use App\Entity\TaskStatus;
 use App\Entity\TrackedPeriod;
@@ -21,49 +24,29 @@ class TaskResponseBuilder
         $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
 
-    /**
-     * @param TaskStatus[] $statusList
-     * @return array
-     */
-    public function buildStatusListResponse(array $statusList): array
+    public function buildStatusListResponse(TaskStatusCollection $collection): array
     {
         $statusListResponse = [];
-        foreach ($statusList as $status) {
+        foreach ($collection->getIterator() as $status) {
             $statusListResponse[] = $this->buildStatusResponse($status);
         }
         return $statusListResponse;
     }
 
-    /**
-     * @param Task[] $tasks
-     * @param UserTaskSettings[] $settings
-     * @param Task $root
-     * @return array
-     */
-    public function buildTaskListResponse(array $tasks, array $settings, Task $root): array
-    {
+    public function buildTaskListResponse(
+        TaskCollection $tasks,
+        UserTaskSettingsCollection $settings,
+        Task $root
+    ): array {
         $taskListResponse = [];
-        foreach ($tasks as $task) {
+        foreach ($tasks->getIterator() as $task) {
             if ($task->getParent() === null) {
                 continue;
             }
-            $setting = $this->findTaskSetting($task, $settings);
+            $setting = $settings->findOneByTask($task) ?? $this->settingsBuilder->buildDefaultSettings($task);
             $taskListResponse[] = $this->buildTaskResponse($task, $setting, $root);
         }
         return $taskListResponse;
-    }
-
-    /**
-     * @param Task $task
-     * @param UserTaskSettings[] $settings
-     * @return UserTaskSettings
-     */
-    private function findTaskSetting(Task $task, array $settings): UserTaskSettings
-    {
-        if (array_key_exists($task->getId(), $settings)) {
-            return $settings[$task->getId()];
-        }
-        return $this->settingsBuilder->buildDefaultSettings($task);
     }
 
     public function buildTaskJsonResponse(Task $task, UserTaskSettings $userSettings, Task $root): JsonResponse

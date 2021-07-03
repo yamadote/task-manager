@@ -2,6 +2,7 @@
 
 namespace App\Config;
 
+use App\Collection\TaskStatusCollection;
 use App\Entity\TaskStatus;
 
 class TaskStatusConfig
@@ -74,49 +75,17 @@ class TaskStatusConfig
         self::COMPLETED_STATUS_ID
     ];
 
-    /**
-     * @return string[]
-     */
-    public function getStatusTitles(): array
+    public function getStatusCollection(): TaskStatusCollection
     {
-        $titles = [];
-        foreach (self::STATUSES as $id => $raw) {
-            $titles[$id] = $raw[self::TITLE_FIELD];
-        }
-        return $titles;
+        return $this->createTaskStatusCollection(array_keys(self::STATUSES));
     }
 
-    /**
-     * @return TaskStatus[]
-     */
-    public function getStatusList(): array
+    public function getTodoStatusCollection(): TaskStatusCollection
     {
-        $list = [];
-        foreach (self::STATUSES as $id => $raw) {
-            $list[$id] = $this->createStatusEntity($id, $raw);
-        }
-        return $list;
-    }
-
-    private function createStatusEntity(int $id, array $raw): TaskStatus
-    {
-        return new TaskStatus(
-            $id,
-            $raw[self::TITLE_FIELD],
-            $raw[self::SLUG_FIELD],
-            $raw[self::COLOR_FIELD]
-        );
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getTodoStatusIds(): array
-    {
-        return [
+        return $this->createTaskStatusCollection([
             self::IN_PROGRESS_STATUS_ID,
             self::PENDING_STATUS_ID
-        ];
+        ]);
     }
 
     private function getStatusIdBySlug(string $statusSlug): string
@@ -129,9 +98,6 @@ class TaskStatusConfig
         return self::NONE_STATUS_ID;
     }
 
-    /**
-     * @return int[]
-     */
     public function getTasksListStatusOrder(): array
     {
         return self::TASKS_LIST_STATUS_ORDER;
@@ -154,6 +120,25 @@ class TaskStatusConfig
 
     public function getStatusById(int $id): TaskStatus
     {
-        return $this->createStatusEntity($id, self::STATUSES[$id]);
+        return $this->createTaskStatus($id, self::STATUSES[$id]);
+    }
+
+    private function createTaskStatusCollection(array $ids): TaskStatusCollection
+    {
+        $list = [];
+        foreach ($ids as $id) {
+            $list[$id] = $this->createTaskStatus($id, self::STATUSES[$id]);
+        }
+        return new TaskStatusCollection($list);
+    }
+
+    private function createTaskStatus(int $id, array $raw): TaskStatus
+    {
+        return new TaskStatus(
+            $id,
+            $raw[self::TITLE_FIELD],
+            $raw[self::SLUG_FIELD],
+            $raw[self::COLOR_FIELD]
+        );
     }
 }
