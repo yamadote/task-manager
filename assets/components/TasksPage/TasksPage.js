@@ -31,13 +31,13 @@ const TasksPage = ({fetchFrom, nested = true}) => {
     const events = new function () {
         return {
             reload: () => {
-                setTasks(undefined);
+                setTasks([]);
                 Helper.fetchJson(fetchFrom)
                     .then(response => {
                         setStatuses(response.statuses);
+                        setActiveTask(response.activeTask);
                         setTasks(response.tasks);
                         setRoot(findRootTask(params, response.tasks, root));
-                        setActiveTask(response.activeTask);
                     });
             },
             updateTask: (id, update) => {
@@ -128,6 +128,12 @@ const TasksPage = ({fetchFrom, nested = true}) => {
                     Helper.fetchJsonPost(url, {'description': description})
                         .then(() => setDescriptionChanging(false));
                 }, Config.updateInputTimeout);
+            },
+            updateTaskTrackedTime: (id, trackedTime) => {
+                events.updateTask(id, {trackedTime: trackedTime})
+            },
+            updateTaskChildrenTrackedTime: (id, childrenTrackedTime) => {
+                events.updateTask(id, {childrenTrackedTime: childrenTrackedTime})
             }
         }
     }

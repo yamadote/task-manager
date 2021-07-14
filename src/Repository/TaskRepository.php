@@ -111,4 +111,22 @@ class TaskRepository extends NestedTreeRepository
         }
         return $root;
     }
+
+    public function getTaskPath(Task $task): TaskCollection
+    {
+        $nodes = $this->getPath($task);
+        return new TaskCollection($nodes);
+    }
+
+    public function increaseTrackedTime(Task $task, int $increase): void
+    {
+        $task->increaseTrackedTime($increase);
+        $path = $this->getTaskPath($task);
+        foreach ($path->getIterator() as $item) {
+            if ($item->equals($task)) {
+                continue;
+            }
+            $item->increaseChildrenTrackedTime($increase);
+        }
+    }
 }

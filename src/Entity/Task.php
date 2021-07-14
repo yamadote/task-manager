@@ -118,6 +118,16 @@ class Task
      */
     private ?string $description = null;
 
+    /**
+     * @ORM\Column(type="integer", options={"default" : 0})
+     */
+    private int $trackedTime = 0;
+
+    /**
+     * @ORM\Column(type="integer", options={"default" : 0})
+     */
+    private int $childrenTrackedTime = 0;
+
     public function __construct()
     {
         $this->usersSettings = new ArrayCollection();
@@ -296,5 +306,35 @@ class Task
     public function setDescription(?string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getTrackedTime(): int
+    {
+        return $this->trackedTime;
+    }
+
+    public function setTrackedTime(int $trackedTime): void
+    {
+        $this->trackedTime = $trackedTime;
+    }
+
+    public function increaseTrackedTime(int $increase): void
+    {
+        $this->trackedTime += $increase;
+    }
+
+    public function getChildrenTrackedTime(): int
+    {
+        return $this->childrenTrackedTime;
+    }
+
+    public function setChildrenTrackedTime(int $childrenTrackedTime): void
+    {
+        $this->childrenTrackedTime = $childrenTrackedTime;
+    }
+
+    public function increaseChildrenTrackedTime(int $increase): void
+    {
+        $this->childrenTrackedTime += $increase;
     }
 }

@@ -6,8 +6,10 @@ use App\Builder\JsonResponseBuilder;
 use App\Config\TaskConfig;
 use App\Entity\Task;
 use App\Entity\TrackedPeriod;
+use App\Repository\TaskRepository;
 use App\Repository\TrackedPeriodRepository;
 use DateTime;
+use DateTimeInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,15 +21,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class TrackedPeriodController extends AbstractController
 {
     private TrackedPeriodRepository $trackedPeriodRepository;
+    private TaskRepository $taskRepository;
     private TaskConfig $taskConfig;
     private JsonResponseBuilder $jsonResponseBuilder;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
+        TaskRepository $taskRepository,
         TaskConfig $taskConfig,
         JsonResponseBuilder $jsonResponseBuilder
     ) {
         $this->trackedPeriodRepository = $trackedPeriodRepository;
+        $this->taskRepository = $taskRepository;
         $this->taskConfig = $taskConfig;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
@@ -53,6 +58,11 @@ class TrackedPeriodController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         // todo: check case when removed active period is the last
         if (!is_null($lastPeriod) && $this->canContinuePeriod($task, $lastPeriod)) {
+            /** @var DateTimeInterface $finishedAt */
+            $finishedAt = $lastPeriod->getFinishedAt();
+            $diff = $finishedAt->getTimestamp() - $lastPeriod->getStartedAt()->getTimestamp();
+            // todo: fix tracked time amount
+            $this->taskRepository->increaseTrackedTime($task, -$diff);
             $lastPeriod->setFinishedAt(null);
             $entityManager->flush();
             // todo: success message
@@ -60,7 +70,8 @@ class TrackedPeriodController extends AbstractController
         }
         $period = new TrackedPeriod();
         $period->setUser($this->getUser());
-        $period->setStartedAt(new DateTime());
+        $startedAt = new DateTime();
+        $period->setStartedAt($startedAt);
         $period->setTask($task);
         $entityManager->persist($period);
         $entityManager->flush();
@@ -87,7 +98,11 @@ class TrackedPeriodController extends AbstractController
     private function finishPeriod(TrackedPeriod $period): void
     {
         // todo: remove if period has minimum tracked time
-        $period->setFinishedAt(new DateTime());
+        $finishedAt = new DateTime();
+        $period->setFinishedAt($finishedAt);
+        $task = $period->getTask();
+        $diff = $finishedAt->getTimestamp() - $period->getStartedAt()->getTimestamp();
+        $this->taskRepository->increaseTrackedTime($task, $diff);
     }
 
     private function canTrackTask(Task $task): bool

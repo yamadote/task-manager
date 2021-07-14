@@ -67,6 +67,8 @@ class TaskResponseBuilder
             'reminder' => $reminder ? $reminder->getTimestamp() : null,
             'createdAt' => $createdAt ? $createdAt->getTimestamp() : null,
             'status' => $task->getStatus(),
+            'trackedTime' => $task->getTrackedTime(),
+            'childrenTrackedTime' => $task->getChildrenTrackedTime(),
             'isAdditionalPanelOpen' => $userSettings->getIsAdditionalPanelOpen(),
             'isChildrenOpen' => $userSettings->getIsChildrenOpen()
         ];
