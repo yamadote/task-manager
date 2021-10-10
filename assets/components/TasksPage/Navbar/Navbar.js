@@ -44,7 +44,9 @@ const Navbar = ({events, root}) => {
             <ul className="nav nav-tabs">
                 { root ? <NavbarRootPanel root={root}/> : null }
                 <li className="nav-item">
-                    <button className="nav-link" onClick={() => events.reload()}>Reload</button>
+                    <button className="nav-link" onClick={() => events.reload()}>
+                        <span className="oi oi-reload"/>
+                    </button>
                 </li>
                 <li className="nav-item nav-item-new-task">
                     <button className="nav-link" onClick={() => events.createNewTask(root?.id)}>New Task</button>
