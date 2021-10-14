@@ -19,6 +19,7 @@ body {
 
 .container.login, .container.register {
     max-width: 460px;
+    min-width: 460px;
     padding: 30px 40px;
     border-radius: 3px;
 }
