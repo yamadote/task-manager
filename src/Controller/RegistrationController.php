@@ -23,6 +23,9 @@ class RegistrationController extends AbstractController
         GuardAuthenticatorHandler $guardHandler,
         LoginFormAuthenticator $authenticator
     ): Response {
+
+        return new Response("Registration is disabled!");
+
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
