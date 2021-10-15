@@ -29,4 +29,16 @@ class TaskCollection extends AbstractCollection
         }
         return false;
     }
+
+    /**
+     * @return int[]
+     */
+    public function getIds(): array
+    {
+        $ids = [];
+        foreach ($this->list as $task) {
+            $ids[] = $task->getId();
+        }
+        return $ids;
+    }
 }

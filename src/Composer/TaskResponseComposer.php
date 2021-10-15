@@ -47,7 +47,8 @@ class TaskResponseComposer
         $statusCollection = $this->taskStatusConfig->getStatusCollection();
         $activeTask = null;
         if ($activePeriod) {
-            $activeTask = $this->taskResponseBuilder->buildActiveTaskResponse($activePeriod);
+            $path = $this->taskRepository->getTaskPath($activePeriod->getTask());
+            $activeTask = $this->taskResponseBuilder->buildActiveTaskResponse($activePeriod, $path);
         }
         return $this->jsonResponseBuilder->build([
             'statuses' => $this->taskResponseBuilder->buildStatusListResponse($statusCollection),

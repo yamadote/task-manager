@@ -5,7 +5,6 @@ import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 import Navbar from "./Navbar/Navbar";
 import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
-import moment from "moment";
 import Footer from "./Footer/Footer";
 
 const TasksPage = ({fetchFrom, nested = true}) => {
@@ -63,7 +62,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             startTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/start';
                 Helper.fetchJsonPost(url)
-                    .then(() => setActiveTask({task: id, startedAt: moment().unix()}));
+                    .then(response => setActiveTask({task: id, trackedTime: 0, path: response.activeTask.path}));
             },
             finishTask: (id) => {
                 const url = Config.apiUrlPrefix + '/tasks/' + id + '/finish';

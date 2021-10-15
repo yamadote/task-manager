@@ -94,11 +94,12 @@ class TaskResponseBuilder
         ];
     }
 
-    public function buildActiveTaskResponse(TrackedPeriod $activePeriod): array
+    public function buildActiveTaskResponse(TrackedPeriod $activePeriod, TaskCollection $path): array
     {
         return [
             'task' => $activePeriod->getTask()->getId(),
-            'startedAt' => $activePeriod->getStartedAt()->getTimestamp()
+            'trackedTime' => time() - $activePeriod->getStartedAt()->getTimestamp(),
+            'path' => $path->getIds()
         ];
     }
 }

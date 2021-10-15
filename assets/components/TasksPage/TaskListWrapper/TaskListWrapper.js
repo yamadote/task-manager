@@ -18,7 +18,7 @@ const TaskListWrapper = ({data, events}) => {
     if (children.length === 0) {
         return "no records found";
     }
-    return <TaskList children={children} data={data} events={events} increaseParentTrackedTime={() => {}}/>;
+    return <TaskList children={children} data={data} events={events}/>;
 }
 
 export default TaskListWrapper;
