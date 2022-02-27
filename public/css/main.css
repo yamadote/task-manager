@@ -32,3 +32,7 @@ body {
 .btn, button:focus, textarea:focus {
     outline: none !important;
 }
+
+.oi, .oi::before {
+    font-size: 13px;
+}
