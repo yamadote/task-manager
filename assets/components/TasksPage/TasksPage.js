@@ -3,11 +3,13 @@ import React, {useLayoutEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
-import Navbar from "./Navbar/Navbar";
 import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
 import Footer from "./Footer/Footer";
+import Header from "../Header/Header";
+import Sidebar from "../Sidebar/Sidebar";
+import TaskPanelHeading from "./TaskPanelHeading/TaskPanelHeading";
 
-const TasksPage = ({fetchFrom, nested = true}) => {
+const TasksPage = ({title, fetchFrom, nested = true}) => {
 
     const findRootTask = (params, tasks, oldRootTask) => {
         if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
@@ -133,6 +135,9 @@ const TasksPage = ({fetchFrom, nested = true}) => {
             },
             updateTaskChildrenTrackedTime: (id, childrenTrackedTime) => {
                 events.updateTask(id, {childrenTrackedTime: childrenTrackedTime})
+            },
+            search: (value) => {
+                console.log("Search: " + value)
             }
         }
     }
@@ -142,15 +147,31 @@ const TasksPage = ({fetchFrom, nested = true}) => {
 
     return (
         <div>
-            {/*<Navbar events={events} root={root}/>*/}
-            <TaskListWrapper data={{
-                root: root,
-                tasks: tasks,
-                activeTask: activeTask,
-                statuses: statuses,
-                nested: nested
-            }} events={events} />
-            <Footer tasks={tasks} root={root} nested={nested}/>
+            <Header/>
+            <div className="container-fluid main-container">
+                <div className="row row-offcanvas row-offcanvas-left">
+                    <Sidebar root={root} search={events.search}/>
+                    <div className="col-xs-12 col-sm-9 content">
+                        <div className="panel panel-default">
+                            <TaskPanelHeading title={title} root={root} events={events}/>
+                            <div className="panel-body">
+                                <div className="content-row">
+                                    <div className="row">
+                                        <TaskListWrapper data={{
+                                            root: root,
+                                            tasks: tasks,
+                                            activeTask: activeTask,
+                                            statuses: statuses,
+                                            nested: nested
+                                        }} events={events} />
+                                        <Footer tasks={tasks} root={root} nested={nested}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
