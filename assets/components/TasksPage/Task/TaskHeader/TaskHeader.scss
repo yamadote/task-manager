@@ -5,8 +5,8 @@
     min-height: 40px;
 
     .title {
-      padding: 3px 0;
-      margin: 10px 5px;
+      padding: 4px 0 2px;
+      margin: 10px 0;
       background: none;
       width: 100%;
       border: none;
@@ -32,6 +32,7 @@
 
     .title-button:first-child {
       margin-left: 0;
+      margin-right: 6px;
     }
 
     .title-link {
