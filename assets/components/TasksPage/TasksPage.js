@@ -142,7 +142,7 @@ const TasksPage = ({fetchFrom, nested = true}) => {
 
     return (
         <div>
-            <Navbar events={events} root={root}/>
+            {/*<Navbar events={events} root={root}/>*/}
             <TaskListWrapper data={{
                 root: root,
                 tasks: tasks,

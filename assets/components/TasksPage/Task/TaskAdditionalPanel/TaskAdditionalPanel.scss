@@ -1,65 +1,65 @@
-
-.task {
-  .fields {
-    margin-bottom: 9px;
-  }
-
-  .field {
-    height: 24px;
-    margin: 2px 0;
-    display: flex;
-
-    span {
-      padding-top: 2px;
-      font-weight: 700;
-      font-size: .81rem;
-      margin-right: 5px;
-    }
-
-    input, select {
-      height: 24px;
-      border: none;
-      background: none;
-      outline: none;
-    }
-
-    input {
-      width: 100%;
-      line-height: 14px;
-      padding: 3px 0;
-    }
-
-    input[type=datetime-local] {
-      width: 190px;
-      font-size: .81rem;
-      border-radius: 0;
-      color: black;
-      transition: none;
-    }
-
-    select {
-      padding: 0 2px 2px;
-    }
-
-    input:focus, input.changing {
-      box-shadow: rgb(0 0 0 / 20%) 0 0 0 1px;
-      background: ghostwhite;
-    }
-
-    input.changing {
-      background: var(--changing-color);
-    }
-  }
-
-  .field:first-child {
-    margin-top: -4px;
-  }
-
-  .created-at {
-    float: right;
-    font-size: .75rem;
-    line-height: 18px;
-    margin-right: 8px;
-    margin-top: 12px;
-  }
-}
+//
+//.task {
+//  .fields {
+//    margin-bottom: 9px;
+//  }
+//
+//  .field {
+//    height: 24px;
+//    margin: 2px 0;
+//    display: flex;
+//
+//    span {
+//      padding-top: 2px;
+//      font-weight: 700;
+//      font-size: .81rem;
+//      margin-right: 5px;
+//    }
+//
+//    input, select {
+//      height: 24px;
+//      border: none;
+//      background: none;
+//      outline: none;
+//    }
+//
+//    input {
+//      width: 100%;
+//      line-height: 14px;
+//      padding: 3px 0;
+//    }
+//
+//    input[type=datetime-local] {
+//      width: 190px;
+//      font-size: .81rem;
+//      border-radius: 0;
+//      color: black;
+//      transition: none;
+//    }
+//
+//    select {
+//      padding: 0 2px 2px;
+//    }
+//
+//    input:focus, input.changing {
+//      box-shadow: rgb(0 0 0 / 20%) 0 0 0 1px;
+//      background: ghostwhite;
+//    }
+//
+//    input.changing {
+//      background: var(--changing-color);
+//    }
+//  }
+//
+//  .field:first-child {
+//    margin-top: -4px;
+//  }
+//
+//  .created-at {
+//    float: right;
+//    font-size: .75rem;
+//    line-height: 18px;
+//    margin-right: 8px;
+//    margin-top: 12px;
+//  }
+//}
