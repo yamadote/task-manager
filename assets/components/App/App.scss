@@ -62,7 +62,7 @@ body {
   /*font-family: 'Lato', sans-serif !important;*/
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   /*font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; */
-  font-size: 12px;
+  font-size: 14px;
   background-color: #f1f2f6;
   overflow-x: hidden;
 }
@@ -102,6 +102,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   content: attr(data-icon);
   speak: none;
 }
+.oi, .oi::before {
+  font-size: 12px;
+}
 
 /* ----------------------------------
  * navbar
@@ -115,7 +118,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   border-radius: 0;
   background-color: #303641;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
   margin-bottom: 10px
 }
 .navbar-custom .navbar-nav {
@@ -125,7 +128,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .navbar-custom .nav li a {
   display: block;
   color: #aaabae;
-  font-size: 12px
+  font-size: 13px
 }
 .dropdown-menu .active a, .dropdown-menu .active a:focus, .dropdown-menu .active a:hover, .dropdown-menu li a:focus, .dropdown-menu li a:hover {
   background-color: #2B303A;
@@ -313,8 +316,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .list-group-item a, .list-group-item span {
   display: block;
   color: #434a54;
-  padding: 10px 15px;
+  padding: 10px 18px;
   text-decoration: none;
+}
+.list-group-item span {
+  padding-left: 20px;
+  padding-right: 0;
 }
 .list-group-item a:hover {
   background-color: #E6E9ED;

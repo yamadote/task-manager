@@ -2,10 +2,11 @@
   .task-header {
     display: flex;
     height: 42px;
+    min-height: 40px;
 
     .title {
       padding: 3px 0;
-      margin: 10px .25rem 10px 0;
+      margin: 10px 5px;
       background: none;
       width: 100%;
       border: none;
@@ -21,27 +22,30 @@
       background: var(--changing-color);
     }
 
-    .title-link {
+    .title-link, .title-button {
       color: #000;
+      line-height: 24px;
+      margin-top: 10px;
+      margin-left: 8px;
+      padding: 0 2px;
+    }
+
+    .title-button:first-child {
+      margin-left: 0;
+    }
+
+    .title-link {
       width: 20px;
-      margin: 1px 6px 0 4px;
-      line-height: 42px;
-      font-size: 16px;
+      height: 24px;
+      display: block;
     }
 
     .title-button {
       border: none;
       background: none;
       outline: none;
-      padding: 0 3px;
       font-size: 13px;
       height: 24px;
-      margin-top: 10px;
-    }
-
-    .task-children-page-button {
-      margin-left: 2px;
-      margin-top: 12px;
     }
   }
 }
