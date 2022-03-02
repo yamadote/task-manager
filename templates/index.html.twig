@@ -23,7 +23,7 @@
                         <ul role="menu" class="dropdown-menu">
                             <li><a href="#"><i class="glyphicon glyphicon-cog"></i> Settings</a></li>
                             <li class="divider"></li>
-                            <li><a href="#"><i class="glyphicon glyphicon-log-out"></i> Signout</a></li>
+                            <li><a href="/logout"><i class="glyphicon glyphicon-log-out"></i> Signout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -38,14 +38,14 @@
                     <li class="list-group-item list-group-item-search">
                         <input type="text" class="form-control search-query" placeholder="Search">
                     </li>
-                    <li class="list-group-item"><a href="#"><i class="glyphicon glyphicon-list-alt"></i>All Tasks</a></li>
-                    <li class="list-group-item"><a href="#"><i class="glyphicon glyphicon-bell"></i>Reminders</a></li>
-                    <li class="list-group-item"><a href="#"><i class="glyphicon glyphicon-flash"></i>Todo</a></li>
-                    <li class="list-group-item"><a href="#"><i class="glyphicon glyphicon-flag"></i>In Progress</a></li>
-                    <li class="list-group-item"><a href="#" ><i class="glyphicon glyphicon-certificate"></i>Frozen</a></li>
-                    <li class="list-group-item"><a href="#" ><i class="glyphicon glyphicon-calendar"></i>Potential</a></li>
-                    <li class="list-group-item"><a href="#" ><i class="glyphicon glyphicon-remove"></i>Cancelled</a></li>
-                    <li class="list-group-item"><a href="#" ><i class="glyphicon glyphicon-ok"></i>Completed</a></li>
+                    <li class="list-group-item"><a href="/tasks"><i class="glyphicon glyphicon-list-alt"></i>All Tasks</a></li>
+                    <li class="list-group-item"><a href="/tasks/reminders"><i class="glyphicon glyphicon-bell"></i>Reminders</a></li>
+                    <li class="list-group-item"><a href="/tasks/todo"><i class="glyphicon glyphicon-flash"></i>Todo</a></li>
+                    <li class="list-group-item"><a href="/tasks/status/progress"><i class="glyphicon glyphicon-flag"></i>In Progress</a></li>
+                    <li class="list-group-item"><a href="/tasks/status/frozen"><i class="glyphicon glyphicon-certificate"></i>Frozen</a></li>
+                    <li class="list-group-item"><a href="/tasks/status/potential"><i class="glyphicon glyphicon-calendar"></i>Potential</a></li>
+                    <li class="list-group-item"><a href="/tasks/status/cancelled"><i class="glyphicon glyphicon-remove"></i>Cancelled</a></li>
+                    <li class="list-group-item"><a href="/tasks/status/completed"><i class="glyphicon glyphicon-ok"></i>Completed</a></li>
                 </ul>
             </div>
             <div class="col-xs-12 col-sm-9 content">
