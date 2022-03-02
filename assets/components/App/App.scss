@@ -1,61 +1,6 @@
 :root {
-//  --bs-dark-rgb: 77,82,86;
   --changing-color: lightyellow;
 }
-//
-//body {
-//  font-family: "Roboto",Arial,sans-serif;
-//  background: #fff;
-//}
-//
-//.btn {
-//  box-shadow: none !important;
-//  outline: none !important;
-//}
-//
-//.btn, button:focus, textarea:focus, .navbar-toggler:focus {
-//  outline: none !important;
-//}
-//
-//.btn-danger, .btn-danger:hover {
-//  color: #fff;
-//  background-color: #f67e7d;
-//  border-color: #f67e7d;
-//}
-//
-//.btn-secondary, .btn-secondary:hover {
-//  color: #fff;
-//  background-color: #6c757d;
-//  border-color: #6c757d;
-//}
-//
-//.btn-info, .btn-info:hover {
-//  color: #fff;
-//  background-color: #17a2b8;
-//  border-color: #17a2b8;
-//}
-//
-//.oi, .oi::before {
-//  font-size: 12px;
-//}
-//
-//nav.navbar {
-//  gap: 0;
-//}
-//
-//.navbar-brand {
-//  padding-top: 0.2rem;
-//  padding-bottom: 0.1rem;
-//}
-//
-//.nav-link {
-//  padding: 0.6rem 1rem 0.35rem;
-//}
-//
-//.navbar-dark .navbar-nav .nav-link {
-//  color: #fff;
-//}
-
 body {
   position: relative;
   /* For scrollyspy */
@@ -81,9 +26,34 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* ----------------------------------
+ * buttons
+ * ---------------------------------- */
+
+.btn {
+  box-shadow: none !important;
+  outline: none !important;
+}
+.btn, button:focus, textarea:focus {
+  outline: none !important;
+}
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+.btn-secondary:hover {
+  color: #fff;
+  background-color: #64686b;
+  border-color: #64686b;
+}
+
+/* ----------------------------------
  * icons
  * ---------------------------------- */
 
+.oi, .oi::before {
+  font-size: 12px;
+}
 @font-face {
   font-family: "angularicons";
   src: url("../../../public/fonts/angularicons.eot");
@@ -102,9 +72,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .icon[data-icon]:before {
   content: attr(data-icon);
   speak: none;
-}
-.oi, .oi::before {
-  font-size: 12px;
 }
 
 /* ----------------------------------

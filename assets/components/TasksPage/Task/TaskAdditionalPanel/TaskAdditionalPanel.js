@@ -11,7 +11,7 @@ import TaskTimeTrackingButton from "./TaskTimeTrackingButton/TaskTimeTrackingBut
 const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
     const [isDescriptionHidden, setDescriptionHidden] = useState(!task.description)
     return (
-        <div className="mb-3">
+        <div className="additional-panel">
             <div className="fields">
                 <TaskStatusField task={task} statuses={statuses} events={events} />
                 <TaskReminderField task={task} events={events} />
