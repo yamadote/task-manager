@@ -5,7 +5,7 @@ import Helper from "../../../../App/Helper";
 
 const TaskChildrenPageButton = ({task}) => {
     return (
-        <Link to={Helper.getTaskPageUrl(task.id)} className="title-button btn btn-sm task-children-page-button">
+        <Link to={Helper.getTaskPageUrl(task.id)} className="title-button">
             <span className="oi oi-align-center"/>
         </Link>
     );

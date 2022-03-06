@@ -3,7 +3,7 @@
 {% block title %}Register | {{ parent() }}{% endblock %}
 
 {% block body %}
-<div class="container pt-4 mt-5 register">
+<div class="container register">
     <h1>Register</h1>
 
     {% for flashError in app.flashes('verify_email_error') %}
@@ -14,8 +14,8 @@
         {{ form_row(registrationForm.email) }}
         {{ form_row(registrationForm.plainPassword, {label: 'Password'}) }}
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary mr-1">Register</button>
+        <div class="buttons">
+            <button type="submit" class="btn btn-primary">Register</button>
             <a href="{{ path('app_login') }}" class="btn btn-secondary">Login</a>
         </div>
     {{ form_end(registrationForm) }}

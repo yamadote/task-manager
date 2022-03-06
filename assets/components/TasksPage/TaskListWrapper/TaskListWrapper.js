@@ -5,7 +5,7 @@ import TaskList from '../TaskList/TaskList'
 const TaskListWrapper = ({data, events}) => {
     const {tasks, root, nested} = data;
     if (tasks === undefined) {
-        return "loading ..."
+        return null;
     }
     const getChildren = () => {
         if (nested === false) {
@@ -16,7 +16,7 @@ const TaskListWrapper = ({data, events}) => {
     }
     const children = getChildren();
     if (children.length === 0) {
-        return "no records found";
+        return null;
     }
     return <TaskList children={children} data={data} events={events}/>;
 }

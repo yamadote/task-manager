@@ -1,5 +1,10 @@
 
 .task {
+  .additional-panel {
+    margin-bottom: 14px;
+    margin-top: -4px;
+  }
+
   .fields {
     margin-bottom: 9px;
   }
@@ -12,7 +17,6 @@
     span {
       padding-top: 2px;
       font-weight: 700;
-      font-size: .81rem;
       margin-right: 5px;
     }
 
@@ -31,14 +35,17 @@
 
     input[type=datetime-local] {
       width: 190px;
-      font-size: .81rem;
+      font-size: 13px;
+      font-family: inherit;
       border-radius: 0;
       color: black;
       transition: none;
+      cursor: pointer;
     }
 
     select {
       padding: 0 2px 2px;
+      cursor: pointer;
     }
 
     input:focus, input.changing {
@@ -51,15 +58,16 @@
     }
   }
 
-  .field:first-child {
-    margin-top: -4px;
-  }
+  .additional-panel-buttons {
+    display: flex;
+    row-gap: 5px;
+    flex-wrap: wrap;
 
-  .created-at {
-    float: right;
-    font-size: .75rem;
-    line-height: 18px;
-    margin-right: 8px;
-    margin-top: 12px;
+    .created-at {
+      margin-left: auto;
+      line-height: 18px;
+      margin-right: 8px;
+      margin-top: 10px;
+    }
   }
 }
