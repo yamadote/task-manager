@@ -3,7 +3,7 @@
 {% block title %}Login | {{ parent() }}{% endblock %}
 
 {% block body %}
-<div class="container pt-4 mt-5 login">
+<div class="container login">
     <h1>Login</h1>
 
     {% if error %}
@@ -15,8 +15,8 @@
         {{ form_row(loginForm.password) }}
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary mr-1">Login</button>
+        <div class="buttons">
+            <button type="submit" class="btn btn-primary">Login</button>
 {#            <a href="{{ path('app_register') }}" class="btn btn-secondary">Register</a>#}
         </div>
     {{ form_end(loginForm) }}

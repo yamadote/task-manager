@@ -84,7 +84,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
  * container
  * ---------------------------------- */
 
-.container.login {
+.container.login, .container.register {
   width: 460px;
   margin-top: 120px;
   padding: 15px 40px 35px;
@@ -95,8 +95,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   h1 {
     margin-bottom: 20px;
   }
-  button {
-    margin-top: 10px;
+  .buttons {
+    margin-top: 20px;
   }
 }
 
