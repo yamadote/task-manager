@@ -17,11 +17,13 @@ const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
                 <TaskReminderField task={task} events={events} />
                 <TaskLinkField task={task} events={events} />
             </div>
-            <TaskTimeTrackingButton task={task} isActive={isActive} events={events}/>
-            <button onClick={() => events.createNewTask(task.id)} className='btn btn-sm btn-secondary'>New Task</button>
-            <button onClick={() => events.removeTask(task.id)} className='btn btn-sm btn-danger'>Remove</button>
-            <button onClick={() => setDescriptionHidden(false)} className='btn btn-sm btn-info'>Description</button>
-            <span className="created-at">{moment.unix(task.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+            <div className="additional-panel-buttons">
+                <TaskTimeTrackingButton task={task} isActive={isActive} events={events}/>
+                <button onClick={() => events.createNewTask(task.id)} className='btn btn-sm btn-secondary'>New Task</button>
+                <button onClick={() => events.removeTask(task.id)} className='btn btn-sm btn-danger'>Remove</button>
+                <button onClick={() => setDescriptionHidden(false)} className='btn btn-sm btn-info'>Description</button>
+                <span className="created-at">{moment.unix(task.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+            </div>
             { isDescriptionHidden ? null : <TaskDescriptionEditor task={task} events={events}/> }
         </div>
     );

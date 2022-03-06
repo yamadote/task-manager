@@ -2,6 +2,7 @@
 .task {
   .additional-panel {
     margin-bottom: 14px;
+    margin-top: -4px;
   }
 
   .fields {
@@ -57,14 +58,16 @@
     }
   }
 
-  .field:first-child {
-    margin-top: -4px;
-  }
+  .additional-panel-buttons {
+    display: flex;
+    row-gap: 5px;
+    flex-wrap: wrap;
 
-  .created-at {
-    float: right;
-    line-height: 18px;
-    margin-right: 8px;
-    margin-top: 12px;
+    .created-at {
+      margin-left: auto;
+      line-height: 18px;
+      margin-right: 8px;
+      margin-top: 10px;
+    }
   }
 }
