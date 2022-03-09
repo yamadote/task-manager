@@ -26,10 +26,10 @@ const Sidebar = ({root, search}) => {
                     <Link to={prefix + "/tasks/reminders"}><i className="glyphicon glyphicon-bell" />Reminders</Link>
                 </li>
                 <li className="list-group-item">
-                    <Link to={prefix + "/tasks/todo"}><i className="glyphicon glyphicon-flash" />Todo</Link>
+                    <Link to={prefix + "/tasks/status/progress"}><i className="glyphicon glyphicon-flag" />In Progress</Link>
                 </li>
                 <li className="list-group-item">
-                    <Link to={prefix + "/tasks/status/progress"}><i className="glyphicon glyphicon-flag" />In Progress</Link>
+                    <Link to={prefix + "/tasks/todo"}><i className="glyphicon glyphicon-flash" />Todo</Link>
                 </li>
                 <li className="list-group-item">
                     <Link to={prefix + "/tasks/status/frozen"}><i className="glyphicon glyphicon-certificate" />Frozen</Link>
