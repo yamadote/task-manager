@@ -16,7 +16,7 @@ cp ./.env ./.env.local
 
 Start dev environment:
 ```
-npm run watch 
+export NODE_OPTIONS=--openssl-legacy-provider; npm run watch 
 ```
 ```
 cd docker
