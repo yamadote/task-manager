@@ -28,6 +28,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
     const [activeTask, setActiveTask] = useState(undefined);
+    const [reminderNumber, setReminderNumber] = useState(undefined);
 
     const events = new function () {
         return {
@@ -39,6 +40,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                         setActiveTask(response.activeTask);
                         setTasks(response.tasks);
                         setRoot(findRootTask(params, response.tasks, root));
+                        setReminderNumber(response.reminderNumber)
                     });
             },
             updateTask: (id, update) => {
@@ -101,9 +103,16 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                         .then(() => setLinkChanging(false));
                 }, Config.updateInputTimeout);
             },
-            updateTaskReminder: (id, reminder) => {
-                events.updateTask(id, {reminder: reminder});
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+            updateTaskReminder: (task, reminder) => {
+                const time = Math.floor(Date.now() / 1000);
+                const taskWasReminder = task.reminder && task.reminder < time;
+                const taskWillBeReminder = reminder && reminder < time;
+
+                if (taskWasReminder && !taskWillBeReminder) setReminderNumber(reminderNumber - 1);
+                if (!taskWasReminder && taskWillBeReminder) setReminderNumber(reminderNumber + 1);
+
+                events.updateTask(task.id, {reminder: reminder});
+                const url = Config.apiUrlPrefix + '/tasks/' + task.id + '/edit';
                 Helper.fetchJsonPost(url, {'reminder': reminder}).then();
             },
             updateTaskStatus: (id, status) => {
@@ -150,7 +159,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
             <Header/>
             <div className="container-fluid main-container">
                 <div className="row row-offcanvas row-offcanvas-left">
-                    <Sidebar root={root} search={events.search}/>
+                    <Sidebar root={root} search={events.search} reminderNumber={reminderNumber}/>
                     <div className="col-xs-12 col-sm-9 content">
                         <div className="panel panel-default">
                             <TaskPanelHeading title={title} root={root} events={events}/>

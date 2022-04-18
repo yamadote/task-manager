@@ -44,6 +44,7 @@ class TaskResponseComposer
         $root = $this->findRootTask($user, $tasks);
         $settings = $this->settingsRepository->findByTasks($tasks);
         $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
+        $reminderNumber = $this->taskRepository->countUserReminders($user);
         $statusCollection = $this->taskStatusConfig->getStatusCollection();
         $activeTask = null;
         if ($activePeriod) {
@@ -53,7 +54,8 @@ class TaskResponseComposer
         return $this->jsonResponseBuilder->build([
             'statuses' => $this->taskResponseBuilder->buildStatusListResponse($statusCollection),
             'tasks' => $this->taskResponseBuilder->buildTaskListResponse($tasks, $settings, $root),
-            'activeTask' => $activeTask
+            'activeTask' => $activeTask,
+            'reminderNumber' => $reminderNumber
         ]);
     }
 

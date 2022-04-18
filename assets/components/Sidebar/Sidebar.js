@@ -3,7 +3,7 @@ import React from 'react';
 import './Sidebar.scss';
 import {Link} from "react-router-dom";
 
-const Sidebar = ({root, search}) => {
+const Sidebar = ({root, search, reminderNumber}) => {
     const prefix = root === null ? '' : '/' + root.id;
     const searchInputKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -23,7 +23,10 @@ const Sidebar = ({root, search}) => {
                     <Link to={prefix + "/tasks"}><i className="glyphicon glyphicon-list-alt" />All Tasks</Link>
                 </li>
                 <li className="list-group-item">
-                    <Link to={prefix + "/tasks/reminders"}><i className="glyphicon glyphicon-bell" />Reminders</Link>
+                    <Link to={prefix + "/tasks/reminders"}>
+                        <i className="glyphicon glyphicon-bell" />Reminders
+                        { reminderNumber ? <div className="badge badge-warning">{reminderNumber}</div> : null }
+                    </Link>
                 </li>
                 <li className="list-group-item">
                     <Link to={prefix + "/tasks/status/progress"}><i className="glyphicon glyphicon-flag" />In Progress</Link>

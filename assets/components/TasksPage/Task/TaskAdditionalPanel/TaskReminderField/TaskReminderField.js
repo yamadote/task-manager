@@ -5,7 +5,7 @@ import './TaskReminderField.scss';
 
 const TaskReminderField = ({task, events}) => {
     const updateReminder = (reminder) => {
-        events.updateTaskReminder(task.id, reminder)
+        events.updateTaskReminder(task, reminder)
     }
 
     const onReminderChange = event => updateReminder(moment(event.target.value).unix())

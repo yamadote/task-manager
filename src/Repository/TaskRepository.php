@@ -70,6 +70,14 @@ class TaskRepository extends NestedTreeRepository
         return new TaskCollection($queryBuilder->getQuery()->getResult());
     }
 
+    public function countUserReminders(User $user): int
+    {
+        $queryBuilder = $this->prepareUserTasksQueryBuilder($user);
+        $queryBuilder->andWhere("t.reminder < :time");
+        $queryBuilder->select("count(t.id)");
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
     public function findUserTasksByStatusList(
         User $user,
         TaskStatusCollection $taskStatusCollection,
