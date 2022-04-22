@@ -146,7 +146,19 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 events.updateTask(id, {childrenTrackedTime: childrenTrackedTime})
             },
             search: (value) => {
-                console.log("Search: " + value)
+                value = value.toLowerCase();
+                const isTaskVisible = (task, value) => {
+                    if (task.title.toLowerCase().includes(value)) {
+                        return true;
+                    }
+                    return tasks.find(child => child.parent === task.id && isTaskVisible(child, value)) !== undefined;
+                }
+                setTasks(tasks => {
+                    return tasks.map(task => {
+                        task.isHidden = !isTaskVisible(task, value);
+                        return task;
+                    });
+                })
             }
         }
     }

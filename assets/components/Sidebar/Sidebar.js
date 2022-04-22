@@ -6,9 +6,9 @@ import {Link} from "react-router-dom";
 const Sidebar = ({root, search, reminderNumber}) => {
     const prefix = root === null ? '' : '/' + root.id;
     const searchInputKeyDown = (event) => {
-        if (event.key === 'Enter') {
+        setTimeout(function() {
             search(event.target.value)
-        }
+        });
     }
     return (
         <div className="col-xs-6 col-sm-3 sidebar-offcanvas" role="navigation">
