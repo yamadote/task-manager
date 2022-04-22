@@ -23,10 +23,24 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
         };
     }
 
+    const updateTasksVisibility = (tasks, search) => {
+        const isTaskVisible = (task, search) => {
+            if (task.title.toLowerCase().includes(search.toLowerCase())) {
+                return true;
+            }
+            return tasks.find(child => child.parent === task.id && isTaskVisible(child, search)) !== undefined;
+        }
+        return tasks.map(task => {
+            task.isHidden = !isTaskVisible(task, search);
+            return task;
+        });
+    }
+
     const params = useParams();
     const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
     const [statuses, setStatuses] = useState(undefined);
+    const [search, setSearch] = useState("");
     const [activeTask, setActiveTask] = useState(undefined);
     const [reminderNumber, setReminderNumber] = useState(undefined);
 
@@ -38,9 +52,9 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                     .then(response => {
                         setStatuses(response.statuses);
                         setActiveTask(response.activeTask);
-                        setTasks(response.tasks);
+                        setTasks(updateTasksVisibility(response.tasks, search));
                         setRoot(findRootTask(params, response.tasks, root));
-                        setReminderNumber(response.reminderNumber)
+                        setReminderNumber(response.reminderNumber);
                     });
             },
             updateTask: (id, update) => {
@@ -138,40 +152,20 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                     Helper.fetchJsonPost(url, {'description': description})
                         .then(() => setDescriptionChanging(false));
                 }, Config.updateInputTimeout);
-            },
-            updateTaskTrackedTime: (id, trackedTime) => {
-                events.updateTask(id, {trackedTime: trackedTime})
-            },
-            updateTaskChildrenTrackedTime: (id, childrenTrackedTime) => {
-                events.updateTask(id, {childrenTrackedTime: childrenTrackedTime})
-            },
-            search: (value) => {
-                value = value.toLowerCase();
-                const isTaskVisible = (task, value) => {
-                    if (task.title.toLowerCase().includes(value)) {
-                        return true;
-                    }
-                    return tasks.find(child => child.parent === task.id && isTaskVisible(child, value)) !== undefined;
-                }
-                setTasks(tasks => {
-                    return tasks.map(task => {
-                        task.isHidden = !isTaskVisible(task, value);
-                        return task;
-                    });
-                })
             }
         }
     }
 
     useLayoutEffect(events.reload, [fetchFrom]);
     useLayoutEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
+    useLayoutEffect(() => setTasks(updateTasksVisibility(tasks, search)), [search]);
 
     return (
         <div>
             <Header/>
             <div className="container-fluid main-container">
                 <div className="row row-offcanvas row-offcanvas-left">
-                    <Sidebar root={root} search={events.search} reminderNumber={reminderNumber}/>
+                    <Sidebar root={root} setSearch={setSearch} reminderNumber={reminderNumber}/>
                     <div className="col-xs-12 col-sm-9 content">
                         <div className="panel panel-default">
                             <TaskPanelHeading title={title} root={root} events={events}/>
