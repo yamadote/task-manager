@@ -1,6 +1,7 @@
 
 import React from 'react';
 import './Header.scss';
+import {Link} from "react-router-dom";
 
 const Header = () => {
     return (
@@ -26,7 +27,7 @@ const Header = () => {
                                 <i className="glyphicon glyphicon-user" /> Account <b className="caret" />
                             </a>
                             <ul role="menu" className="dropdown-menu">
-                                <li><a href="#"><i className="glyphicon glyphicon-cog" /> Settings</a></li>
+                                <li><Link to="/settings"><i className="glyphicon glyphicon-cog" /> Settings</Link></li>
                                 <li className="divider" />
                                 <li><a href="/logout"><i className="glyphicon glyphicon-log-out" /> Signout</a></li>
                             </ul>

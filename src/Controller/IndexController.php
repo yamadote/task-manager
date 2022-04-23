@@ -34,6 +34,7 @@ class IndexController extends AbstractController
      * @Route("/{parent}/tasks", name="app_parent_task_index", methods={"GET"}, requirements={"parent"="\d+"})
      * @Route("/{parent}/tasks/todo", name="app_parent_task_todo", methods={"GET"}, requirements={"parent"="\d+"})
      * @Route("/{parent}/tasks/reminders", name="app_parent_task_reminders", methods={"GET"}, requirements={"parent"="\d+"})
+     * @Route("/settings", name="app_settings", methods={"GET"})
      * @IsGranted("ROLE_USER")
      */
     public function tasks(): Response

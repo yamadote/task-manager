@@ -3,6 +3,7 @@ import React from 'react';
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import Config from "./../App/Config";
 import TasksPage from "../TasksPage/TasksPage";
+import SettingsPage from "../SettingsPage/SettingsPage";
 import './App.scss';
 
 const App = () => {
@@ -40,6 +41,9 @@ const App = () => {
                 <Route path="/:root?/tasks">
                     <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}
                                title={<span><i className="glyphicon glyphicon-list-alt" />All Tasks</span>}/>
+                </Route>
+                <Route path="/settings">
+                    <SettingsPage/>
                 </Route>
             </Switch>
         </Router>
