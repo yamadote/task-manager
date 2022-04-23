@@ -9,7 +9,7 @@ const TasksAmount = ({tasks, root, nested}) => {
     const count = (tasks, parent) => {
         let amount = 0;
         tasks.forEach(task => {
-            if (task.parent === parent) {
+            if (!task.isHidden && task.parent === parent) {
                 amount += count(tasks, task.id) + 1;
             }
         });

@@ -11,29 +11,18 @@ import TaskPanelHeading from "./TaskPanelHeading/TaskPanelHeading";
 
 const TasksPage = ({title, fetchFrom, nested = true}) => {
 
-    const findRootTask = (params, tasks, oldRootTask) => {
+    const findRootTask = (params, tasks, previousRootTask) => {
         if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
             return null;
         }
         const id = parseInt(params.root);
-        return {
-            id: id,
-            ...oldRootTask,
-            ...tasks?.find(task => task.id === id)
-        };
+        return {id: id, ...previousRootTask, ...tasks?.find(task => task.id === id)};
     }
-
-    const updateTasksVisibility = (tasks, search) => {
-        const isTaskVisible = (task, search) => {
-            if (task.title.toLowerCase().includes(search.toLowerCase())) {
-                return true;
-            }
-            return tasks.find(child => child.parent === task.id && isTaskVisible(child, search)) !== undefined;
+    const isTaskVisible = (task, search, tasks) => {
+        if (task.title.toLowerCase().includes(search.toLowerCase())) {
+            return true;
         }
-        return tasks.map(task => {
-            task.isHidden = !isTaskVisible(task, search);
-            return task;
-        });
+        return tasks.find(child => child.parent === task.id && isTaskVisible(child, search, tasks)) !== undefined;
     }
 
     const params = useParams();
@@ -50,10 +39,14 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 setTasks([]);
                 Helper.fetchJson(fetchFrom)
                     .then(response => {
+                        let tasks = response.tasks.map(task => {
+                            task.isHidden = !isTaskVisible(task, search, response.tasks);
+                            return task;
+                        });
                         setStatuses(response.statuses);
                         setActiveTask(response.activeTask);
-                        setTasks(updateTasksVisibility(response.tasks, search));
-                        setRoot(findRootTask(params, response.tasks, root));
+                        setTasks(tasks);
+                        setRoot(findRootTask(params, tasks, root));
                         setReminderNumber(response.reminderNumber);
                     });
             },
@@ -68,7 +61,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 })
             },
             createNewTask: (parent = null) => {
-                const url = Config.apiUrlPrefix + '/tasks/new';
+                const url = Helper.getNewTaskUrl();
                 Helper.fetchJsonPost(url, {'parent': parent})
                     .then(task => {
                         setTasks(tasks => [task, ...tasks])
@@ -78,12 +71,12 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                     });
             },
             startTask: (id) => {
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/start';
+                const url = Helper.getTaskStartUrl(id);
                 Helper.fetchJsonPost(url)
                     .then(response => setActiveTask({task: id, trackedTime: 0, path: response.activeTask.path}));
             },
             finishTask: (id) => {
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/finish';
+                const url = Helper.getTaskFinishUrl(id);
                 Helper.fetchJsonPost(url)
                     .then(() => setActiveTask(undefined));
             },
@@ -92,7 +85,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 if (!confirm("Are you sure, you want to remove '" + task.title + "'?")) {
                     return;
                 }
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/delete';
+                const url = Helper.getTaskDeleteUrl(id);
                 fetch(url, {method: 'POST'})
                     .then(() => {
                         // todo: remove task children
@@ -103,7 +96,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 setTitleChanging(true);
                 events.updateTask(id, {title: title});
                 Helper.addTimeout('task_title' + id, () => {
-                    const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                    const url = Helper.getTaskEditUrl(id);
                     Helper.fetchJsonPost(url, {'title': title})
                         .then(() => setTitleChanging(false));
                 }, Config.updateInputTimeout);
@@ -112,7 +105,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 setLinkChanging(true);
                 events.updateTask(id, {link: link});
                 Helper.addTimeout('task_link' + id, () => {
-                    const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                    const url = Helper.getTaskEditUrl(id);
                     Helper.fetchJsonPost(url, {'link': link})
                         .then(() => setLinkChanging(false));
                 }, Config.updateInputTimeout);
@@ -126,46 +119,52 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 if (!taskWasReminder && taskWillBeReminder) setReminderNumber(reminderNumber + 1);
 
                 events.updateTask(task.id, {reminder: reminder});
-                const url = Config.apiUrlPrefix + '/tasks/' + task.id + '/edit';
+                const url = Helper.getTaskEditUrl(task.id);
                 Helper.fetchJsonPost(url, {'reminder': reminder}).then();
             },
             updateTaskStatus: (id, status) => {
                 events.updateTask(id, {status: status});
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                const url = Helper.getTaskEditUrl(id);
                 Helper.fetchJsonPost(url, {'status': status}).then();
             },
             updateTaskChildrenViewSetting: (id, value) => {
                 events.updateTask(id, {isChildrenOpen: value})
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
+                const url = Helper.getTaskEditSettingsUrl(id);
                 Helper.fetchJsonPost(url, {'isChildrenOpen': value}).then();
             },
             updateTaskAdditionalPanelViewSetting: (id, value) => {
                 events.updateTask(id, {isAdditionalPanelOpen: value})
-                const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit/settings';
+                const url = Helper.getTaskEditSettingsUrl(id);
                 Helper.fetchJsonPost(url, {'isAdditionalPanelOpen': value}).then();
             },
             updateTaskDescription: (id, description, setDescriptionChanging) => {
                 setDescriptionChanging(true);
                 events.updateTask(id, {description: description})
                 Helper.addTimeout('task_description' + id, () => {
-                    const url = Config.apiUrlPrefix + '/tasks/' + id + '/edit';
+                    const url = Helper.getTaskEditUrl(id);
                     Helper.fetchJsonPost(url, {'description': description})
                         .then(() => setDescriptionChanging(false));
                 }, Config.updateInputTimeout);
+            },
+            onSearchUpdate: () => {
+                setTasks((tasks) => tasks.map(task => {
+                    task.isHidden = !isTaskVisible(task, search, tasks);
+                    return task;
+                }));
             }
         }
     }
 
     useLayoutEffect(events.reload, [fetchFrom]);
+    useLayoutEffect(events.onSearchUpdate, [search]);
     useLayoutEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
-    useLayoutEffect(() => setTasks(updateTasksVisibility(tasks, search)), [search]);
 
     return (
         <div>
             <Header/>
             <div className="container-fluid main-container">
                 <div className="row row-offcanvas row-offcanvas-left">
-                    <Sidebar root={root} setSearch={setSearch} reminderNumber={reminderNumber}/>
+                    <Sidebar root={root} onSearch={setSearch} reminderNumber={reminderNumber}/>
                     <div className="col-xs-12 col-sm-9 content">
                         <div className="panel panel-default">
                             <TaskPanelHeading title={title} root={root} events={events}/>

@@ -3,11 +3,11 @@ import React from 'react';
 import './Sidebar.scss';
 import {Link} from "react-router-dom";
 
-const Sidebar = ({root, setSearch, reminderNumber}) => {
+const Sidebar = ({root, onSearch, reminderNumber}) => {
     const prefix = root === null ? '' : '/' + root.id;
     const searchInputKeyDown = (event) => {
         setTimeout(function() {
-            setSearch(event.target.value)
+            onSearch(event.target.value)
         });
     }
     return (

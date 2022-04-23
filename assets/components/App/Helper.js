@@ -1,5 +1,6 @@
 
 import {useLocation, useParams} from "react-router-dom";
+import Config from "./Config";
 
 const Helper = new function () {
     const timeoutStorage = {};
@@ -46,6 +47,24 @@ const Helper = new function () {
                 url = '/' + taskId + url;
             }
             return url;
+        },
+        getNewTaskUrl() {
+            return Config.apiUrlPrefix + '/tasks/new';
+        },
+        getTaskStartUrl(taskId) {
+            return Config.apiUrlPrefix + '/tasks/' + taskId + '/start';
+        },
+        getTaskFinishUrl(taskId) {
+            return Config.apiUrlPrefix + '/tasks/' + taskId + '/finish';
+        },
+        getTaskEditUrl(taskId) {
+            return Config.apiUrlPrefix + '/tasks/' + taskId + '/edit';
+        },
+        getTaskEditSettingsUrl(taskId) {
+            return Config.apiUrlPrefix + '/tasks/' + taskId + '/edit/settings';
+        },
+        getTaskDeleteUrl(taskId) {
+            return Config.apiUrlPrefix + '/tasks/' + taskId + '/delete';
         }
     }
 }
