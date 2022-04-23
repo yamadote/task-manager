@@ -1,12 +1,13 @@
 
 import React from 'react';
+import Helper from "../../../../App/Helper";
 
 const TaskGithubLink = ({link}) => {
-    if (!link.includes("https://github.com/")) {
+    if (!Helper.isGithubLink(link)) {
         return null;
     }
-    const issue = link.split('/').slice(-1)[0];
-    return <a href={link} target="_blank" className="title-github-link">#{issue}</a>
+    const issue = Helper.getGithubIssueNumber(link)
+    return <a href={link} target="_blank" className="title-github-link">{issue}</a>
 }
 
 export default TaskGithubLink;

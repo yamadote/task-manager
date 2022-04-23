@@ -65,6 +65,12 @@ const Helper = new function () {
         },
         getTaskDeleteUrl(taskId) {
             return Config.apiUrlPrefix + '/tasks/' + taskId + '/delete';
+        },
+        isGithubLink(link) {
+            return link.includes(Config.githubUrlPrefix)
+        },
+        getGithubIssueNumber(link) {
+            return "#" + link.split('/').slice(-1)[0];
         }
     }
 }

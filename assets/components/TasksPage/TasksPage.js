@@ -22,6 +22,9 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
         if (task.title.toLowerCase().includes(search.toLowerCase())) {
             return true;
         }
+        if (task.link && Helper.isGithubLink(task.link) && Helper.getGithubIssueNumber(task.link).includes(search)) {
+            return true;
+        }
         return tasks.find(child => child.parent === task.id && isTaskVisible(child, search, tasks)) !== undefined;
     }
 
