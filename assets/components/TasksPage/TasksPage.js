@@ -4,10 +4,10 @@ import {useParams} from "react-router-dom";
 import Config from "./../App/Config";
 import Helper from "./../App/Helper";
 import TaskListWrapper from "./TaskListWrapper/TaskListWrapper";
-import Footer from "./Footer/Footer";
-import Header from "../Header/Header";
-import Sidebar from "../Sidebar/Sidebar";
 import TaskPanelHeading from "./TaskPanelHeading/TaskPanelHeading";
+import Page from "../Page/Page";
+import PanelBody from "../Page/PanelBody/PanelBody";
+import TasksAmount from "./TasksAmount/TasksAmount";
 
 const TasksPage = ({title, fetchFrom, nested = true}) => {
 
@@ -163,33 +163,19 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     useLayoutEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
 
     return (
-        <div>
-            <Header/>
-            <div className="container-fluid main-container">
-                <div className="row row-offcanvas row-offcanvas-left">
-                    <Sidebar root={root} onSearch={setSearch} reminderNumber={reminderNumber}/>
-                    <div className="col-xs-12 col-sm-9 content">
-                        <div className="panel panel-default">
-                            <TaskPanelHeading title={title} root={root} events={events}/>
-                            <div className="panel-body">
-                                <div className="content-row">
-                                    <div className="row">
-                                        <TaskListWrapper data={{
-                                            root: root,
-                                            tasks: tasks,
-                                            activeTask: activeTask,
-                                            statuses: statuses,
-                                            nested: nested
-                                        }} events={events} />
-                                        <Footer tasks={tasks} root={root} nested={nested}/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Page sidebar={{root: root, onSearch:setSearch, reminderNumber:reminderNumber}}>
+            <TaskPanelHeading title={title} root={root} events={events}/>
+            <PanelBody>
+                <TaskListWrapper data={{
+                    root: root,
+                    tasks: tasks,
+                    activeTask: activeTask,
+                    statuses: statuses,
+                    nested: nested
+                }} events={events} />
+                <TasksAmount tasks={tasks} root={root} nested={nested}/>
+            </PanelBody>
+        </Page>
     );
 }
 

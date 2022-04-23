@@ -2,7 +2,7 @@
 import React from 'react';
 import './PanelHeading.scss';
 
-const PanelHeading = ({title}) => {
+const PanelHeading = ({children, title}) => {
     return (
         <div className="panel-heading">
             <button className="toggle-sidebar btn-to-link">
@@ -11,6 +11,7 @@ const PanelHeading = ({title}) => {
             <h3 className="panel-title">
                 {title}
             </h3>
+            {children}
         </div>
     );
 }

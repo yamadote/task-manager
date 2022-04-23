@@ -1,12 +1,12 @@
 
 import React, {useLayoutEffect, useState} from 'react';
-import Header from "../Header/Header";
-import Sidebar from "../Sidebar/Sidebar";
-import PanelHeading from "../PanelHeading/PanelHeading";
+import PanelHeading from "../Page/PanelHeading/PanelHeading";
 import Helper from "../App/Helper";
 import Config from "../App/Config";
+import Page from "../Page/Page";
+import PanelBody from "../Page/PanelBody/PanelBody";
 
-const TasksPage = () => {
+const SettingsPage = () => {
 
     const [search, setSearch] = useState("");
     const [reminderNumber, setReminderNumber] = useState(undefined);
@@ -27,27 +27,13 @@ const TasksPage = () => {
     useLayoutEffect(events.onSearchUpdate, [search]);
 
     return (
-        <div>
-            <Header/>
-            <div className="container-fluid main-container">
-                <div className="row row-offcanvas row-offcanvas-left">
-                    <Sidebar root={null} onSearch={setSearch} reminderNumber={reminderNumber}/>
-                    <div className="col-xs-12 col-sm-9 content">
-                        <div className="panel panel-default">
-                            <PanelHeading title={<span><i className="glyphicon glyphicon-cog" />Settings</span>}/>
-                            <div className="panel-body">
-                                <div className="content-row">
-                                    <div className="row">
+        <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
+            <PanelHeading title={<span><i className="glyphicon glyphicon-cog" />Settings</span>}/>
+            <PanelBody>
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            </PanelBody>
+        </Page>
     );
 }
 
-export default TasksPage;
+export default SettingsPage;

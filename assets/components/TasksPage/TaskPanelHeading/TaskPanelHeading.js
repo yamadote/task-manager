@@ -2,18 +2,13 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import Helper from "../../App/Helper";
-import '../../PanelHeading/PanelHeading.scss';
+import '../../Page/PanelHeading/PanelHeading.scss';
 import './TaskPanelHeading.scss';
+import PanelHeading from "../../Page/PanelHeading/PanelHeading";
 
 const TaskPanelHeading = ({title, root, events}) => {
     return (
-        <div className="panel-heading">
-            <button className="toggle-sidebar btn-to-link">
-                <span className="fa fa-angle-double-left" data-toggle="offcanvas" title="Maximize Panel" />
-            </button>
-            <h3 className="panel-title">
-                {title}
-            </h3>
+        <PanelHeading title={title}>
             <div className="panel-task-root">
                 {root ? <span className="root-title">{root.title}</span> : ''}
                 {root ? <Link className="btn btn-default" to={Helper.getTaskPageUrl(root?.parent)}><span className="oi oi-share-boxed"/></Link> : null}
@@ -26,7 +21,7 @@ const TaskPanelHeading = ({title, root, events}) => {
                     <span className="oi oi-plus"/>
                 </button>
             </div>
-        </div>
+        </PanelHeading>
     );
 }
 
