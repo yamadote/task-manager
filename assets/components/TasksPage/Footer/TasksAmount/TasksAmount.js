@@ -15,7 +15,7 @@ const TasksAmount = ({tasks, root, nested}) => {
         });
         return amount;
     }
-    let amount = root && nested ? count(tasks, root.id) : tasks.length;
+    let amount = root && nested ? count(tasks, root.id) : tasks.filter(task => !task.isHidden).length;
     if (amount === 0) {
         return null;
     }
