@@ -8,6 +8,7 @@ import TaskPanelHeading from "./TaskPanelHeading/TaskPanelHeading";
 import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
 import TasksAmount from "./TasksAmount/TasksAmount";
+import TasksCalendar from "./TasksCalendar/TasksCalendar";
 
 const TasksPage = ({title, fetchFrom, nested = true}) => {
 
@@ -31,6 +32,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     const params = useParams();
     const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
+    const [showCalendar, setShowCalendar] = useState(false);
     const [statuses, setStatuses] = useState(undefined);
     const [search, setSearch] = useState("");
     const [activeTask, setActiveTask] = useState(undefined);
@@ -154,6 +156,9 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                     task.isHidden = !isTaskVisible(task, search, tasks);
                     return task;
                 }));
+            },
+            toggleCalendar: () => {
+                setShowCalendar(showCalendar => !showCalendar);
             }
         }
     }
@@ -165,6 +170,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     return (
         <Page sidebar={{root: root, onSearch:setSearch, reminderNumber:reminderNumber}}>
             <TaskPanelHeading title={title} root={root} events={events}/>
+            {showCalendar ? <TasksCalendar root={root} tasks={tasks} /> : null}
             <PanelBody>
                 <TaskListWrapper data={{
                     root: root,
