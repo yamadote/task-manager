@@ -14,6 +14,9 @@ const TaskPanelHeading = ({title, root, events}) => {
                 {root ? <Link className="btn btn-default" to={Helper.getTaskPageUrl(root?.parent)}><span className="oi oi-share-boxed"/></Link> : null}
             </div>
             <div>
+                <button className="btn btn-default" onClick={() => events.toggleCalendar()}>
+                    <span className="oi oi-credit-card"/>
+                </button>
                 <button className="btn btn-default" onClick={() => events.reload()}>
                     <span className="oi oi-reload"/>
                 </button>
