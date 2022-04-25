@@ -22,7 +22,7 @@ const TasksCalendar = ({tasks, statuses, events}) => {
         };
     });
     const eventDrop = (info) => {
-        const taskId = parseInt(info.event._def.publicId);
+        const taskId = parseInt(info.event.id);
         const task = tasks.find(task => task.id === taskId);
         const reminder = info.event.start.getTime() / 1000;
         events.updateTaskReminder(task, reminder)
@@ -37,6 +37,7 @@ const TasksCalendar = ({tasks, statuses, events}) => {
                 editable={true}
                 contentHeight={118}
                 firstDay={1}
+                eventClick={info => navigator.clipboard.writeText(info.event.title)}
             />
         </div>
     );
