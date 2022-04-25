@@ -5,31 +5,21 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from "@fullcalendar/interaction"
 import './TasksCalendar.scss';
 
-const TasksCalendar = ({root, tasks}) => {
-
-    let reminders = tasks ? tasks.filter(task => {
-        if (task.isHidden || !task.reminder) {
-            return false;
-        }
-        if (!root) {
-            return true;
-        }
-        // todo: filter by root
-        return true;
-    }).map(task => {
+const TasksCalendar = ({tasks}) => {
+    const reminders = tasks ? tasks.filter(task => !task.isHidden && task.reminder) : [];
+    const events = reminders.map(task => {
         const date = new Date(task.reminder * 1000);
         return {
             title: task.title,
             date: date.toISOString()
         };
-    }) : null;
-
+    });
     return (
         <div className="calendar">
             <FullCalendar
                 plugins={[ dayGridPlugin, interactionPlugin ]}
                 initialView="dayGridWeek"
-                events={reminders}
+                events={events}
                 contentHeight={118}
                 firstDay={1}
             />

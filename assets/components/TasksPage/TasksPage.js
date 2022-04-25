@@ -12,21 +12,38 @@ import TasksCalendar from "./TasksCalendar/TasksCalendar";
 
 const TasksPage = ({title, fetchFrom, nested = true}) => {
 
-    const findRootTask = (params, tasks, previousRootTask) => {
+    const findRootTask = (params) => {
         if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
             return null;
         }
-        const id = parseInt(params.root);
-        return {id: id, ...previousRootTask, ...tasks?.find(task => task.id === id)};
+        return {id: parseInt(params.root)};
     }
-    const isTaskVisible = (task, search, tasks) => {
+    const composeRootTask = (root, previousRoot, tasks) => {
+        if (!root) {
+            return null;
+        }
+        return {...root, ...previousRoot, ...tasks?.find(task => task.id === root.id)};
+    }
+    const checkRootTask = (task, root, tasks) => {
+        if (task.parent === null) {
+            return false;
+        }
+        if (task.parent === root.id) {
+            return true;
+        }
+        return checkRootTask(tasks.find(parent => parent.id === task.parent), root, tasks);
+    }
+    const isTaskVisible = (task, search, tasks, root) => {
+        if (root && !checkRootTask(task, root, tasks)) {
+            return false;
+        }
         if (task.title.toLowerCase().includes(search.toLowerCase())) {
             return true;
         }
         if (task.link && Helper.isGithubLink(task.link) && Helper.getGithubIssueNumber(task.link).includes(search)) {
             return true;
         }
-        return tasks.find(child => child.parent === task.id && isTaskVisible(child, search, tasks)) !== undefined;
+        return tasks.find(child => child.parent === task.id && isTaskVisible(child, search, tasks, root)) !== undefined;
     }
 
     const params = useParams();
@@ -44,14 +61,15 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 setTasks([]);
                 Helper.fetchJson(fetchFrom)
                     .then(response => {
-                        let tasks = response.tasks.map(task => {
-                            task.isHidden = !isTaskVisible(task, search, response.tasks);
+                        const newRoot = findRootTask(params)
+                        const tasks = response.tasks.map(task => {
+                            task.isHidden = !isTaskVisible(task, search, response.tasks, newRoot);
                             return task;
                         });
                         setStatuses(response.statuses);
                         setActiveTask(response.activeTask);
                         setTasks(tasks);
-                        setRoot(findRootTask(params, tasks, root));
+                        setRoot(composeRootTask(newRoot, root, tasks));
                         setReminderNumber(response.reminderNumber);
                     });
             },
@@ -153,9 +171,17 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
             },
             onSearchUpdate: () => {
                 setTasks((tasks) => tasks.map(task => {
-                    task.isHidden = !isTaskVisible(task, search, tasks);
+                    task.isHidden = !isTaskVisible(task, search, tasks, root);
                     return task;
                 }));
+            },
+            onRootUpdate: () => {
+                const newRoot = findRootTask(params);
+                setTasks((tasks) => tasks.map(task => {
+                    task.isHidden = !isTaskVisible(task, search, tasks, newRoot);
+                    return task;
+                }));
+                setRoot(composeRootTask(newRoot, root, tasks))
             },
             toggleCalendar: () => {
                 setShowCalendar(showCalendar => !showCalendar);
@@ -165,12 +191,12 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
 
     useLayoutEffect(events.reload, [fetchFrom]);
     useLayoutEffect(events.onSearchUpdate, [search]);
-    useLayoutEffect(() => setRoot(findRootTask(params, tasks)), [params.root]);
+    useLayoutEffect(events.onRootUpdate, [params.root]);
 
     return (
         <Page sidebar={{root: root, onSearch:setSearch, reminderNumber:reminderNumber}}>
             <TaskPanelHeading title={title} root={root} events={events}/>
-            {showCalendar ? <TasksCalendar root={root} tasks={tasks} /> : null}
+            {showCalendar ? <TasksCalendar tasks={tasks} /> : null}
             <PanelBody>
                 <TaskListWrapper data={{
                     root: root,
@@ -179,7 +205,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                     statuses: statuses,
                     nested: nested
                 }} events={events} />
-                <TasksAmount tasks={tasks} root={root} nested={nested}/>
+                <TasksAmount tasks={tasks} />
             </PanelBody>
         </Page>
     );
