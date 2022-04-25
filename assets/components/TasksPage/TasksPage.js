@@ -35,7 +35,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
         return checkRootTask(tasks.find(parent => parent.id === task.parent), root, tasks);
     }
     const isTaskVisible = (task, search, tasks, root) => {
-        if (root && !checkRootTask(task, root, tasks)) {
+        if (nested && root && !checkRootTask(task, root, tasks)) {
             return false;
         }
         if (task.title.toLowerCase().includes(search.toLowerCase())) {
