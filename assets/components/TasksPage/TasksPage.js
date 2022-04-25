@@ -9,6 +9,7 @@ import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
 import TasksAmount from "./TasksAmount/TasksAmount";
 import TasksCalendar from "./TasksCalendar/TasksCalendar";
+import LocalStorage from "../App/LocalStorage";
 
 const TasksPage = ({title, fetchFrom, nested = true}) => {
 
@@ -49,7 +50,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     const params = useParams();
     const [root, setRoot] = useState(findRootTask(params))
     const [tasks, setTasks] = useState(undefined);
-    const [showCalendar, setShowCalendar] = useState(false);
+    const [showCalendar, setShowCalendar] = useState(LocalStorage.getShowCalendar());
     const [statuses, setStatuses] = useState(undefined);
     const [search, setSearch] = useState("");
     const [activeTask, setActiveTask] = useState(undefined);
@@ -184,7 +185,8 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
                 setRoot(composeRootTask(newRoot, root, tasks))
             },
             toggleCalendar: () => {
-                setShowCalendar(showCalendar => !showCalendar);
+                setShowCalendar(!showCalendar);
+                LocalStorage.setShowCalendar(!showCalendar);
             }
         }
     }
