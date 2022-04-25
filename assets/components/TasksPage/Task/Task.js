@@ -1,5 +1,5 @@
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import TaskHeader from "./TaskHeader/TaskHeader";
 import TaskAdditionalPanel from "./TaskAdditionalPanel/TaskAdditionalPanel";
 import TaskList from "../TaskList/TaskList";

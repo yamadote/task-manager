@@ -198,7 +198,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
     return (
         <Page sidebar={{root: root, onSearch:setSearch, reminderNumber:reminderNumber}}>
             <TaskPanelHeading title={title} root={root} events={events}/>
-            {showCalendar ? <TasksCalendar tasks={tasks} events={events} /> : null}
+            {showCalendar ? <TasksCalendar tasks={tasks} statuses={statuses} events={events} /> : null}
             <PanelBody>
                 <TaskListWrapper data={{
                     root: root,

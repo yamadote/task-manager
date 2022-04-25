@@ -4,15 +4,21 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from "@fullcalendar/interaction"
 import './TasksCalendar.scss';
+import moment from "moment";
+import Config from "../../App/Config";
 
-const TasksCalendar = ({tasks, events}) => {
+const TasksCalendar = ({tasks, statuses, events}) => {
     const reminders = tasks ? tasks.filter(task => !task.isHidden && task.reminder) : [];
     const calendarEvents = reminders.map(task => {
         const date = new Date(task.reminder * 1000);
+        const isReminder = task.reminder && task.reminder < moment().unix();
+        const status = statuses.find((status) => status.id === task.status);
+        const color = isReminder ? Config.reminderTaskColor : status.color;
         return {
             id: task.id,
             title: task.title,
-            date: date.toISOString()
+            date: date.toISOString(),
+            backgroundColor: color
         };
     });
     const eventDrop = (info) => {
