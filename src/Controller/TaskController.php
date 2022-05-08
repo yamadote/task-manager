@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Builder\JsonResponseBuilder;
-use App\Builder\TaskBuilder;
 use App\Builder\UserTaskSettingsBuilder;
 use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
@@ -29,7 +28,6 @@ class TaskController extends AbstractController
     private TaskRepository $taskRepository;
     private TaskResponseComposer $taskResponseComposer;
     private TaskStatusConfig $taskStatusConfig;
-    private TaskBuilder $taskBuilder;
     private UserTaskSettingsRepository $userTaskSettingsRepository;
     private UserTaskSettingsBuilder $userTaskSettingsBuilder;
     private JsonResponseBuilder $jsonResponseBuilder;
@@ -39,7 +37,6 @@ class TaskController extends AbstractController
      * @param TaskRepository $taskRepository
      * @param TaskResponseComposer $taskResponseComposer
      * @param TaskStatusConfig $taskStatusConfig
-     * @param TaskBuilder $taskBuilder
      * @param UserTaskSettingsRepository $userTaskSettingsRepository
      * @param UserTaskSettingsBuilder $userTaskSettingsBuilder
      * @param JsonResponseBuilder $jsonResponseBuilder
@@ -49,7 +46,6 @@ class TaskController extends AbstractController
         TaskRepository $taskRepository,
         TaskResponseComposer $taskResponseComposer,
         TaskStatusConfig $taskStatusConfig,
-        TaskBuilder $taskBuilder,
         UserTaskSettingsRepository $userTaskSettingsRepository,
         UserTaskSettingsBuilder $userTaskSettingsBuilder,
         JsonResponseBuilder $jsonResponseBuilder,
@@ -58,7 +54,6 @@ class TaskController extends AbstractController
         $this->taskRepository = $taskRepository;
         $this->taskResponseComposer = $taskResponseComposer;
         $this->taskStatusConfig = $taskStatusConfig;
-        $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
@@ -119,15 +114,7 @@ class TaskController extends AbstractController
         if (!$parent->getUser()->equals($user)) {
             return $this->getPermissionDeniedResponse();
         }
-        $task = $this->taskBuilder->buildNewTask($user, $parent);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($task);
-
-        $parentSettings = $this->userTaskSettingsRepository->findByUserAndTask($user, $parent);
-        $parentSettings->setIsChildrenOpen(true);
-        $entityManager->persist($parentSettings);
-
-        $entityManager->flush();
+        $task = $this->taskService->createTask($user, $parent);
         $settings = $this->userTaskSettingsBuilder->buildDefaultSettings($task);
         return $this->taskResponseComposer->composeTaskResponse($user, $task, $settings);
     }
@@ -175,7 +162,8 @@ class TaskController extends AbstractController
      * @throws Exception
      * todo: refactor
      */
-    public function editSettings(Task $task, Request $request): JsonResponse {
+    public function editSettings(Task $task, Request $request): JsonResponse
+    {
         $setting = $this->userTaskSettingsRepository->findByUserAndTask($this->getUser(), $task);
         if ($request->request->has('isChildrenOpen')) {
             $setting->setIsChildrenOpen($request->request->get('isChildrenOpen'));
