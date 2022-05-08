@@ -5,13 +5,12 @@ namespace App\Controller;
 use App\Builder\JsonResponseBuilder;
 use App\Builder\TaskBuilder;
 use App\Builder\UserTaskSettingsBuilder;
-use App\Collection\TaskCollection;
 use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
-use App\Repository\TrackedPeriodRepository;
 use App\Repository\UserTaskSettingsRepository;
+use App\Service\TaskService;
 use DateTime;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -33,9 +32,19 @@ class TaskController extends AbstractController
     private TaskBuilder $taskBuilder;
     private UserTaskSettingsRepository $userTaskSettingsRepository;
     private UserTaskSettingsBuilder $userTaskSettingsBuilder;
-    private TrackedPeriodRepository $trackedPeriodRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
+    private TaskService $taskService;
 
+    /**
+     * @param TaskRepository $taskRepository
+     * @param TaskResponseComposer $taskResponseComposer
+     * @param TaskStatusConfig $taskStatusConfig
+     * @param TaskBuilder $taskBuilder
+     * @param UserTaskSettingsRepository $userTaskSettingsRepository
+     * @param UserTaskSettingsBuilder $userTaskSettingsBuilder
+     * @param JsonResponseBuilder $jsonResponseBuilder
+     * @param TaskService $taskService
+     */
     public function __construct(
         TaskRepository $taskRepository,
         TaskResponseComposer $taskResponseComposer,
@@ -43,8 +52,8 @@ class TaskController extends AbstractController
         TaskBuilder $taskBuilder,
         UserTaskSettingsRepository $userTaskSettingsRepository,
         UserTaskSettingsBuilder $userTaskSettingsBuilder,
-        TrackedPeriodRepository $trackedPeriodRepository,
-        JsonResponseBuilder $jsonResponseBuilder
+        JsonResponseBuilder $jsonResponseBuilder,
+        TaskService $taskService
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskResponseComposer = $taskResponseComposer;
@@ -52,8 +61,8 @@ class TaskController extends AbstractController
         $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
-        $this->trackedPeriodRepository = $trackedPeriodRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
+        $this->taskService = $taskService;
     }
 
     /**
@@ -93,28 +102,8 @@ class TaskController extends AbstractController
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
             return $this->jsonResponseBuilder->build(null, 400);
         }
-        $status = $this->taskStatusConfig->getStatusBySlug($statusSlug);
-        $isProgressStatus = $status->getId() === TaskStatusConfig::IN_PROGRESS_STATUS_ID;
-        $fullHierarchy = !$isProgressStatus;
-
-        $tasks = $this->taskRepository->findUserTasksByStatus($this->getUser(), $status, $fullHierarchy);
-        if ($isProgressStatus) {
-            $tasks = $this->addActiveTask($tasks);
-        }
+        $tasks = $this->taskService->getTasksByStatus($this->getUser(), $statusSlug);
         return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
-    }
-
-    private function addActiveTask(TaskCollection $tasks): TaskCollection
-    {
-        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
-        if (null === $activePeriod) {
-            return $tasks;
-        }
-        $activeTask = $activePeriod->getTask();
-        if (!$tasks->has($activeTask)) {
-            $tasks->add($activeTask);
-        }
-        return $tasks;
     }
 
     /**
