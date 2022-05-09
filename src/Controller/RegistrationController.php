@@ -23,6 +23,9 @@ class RegistrationController extends AbstractController
         GuardAuthenticatorHandler $guardHandler,
         LoginFormAuthenticator $authenticator
     ): Response {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('app_task_index');
+        }
 
         return new Response("Registration is disabled!");
 

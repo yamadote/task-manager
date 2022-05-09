@@ -16,6 +16,9 @@ class SecurityController extends AbstractController
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('app_task_index');
+        }
         $loginForm = $this->createForm(LoginFormType::class);
         $loginForm->setData(['email' => $authenticationUtils->getLastUsername()]);
 
