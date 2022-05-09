@@ -10,4 +10,14 @@ class JsonResponseBuilder
     {
         return new JsonResponse($data, $status);
     }
+
+    public function buildError(string $message, int $status = 400): JsonResponse
+    {
+        return $this->build(['error' => $message], $status);
+    }
+
+    public function buildPermissionDenied(): JsonResponse
+    {
+        return $this->buildError('Permission denied', 403);
+    }
 }

@@ -8,9 +8,7 @@ use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
-use App\Repository\UserTaskSettingsRepository;
 use App\Service\TaskService;
-use DateTime;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,25 +26,14 @@ class TaskController extends AbstractController
     private TaskRepository $taskRepository;
     private TaskResponseComposer $taskResponseComposer;
     private TaskStatusConfig $taskStatusConfig;
-    private UserTaskSettingsRepository $userTaskSettingsRepository;
     private UserTaskSettingsBuilder $userTaskSettingsBuilder;
     private JsonResponseBuilder $jsonResponseBuilder;
     private TaskService $taskService;
 
-    /**
-     * @param TaskRepository $taskRepository
-     * @param TaskResponseComposer $taskResponseComposer
-     * @param TaskStatusConfig $taskStatusConfig
-     * @param UserTaskSettingsRepository $userTaskSettingsRepository
-     * @param UserTaskSettingsBuilder $userTaskSettingsBuilder
-     * @param JsonResponseBuilder $jsonResponseBuilder
-     * @param TaskService $taskService
-     */
     public function __construct(
         TaskRepository $taskRepository,
         TaskResponseComposer $taskResponseComposer,
         TaskStatusConfig $taskStatusConfig,
-        UserTaskSettingsRepository $userTaskSettingsRepository,
         UserTaskSettingsBuilder $userTaskSettingsBuilder,
         JsonResponseBuilder $jsonResponseBuilder,
         TaskService $taskService
@@ -54,7 +41,6 @@ class TaskController extends AbstractController
         $this->taskRepository = $taskRepository;
         $this->taskResponseComposer = $taskResponseComposer;
         $this->taskStatusConfig = $taskStatusConfig;
-        $this->userTaskSettingsRepository = $userTaskSettingsRepository;
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
         $this->taskService = $taskService;
@@ -95,7 +81,7 @@ class TaskController extends AbstractController
     {
         $statusSlug = $request->attributes->get(self::STATUS_REQUEST_FIELD);
         if (!$this->taskStatusConfig->isStatusSlugExisting($statusSlug)) {
-            return $this->jsonResponseBuilder->build(null, 400);
+            return $this->jsonResponseBuilder->buildError('Task status not valid');
         }
         $tasks = $this->taskService->getTasksByStatus($this->getUser(), $statusSlug);
         return $this->taskResponseComposer->composeListResponse($this->getUser(), $tasks);
@@ -108,18 +94,18 @@ class TaskController extends AbstractController
     {
         $parent = $this->getParentFromRequest($request);
         if (null === $parent) {
-            return $this->jsonResponseBuilder->build(['error' => 'Parent task not found.'], 400);
+            return $this->jsonResponseBuilder->buildError('Parent task not found');
         }
         $user = $this->getUser();
         if (!$parent->getUser()->equals($user)) {
-            return $this->getPermissionDeniedResponse();
+            return $this->jsonResponseBuilder->buildPermissionDenied();
         }
         $task = $this->taskService->createTask($user, $parent);
         $settings = $this->userTaskSettingsBuilder->buildDefaultSettings($task);
         return $this->taskResponseComposer->composeTaskResponse($user, $task, $settings);
     }
 
-    private function getParentFromRequest(Request $request): Task
+    private function getParentFromRequest(Request $request): ?Task
     {
         if (empty($request->request->get('parent'))) {
             return $this->taskRepository->findUserRootTask($this->getUser());
@@ -130,50 +116,26 @@ class TaskController extends AbstractController
     /**
      * @Route("/{id}/edit", name="app_api_task_edit", methods={"POST"})
      * @throws Exception
-     * todo: refactor
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
         if (!$this->canEditTask($task)) {
-            return $this->getPermissionDeniedResponse();
+            return $this->jsonResponseBuilder->buildPermissionDenied();
         }
-        if ($request->request->has('title')) {
-            $task->setTitle($request->request->get('title'));
-        }
-        if ($request->request->has('link')) {
-            $task->setLink($request->request->get('link'));
-        }
-        if ($request->request->has('reminder')) {
-            $reminder = $request->request->get('reminder');
-            $task->setReminder($reminder ? (new DateTime())->setTimestamp($reminder) : null);
-        }
-        if ($request->request->has('status')) {
-            $task->setStatus($request->request->get('status'));
-        }
-        if ($request->request->has('description')) {
-            $task->setDescription($request->request->get('description'));
-        }
-        $this->getDoctrine()->getManager()->flush();
+        $this->taskService->editTask($task, $request->request);
         return $this->jsonResponseBuilder->build();
     }
 
     /**
      * @Route("/{id}/edit/settings", name="app_api_task_edit_settings", methods={"POST"})
      * @throws Exception
-     * todo: refactor
      */
     public function editSettings(Task $task, Request $request): JsonResponse
     {
-        $setting = $this->userTaskSettingsRepository->findByUserAndTask($this->getUser(), $task);
-        if ($request->request->has('isChildrenOpen')) {
-            $setting->setIsChildrenOpen($request->request->get('isChildrenOpen'));
+        if (!$this->canEditTask($task)) {
+            return $this->jsonResponseBuilder->buildPermissionDenied();
         }
-        if ($request->request->has('isAdditionalPanelOpen')) {
-            $setting->setIsAdditionalPanelOpen($request->request->get('isAdditionalPanelOpen'));
-        }
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($setting);
-        $entityManager->flush();
+        $this->taskService->editTaskSettings($this->getUser(), $task, $request->request);
         return $this->jsonResponseBuilder->build();
     }
 
@@ -183,7 +145,7 @@ class TaskController extends AbstractController
     public function delete(Task $task): JsonResponse
     {
         if (!$this->canEditTask($task)) {
-            return $this->getPermissionDeniedResponse();
+            return $this->jsonResponseBuilder->buildPermissionDenied();
         }
 //        todo: stop period of task, maybe remove it also?
 //        todo: investigate adding csrf token validation
@@ -195,10 +157,5 @@ class TaskController extends AbstractController
     private function canEditTask(Task $task): bool
     {
         return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
-    }
-
-    private function getPermissionDeniedResponse(): JsonResponse
-    {
-        return $this->jsonResponseBuilder->build(['error' => 'Permission denied'], 403);
     }
 }

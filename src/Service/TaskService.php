@@ -10,7 +10,9 @@ use App\Entity\User;
 use App\Repository\TaskRepository;
 use App\Repository\TrackedPeriodRepository;
 use App\Repository\UserTaskSettingsRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class TaskService
 {
@@ -56,11 +58,6 @@ class TaskService
         return $tasks;
     }
 
-    /**
-     * @param User $user
-     * @param Task $parent
-     * @return Task
-     */
     public function createTask(User $user, Task $parent): Task
     {
         $task = $this->taskBuilder->buildNewTask($user, $parent);
@@ -72,6 +69,40 @@ class TaskService
 
         $this->entityManager->flush();
         return $task;
+    }
+
+    public function editTask(Task $task, ParameterBag $input): void
+    {
+        if ($input->has('title')) {
+            $task->setTitle($input->get('title'));
+        }
+        if ($input->has('link')) {
+            $task->setLink($input->get('link'));
+        }
+        if ($input->has('reminder')) {
+            $reminder = $input->get('reminder');
+            $task->setReminder($reminder ? (new DateTime())->setTimestamp($reminder) : null);
+        }
+        if ($input->has('status')) {
+            $task->setStatus($input->get('status'));
+        }
+        if ($input->has('description')) {
+            $task->setDescription($input->get('description'));
+        }
+        $this->entityManager->flush();
+    }
+
+    public function editTaskSettings(User $user, Task $task, ParameterBag $input): void
+    {
+        $setting = $this->userTaskSettingsRepository->findByUserAndTask($user, $task);
+        if ($input->has('isChildrenOpen')) {
+            $setting->setIsChildrenOpen($input->get('isChildrenOpen'));
+        }
+        if ($input->has('isAdditionalPanelOpen')) {
+            $setting->setIsAdditionalPanelOpen($input->get('isAdditionalPanelOpen'));
+        }
+        $this->entityManager->persist($setting);
+        $this->entityManager->flush();
     }
 
     public function deleteTask(Task $task): void
