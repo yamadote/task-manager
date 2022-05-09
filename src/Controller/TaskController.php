@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Builder\JsonResponseBuilder;
 use App\Builder\UserTaskSettingsBuilder;
+use App\Checker\TaskPermissionChecker;
 use App\Composer\TaskResponseComposer;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
@@ -29,6 +30,7 @@ class TaskController extends AbstractController
     private UserTaskSettingsBuilder $userTaskSettingsBuilder;
     private JsonResponseBuilder $jsonResponseBuilder;
     private TaskService $taskService;
+    private TaskPermissionChecker $taskPermissionChecker;
 
     public function __construct(
         TaskRepository $taskRepository,
@@ -36,7 +38,8 @@ class TaskController extends AbstractController
         TaskStatusConfig $taskStatusConfig,
         UserTaskSettingsBuilder $userTaskSettingsBuilder,
         JsonResponseBuilder $jsonResponseBuilder,
-        TaskService $taskService
+        TaskService $taskService,
+        TaskPermissionChecker $taskPermissionChecker
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskResponseComposer = $taskResponseComposer;
@@ -44,6 +47,7 @@ class TaskController extends AbstractController
         $this->userTaskSettingsBuilder = $userTaskSettingsBuilder;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
         $this->taskService = $taskService;
+        $this->taskPermissionChecker = $taskPermissionChecker;
     }
 
     /**
@@ -119,7 +123,7 @@ class TaskController extends AbstractController
      */
     public function edit(Task $task, Request $request): JsonResponse
     {
-        if (!$this->canEditTask($task)) {
+        if (!$this->taskPermissionChecker->canEditTask($this->getUser(), $task)) {
             return $this->jsonResponseBuilder->buildPermissionDenied();
         }
         $this->taskService->editTask($task, $request->request);
@@ -132,7 +136,7 @@ class TaskController extends AbstractController
      */
     public function editSettings(Task $task, Request $request): JsonResponse
     {
-        if (!$this->canEditTask($task)) {
+        if (!$this->taskPermissionChecker->canEditTask($this->getUser(), $task)) {
             return $this->jsonResponseBuilder->buildPermissionDenied();
         }
         $this->taskService->editTaskSettings($this->getUser(), $task, $request->request);
@@ -144,7 +148,7 @@ class TaskController extends AbstractController
      */
     public function delete(Task $task): JsonResponse
     {
-        if (!$this->canEditTask($task)) {
+        if (!$this->taskPermissionChecker->canDeleteTask($this->getUser(), $task)) {
             return $this->jsonResponseBuilder->buildPermissionDenied();
         }
 //        todo: stop period of task, maybe remove it also?
@@ -152,10 +156,5 @@ class TaskController extends AbstractController
 //        $this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))
         $this->taskService->deleteTask($task);
         return $this->jsonResponseBuilder->build();
-    }
-
-    private function canEditTask(Task $task): bool
-    {
-        return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
     }
 }

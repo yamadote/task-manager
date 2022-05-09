@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Builder\JsonResponseBuilder;
+use App\Checker\TaskPermissionChecker;
 use App\Entity\Task;
 use App\Entity\TrackedPeriod;
 use App\Repository\TaskRepository;
@@ -21,15 +22,18 @@ class TrackedPeriodController extends AbstractController
     private TrackedPeriodRepository $trackedPeriodRepository;
     private TaskRepository $taskRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
+    private TaskPermissionChecker $taskPermissionChecker;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
         TaskRepository $taskRepository,
-        JsonResponseBuilder $jsonResponseBuilder
+        JsonResponseBuilder $jsonResponseBuilder,
+        TaskPermissionChecker $taskPermissionChecker
     ) {
         $this->trackedPeriodRepository = $trackedPeriodRepository;
         $this->taskRepository = $taskRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
+        $this->taskPermissionChecker = $taskPermissionChecker;
     }
 
     /**
@@ -37,7 +41,7 @@ class TrackedPeriodController extends AbstractController
      */
     public function start(Task $task): JsonResponse
     {
-        if (!$this->canTrackTask($task)) {
+        if (!$this->taskPermissionChecker->canTrackTask($this->getUser(), $task)) {
             // todo: error message
             return $this->jsonResponseBuilder->build();
         }
@@ -88,10 +92,5 @@ class TrackedPeriodController extends AbstractController
         $task = $period->getTask();
         $diff = $finishedAt->getTimestamp() - $period->getStartedAt()->getTimestamp();
         $this->taskRepository->increaseTrackedTime($task, $diff);
-    }
-
-    private function canTrackTask(Task $task): bool
-    {
-        return $this->getUser()->equals($task->getUser()) && null !== $task->getParent();
     }
 }
