@@ -5,10 +5,9 @@ namespace App\Controller;
 use App\Builder\JsonResponseBuilder;
 use App\Checker\TaskPermissionChecker;
 use App\Entity\Task;
-use App\Entity\TrackedPeriod;
 use App\Repository\TaskRepository;
 use App\Repository\TrackedPeriodRepository;
-use DateTime;
+use App\Service\TrackedPeriodService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,17 +22,20 @@ class TrackedPeriodController extends AbstractController
     private TaskRepository $taskRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
     private TaskPermissionChecker $taskPermissionChecker;
+    private TrackedPeriodService $trackedPeriodService;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
         TaskRepository $taskRepository,
         JsonResponseBuilder $jsonResponseBuilder,
-        TaskPermissionChecker $taskPermissionChecker
+        TaskPermissionChecker $taskPermissionChecker,
+        TrackedPeriodService $trackedPeriodService
     ) {
         $this->trackedPeriodRepository = $trackedPeriodRepository;
         $this->taskRepository = $taskRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
         $this->taskPermissionChecker = $taskPermissionChecker;
+        $this->trackedPeriodService = $trackedPeriodService;
     }
 
     /**
@@ -42,30 +44,18 @@ class TrackedPeriodController extends AbstractController
     public function start(Task $task): JsonResponse
     {
         if (!$this->taskPermissionChecker->canTrackTask($this->getUser(), $task)) {
-            // todo: error message
-            return $this->jsonResponseBuilder->build();
+            return $this->jsonResponseBuilder->buildPermissionDenied();
         }
-        // todo: check if small diff reactivate period
         $lastPeriod = $this->trackedPeriodRepository->findLastTrackedPeriod($this->getUser());
         if (!is_null($lastPeriod) && $lastPeriod->isActive()) {
             if ($lastPeriod->getTask()->equals($task)) {
-                // todo: add error message: you can't start active task
-                return $this->jsonResponseBuilder->build();
+                return $this->jsonResponseBuilder->buildError("Task already active");
             }
-            $this->finishPeriod($lastPeriod);
+            $this->trackedPeriodService->finishPeriod($lastPeriod);
         }
-        $entityManager = $this->getDoctrine()->getManager();
-        $period = new TrackedPeriod();
-        $period->setUser($this->getUser());
-        $startedAt = new DateTime();
-        $period->setStartedAt($startedAt);
-        $period->setTask($task);
-        $entityManager->persist($period);
-        $entityManager->flush();
+        $this->trackedPeriodService->startPeriod($this->getUser(), $task);
         $path = $this->taskRepository->getTaskPath($task);
-        return $this->jsonResponseBuilder->build([
-            'activeTask' => ['path' => $path->getIds()]
-        ]);
+        return $this->jsonResponseBuilder->build(['activeTask' => ['path' => $path->getIds()]]);
     }
 
     /**
@@ -75,22 +65,9 @@ class TrackedPeriodController extends AbstractController
     {
         $activePeriod = $this->trackedPeriodRepository->findActivePeriod($this->getUser());
         if (is_null($activePeriod) || !$activePeriod->getTask()->equals($task)) {
-            // todo: error message
-            return $this->jsonResponseBuilder->build();
+            return $this->jsonResponseBuilder->buildError("The task can't be finished");
         }
-        $this->finishPeriod($activePeriod);
-        $this->getDoctrine()->getManager()->flush();
-        // todo: success message
+        $this->trackedPeriodService->finishPeriod($activePeriod);
         return $this->jsonResponseBuilder->build();
-    }
-
-    private function finishPeriod(TrackedPeriod $period): void
-    {
-        // todo: remove if period has minimum tracked time
-        $finishedAt = new DateTime();
-        $period->setFinishedAt($finishedAt);
-        $task = $period->getTask();
-        $diff = $finishedAt->getTimestamp() - $period->getStartedAt()->getTimestamp();
-        $this->taskRepository->increaseTrackedTime($task, $diff);
     }
 }
