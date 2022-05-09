@@ -6,9 +6,9 @@ import '../../Page/PanelHeading/PanelHeading.scss';
 import './TaskPanelHeading.scss';
 import PanelHeading from "../../Page/PanelHeading/PanelHeading";
 
-const TaskPanelHeading = ({title, root, events}) => {
+const TaskPanelHeading = ({title, icon, root, events}) => {
     return (
-        <PanelHeading title={title}>
+        <PanelHeading title={title} icon={icon}>
             <div className="panel-task-root">
                 {root ? <span className="root-title">{root.title}</span> : ''}
                 {root ? <Link className="btn btn-default" to={Helper.getTaskPageUrl(root?.parent)}><span className="oi oi-share-boxed"/></Link> : null}

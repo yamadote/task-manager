@@ -2,6 +2,7 @@
 import React from 'react';
 import './Header.scss';
 import {Link} from "react-router-dom";
+import Icon from "../../App/Icon";
 
 const Header = () => {
     return (
@@ -24,12 +25,12 @@ const Header = () => {
                         <li className="active"><a href="#">Documentation</a></li>
                         <li className="dropdown">
                             <a data-toggle="dropdown" className="dropdown-toggle" href="#">
-                                <i className="glyphicon glyphicon-user" /> Account <b className="caret" />
+                                <Icon name="user" /> Account <b className="caret" />
                             </a>
                             <ul role="menu" className="dropdown-menu">
-                                <li><Link to="/settings"><i className="glyphicon glyphicon-cog" /> Settings</Link></li>
+                                <li><Link to="/settings"><Icon name="cog" /> Settings</Link></li>
                                 <li className="divider" />
-                                <li><a href="/logout"><i className="glyphicon glyphicon-log-out" /> Signout</a></li>
+                                <li><a href="/logout"><Icon name="log-out" /> Signout</a></li>
                             </ul>
                         </li>
                     </ul>

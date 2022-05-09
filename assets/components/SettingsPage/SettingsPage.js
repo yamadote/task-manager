@@ -5,8 +5,11 @@ import Helper from "../App/Helper";
 import Config from "../App/Config";
 import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
+import Icon from "../App/Icon";
 
 const SettingsPage = () => {
+    const title = "Settings";
+    const icon = <Icon name="cog"/>;
 
     const [search, setSearch] = useState("");
     const [reminderNumber, setReminderNumber] = useState(undefined);
@@ -28,7 +31,7 @@ const SettingsPage = () => {
 
     return (
         <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
-            <PanelHeading title={<span><i className="glyphicon glyphicon-cog" />Settings</span>}/>
+            <PanelHeading title={title} icon={icon}/>
             <PanelBody>
 
             </PanelBody>

@@ -11,7 +11,7 @@ import TasksAmount from "./TasksAmount/TasksAmount";
 import TasksCalendar from "./TasksCalendar/TasksCalendar";
 import LocalStorage from "../App/LocalStorage";
 
-const TasksPage = ({title, fetchFrom, nested = true}) => {
+const TasksPage = ({title, icon, fetchFrom, nested = true}) => {
 
     const findRootTask = (params) => {
         if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
@@ -197,7 +197,7 @@ const TasksPage = ({title, fetchFrom, nested = true}) => {
 
     return (
         <Page sidebar={{root: root, onSearch:setSearch, reminderNumber:reminderNumber}}>
-            <TaskPanelHeading title={title} root={root} events={events}/>
+            <TaskPanelHeading title={title} icon={icon} root={root} events={events}/>
             {showCalendar ? <TasksCalendar tasks={tasks} statuses={statuses} events={events} /> : null}
             <PanelBody>
                 <TaskListWrapper data={{

@@ -5,42 +5,39 @@ import Config from "./../App/Config";
 import TasksPage from "../TasksPage/TasksPage";
 import SettingsPage from "../SettingsPage/SettingsPage";
 import './App.scss';
+import Icon from "./Icon";
 
 const App = () => {
+    const renderTasksPage = (title, icon, url = "", nested = true) => {
+        let fetchFrom = Config.apiUrlPrefix + "/tasks" + url;
+        return <TasksPage title={title} icon={icon} fetchFrom={fetchFrom} nested={nested}/>
+    }
     return (
         <Router>
             <Switch>
                 <Route path="/:root?/tasks/reminders">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/reminders"} nested={false}
-                               title={<span><i className="glyphicon glyphicon-bell" />Reminders</span>}/>
+                    {renderTasksPage("Reminders", <Icon name="bell"/>, "/reminders", false)}
                 </Route>
                 <Route path="/:root?/tasks/todo">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/todo"}
-                               title={<span><i className="glyphicon glyphicon-flash" />Todo</span>}/>
+                    {renderTasksPage("Todo", <Icon name="flash"/>, "/todo")}
                 </Route>
                 <Route path="/:root?/tasks/status/progress">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/progress"} nested={false}
-                               title={<span><i className="glyphicon glyphicon-flag" />In Progress</span>}/>
+                    {renderTasksPage("In Progress", <Icon name="flag"/>, "/status/progress", false)}
                 </Route>
                 <Route path="/:root?/tasks/status/frozen">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/frozen"}
-                               title={<span><i className="glyphicon glyphicon-certificate" />Frozen</span>}/>
+                    {renderTasksPage("Frozen", <Icon name="certificate"/>, "/status/frozen")}
                 </Route>
                 <Route path="/:root?/tasks/status/potential">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/potential"}
-                               title={<span><i className="glyphicon glyphicon-calendar" />Potential</span>}/>
+                    {renderTasksPage("Potential", <Icon name="calendar"/>, "/status/potential")}
                 </Route>
                 <Route path="/:root?/tasks/status/cancelled">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/cancelled"}
-                               title={<span><i className="glyphicon glyphicon-remove" />Cancelled</span>}/>
+                    {renderTasksPage("Cancelled", <Icon name="remove"/>, "/status/cancelled")}
                 </Route>
                 <Route path="/:root?/tasks/status/completed">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks/status/completed"}
-                               title={<span><i className="glyphicon glyphicon-ok" />Completed</span>}/>
+                    {renderTasksPage("Completed", <Icon name="ok"/>, "/status/completed")}
                 </Route>
                 <Route path="/:root?/tasks">
-                    <TasksPage fetchFrom={Config.apiUrlPrefix + "/tasks"}
-                               title={<span><i className="glyphicon glyphicon-list-alt" />All Tasks</span>}/>
+                    {renderTasksPage("All Tasks", <Icon name="list-alt"/>)}
                 </Route>
                 <Route path="/settings">
                     <SettingsPage/>
