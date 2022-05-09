@@ -9,8 +9,6 @@ class TaskConfig
     private const ROOT_TASK_DEFAULT_STATUS = TaskStatusConfig::NONE_STATUS_ID;
     private const ROOT_TASK_TITLE = "";
 
-    private const MINIMUM_TRACKED_TIME = 60;
-
     public function getNewTaskTitle(): string
     {
         return self::NEW_TASK_TITLE;
@@ -29,10 +27,5 @@ class TaskConfig
     public function getRootTaskTitle(): string
     {
         return self::ROOT_TASK_TITLE;
-    }
-
-    public function getMinimumTrackedTime(): int
-    {
-        return self::MINIMUM_TRACKED_TIME;
     }
 }
