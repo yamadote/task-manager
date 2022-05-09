@@ -45,20 +45,13 @@ class TaskService
 
         $tasks = $this->taskRepository->findUserTasksByStatus($user, $status, $fullHierarchy);
         if ($isProgressStatus) {
-            $tasks = $this->addActiveTask($tasks, $user);
-        }
-        return $tasks;
-    }
-
-    private function addActiveTask(TaskCollection $tasks, User $user): TaskCollection
-    {
-        $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
-        if (null === $activePeriod) {
-            return $tasks;
-        }
-        $activeTask = $activePeriod->getTask();
-        if (!$tasks->has($activeTask)) {
-            $tasks->add($activeTask);
+            $activePeriod = $this->trackedPeriodRepository->findActivePeriod($user);
+            if ($activePeriod) {
+                $activeTask = $activePeriod->getTask();
+                if (!$tasks->has($activeTask)) {
+                    $tasks->add($activeTask);
+                }
+            }
         }
         return $tasks;
     }
@@ -79,5 +72,15 @@ class TaskService
 
         $this->entityManager->flush();
         return $task;
+    }
+
+    public function deleteTask(Task $task): void
+    {
+        $children = $this->taskRepository->findChildren($task);
+        foreach ($children as $child) {
+            $this->entityManager->remove($child);
+        }
+        $this->entityManager->remove($task);
+        $this->entityManager->flush();
     }
 }
