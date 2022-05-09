@@ -6,6 +6,7 @@ import TasksPage from "../TasksPage/TasksPage";
 import SettingsPage from "../SettingsPage/SettingsPage";
 import './App.scss';
 import Icon from "./Icon";
+import HistoryPage from "../HistoryPage/HistoryPage";
 
 const App = () => {
     const renderTasksPage = (title, icon, url = "", nested = true) => {
@@ -41,6 +42,9 @@ const App = () => {
                 </Route>
                 <Route path="/settings">
                     <SettingsPage/>
+                </Route>
+                <Route path="/history">
+                    <HistoryPage/>
                 </Route>
             </Switch>
         </Router>

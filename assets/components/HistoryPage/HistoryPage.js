@@ -8,9 +8,9 @@ import PanelBody from "../Page/PanelBody/PanelBody";
 import Icon from "../App/Icon";
 import LocalStorage from "../App/LocalStorage";
 
-const SettingsPage = () => {
-    const title = "Settings";
-    const icon = <Icon name="cog"/>;
+const HistoryPage = () => {
+    const title = "History";
+    const icon = <Icon name="th-list"/>;
 
     const [search, setSearch] = useState("");
     const [reminderNumber, setReminderNumber] = useState(LocalStorage.getReminderNumber());
@@ -18,7 +18,7 @@ const SettingsPage = () => {
     const events = new function () {
         return {
             init: () => {
-                Helper.fetchJson(Config.apiUrlPrefix + "/settings")
+                Helper.fetchJson(Config.apiUrlPrefix + "/history")
                     .then(response => {
                         setReminderNumber(response.reminderNumber);
                         LocalStorage.setReminderNumber(reminderNumber);
@@ -43,4 +43,4 @@ const SettingsPage = () => {
     );
 }
 
-export default SettingsPage;
+export default HistoryPage;
