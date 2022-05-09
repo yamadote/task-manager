@@ -6,6 +6,12 @@ const LocalStorage = new function () {
         },
         setShowCalendar: (showCalendar) => {
             localStorage.setItem('showCalendar', showCalendar.toString());
+        },
+        getReminderNumber: () => {
+            return localStorage.getItem('reminderNumber');
+        },
+        setReminderNumber: (reminderNumber) =>  {
+            localStorage.setItem('reminderNumber', reminderNumber);
         }
     }
 }

@@ -54,7 +54,7 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
     const [statuses, setStatuses] = useState(undefined);
     const [search, setSearch] = useState("");
     const [activeTask, setActiveTask] = useState(undefined);
-    const [reminderNumber, setReminderNumber] = useState(undefined);
+    const [reminderNumber, setReminderNumber] = useState(LocalStorage.getReminderNumber());
 
     const events = new function () {
         return {
@@ -170,6 +170,9 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
                         .then(() => setDescriptionChanging(false));
                 }, Config.updateInputTimeout);
             },
+            toggleCalendar: () => {
+                setShowCalendar(!showCalendar);
+            },
             onSearchUpdate: () => {
                 setTasks((tasks) => tasks.map(task => {
                     task.isHidden = !isTaskVisible(task, search, tasks, root);
@@ -184,15 +187,19 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
                 }));
                 setRoot(composeRootTask(newRoot, root, tasks))
             },
-            toggleCalendar: () => {
-                setShowCalendar(!showCalendar);
-                LocalStorage.setShowCalendar(!showCalendar);
-            }
+            onReminderNumberUpdate: () => {
+                LocalStorage.setReminderNumber(reminderNumber);
+            },
+            onShowCalendarUpdate: () => {
+                LocalStorage.setShowCalendar(showCalendar);
+            },
         }
     }
 
     useLayoutEffect(events.reload, [fetchFrom]);
     useLayoutEffect(events.onSearchUpdate, [search]);
+    useLayoutEffect(events.onReminderNumberUpdate, [reminderNumber]);
+    useLayoutEffect(events.onShowCalendarUpdate, [showCalendar]);
     useLayoutEffect(events.onRootUpdate, [params.root]);
 
     return (
