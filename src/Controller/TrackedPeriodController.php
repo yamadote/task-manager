@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Builder\JsonResponseBuilder;
 use App\Checker\TaskPermissionChecker;
+use App\Composer\TrackedPeriodResponseComposer;
 use App\Entity\Task;
-use App\Repository\TaskRepository;
 use App\Repository\TrackedPeriodRepository;
 use App\Service\TrackedPeriodService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -19,23 +19,23 @@ use Symfony\Component\Routing\Annotation\Route;
 class TrackedPeriodController extends AbstractController
 {
     private TrackedPeriodRepository $trackedPeriodRepository;
-    private TaskRepository $taskRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
     private TaskPermissionChecker $taskPermissionChecker;
     private TrackedPeriodService $trackedPeriodService;
+    private TrackedPeriodResponseComposer $responseComposer;
 
     public function __construct(
         TrackedPeriodRepository $trackedPeriodRepository,
-        TaskRepository $taskRepository,
         JsonResponseBuilder $jsonResponseBuilder,
         TaskPermissionChecker $taskPermissionChecker,
-        TrackedPeriodService $trackedPeriodService
+        TrackedPeriodService $trackedPeriodService,
+        TrackedPeriodResponseComposer $responseComposer
     ) {
         $this->trackedPeriodRepository = $trackedPeriodRepository;
-        $this->taskRepository = $taskRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
         $this->taskPermissionChecker = $taskPermissionChecker;
         $this->trackedPeriodService = $trackedPeriodService;
+        $this->responseComposer = $responseComposer;
     }
 
     /**
@@ -54,8 +54,7 @@ class TrackedPeriodController extends AbstractController
             $this->trackedPeriodService->finishPeriod($lastPeriod);
         }
         $this->trackedPeriodService->startPeriod($this->getUser(), $task);
-        $path = $this->taskRepository->getTaskPath($task);
-        return $this->jsonResponseBuilder->build(['activeTask' => ['path' => $path->getIds()]]);
+        return $this->responseComposer->compose($task);
     }
 
     /**
