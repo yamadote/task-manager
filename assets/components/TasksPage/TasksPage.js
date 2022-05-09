@@ -11,7 +11,7 @@ import TasksAmount from "./TasksAmount/TasksAmount";
 import TasksCalendar from "./TasksCalendar/TasksCalendar";
 import LocalStorage from "../App/LocalStorage";
 
-const TasksPage = ({title, icon, fetchFrom, nested = true}) => {
+const TasksPage = ({title, icon, fetchFrom, nested}) => {
 
     const findRootTask = (params) => {
         if (!params.root || !params.root.match(new RegExp('^[0-9]+$'))) {
