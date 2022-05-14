@@ -7,7 +7,7 @@ import Icon from "../../App/Icon";
 const Sidebar = ({root, onSearch, reminderNumber}) => {
     const prefix = root === null ? '' : '/' + root.id;
     const searchInputKeyDown = (event) => {
-        setTimeout(function() {
+        setTimeout(() => {
             onSearch(event.target.value)
         });
     }

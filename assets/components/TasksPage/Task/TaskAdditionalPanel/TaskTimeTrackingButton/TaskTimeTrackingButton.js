@@ -1,10 +1,11 @@
 
 import React from 'react';
+import Button from "../../../../App/Button";
 
 const TaskTimeTrackingButton = ({task, isActive, events}) => {
     return isActive
-        ? <button onClick={() => events.finishTask(task.id)} className='btn btn-sm btn-info'>Finish</button>
-        : <button onClick={() => events.startTask(task.id)} className='btn btn-sm btn-primary'>Start</button>
+        ? <Button onClick={() => events.finishTask(task.id)} buttonStyle='info' buttonSize='sm'>Finish</Button>
+        : <Button onClick={() => events.startTask(task.id)} buttonStyle='primary' buttonSize='sm'>Start</Button>
     ;
 }
 
