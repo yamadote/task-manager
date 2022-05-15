@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import Icon from "../../App/Icon";
 
 const Sidebar = ({root, onSearch, reminderNumber}) => {
+    const showReminderNumber = reminderNumber && reminderNumber > 0;
     const prefix = root === null ? '' : '/' + root.id;
     const searchInputKeyDown = (event) => {
         setTimeout(() => {
@@ -26,7 +27,7 @@ const Sidebar = ({root, onSearch, reminderNumber}) => {
                 <li className="list-group-item">
                     <Link to={prefix + "/tasks/reminders"}>
                         <Icon name="bell"/>Reminders
-                        { reminderNumber ? <div className="badge badge-warning">{reminderNumber}</div> : null }
+                        { showReminderNumber ? <div className="badge badge-warning">{reminderNumber}</div> : null }
                     </Link>
                 </li>
                 <li className="list-group-item">
