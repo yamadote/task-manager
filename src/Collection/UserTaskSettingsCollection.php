@@ -4,7 +4,13 @@ namespace App\Collection;
 
 use App\Entity\Task;
 use App\Entity\UserTaskSettings;
+use Iterator;
 
+/**
+ * Class UserTaskSettingsCollection
+ * @package App\Collection
+ * @method UserTaskSettings[]|Iterator getIterator()
+ */
 class UserTaskSettingsCollection extends AbstractCollection
 {
     /** @var UserTaskSettings[] */

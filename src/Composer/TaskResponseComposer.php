@@ -67,7 +67,7 @@ class TaskResponseComposer
 
     private function findRootTask(User $user, TaskCollection $tasks): Task
     {
-        foreach ($tasks->getIterator() as $task) {
+        foreach ($tasks as $task) {
             if ($task->getParent() === null) {
                 return $task;
             }

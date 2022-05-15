@@ -130,7 +130,7 @@ class TaskRepository extends NestedTreeRepository
     {
         $task->increaseTrackedTime($increase);
         $path = $this->getTaskPath($task);
-        foreach ($path->getIterator() as $item) {
+        foreach ($path as $item) {
             if ($item->equals($task)) {
                 continue;
             }

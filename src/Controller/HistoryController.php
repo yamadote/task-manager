@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Composer\HistoryResponseComposer;
+use App\Repository\ActionRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -14,10 +15,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class HistoryController extends AbstractController
 {
     private HistoryResponseComposer $historyResponseComposer;
+    private ActionRepository $actionRepository;
 
-    public function __construct(HistoryResponseComposer $historyResponseComposer)
-    {
+    public function __construct(
+        HistoryResponseComposer $historyResponseComposer,
+        ActionRepository $actionRepository
+    ) {
         $this->historyResponseComposer = $historyResponseComposer;
+        $this->actionRepository = $actionRepository;
     }
 
     /**
@@ -25,6 +30,7 @@ class HistoryController extends AbstractController
      */
     public function init(): JsonResponse
     {
-        return $this->historyResponseComposer->composeListResponse($this->getUser());
+        $actions = $this->actionRepository->findByUser($this->getUser());
+        return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions);
     }
 }

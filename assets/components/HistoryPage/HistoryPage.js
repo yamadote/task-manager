@@ -7,12 +7,15 @@ import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
 import Icon from "../App/Icon";
 import LocalStorage from "../App/LocalStorage";
+import ActionList from "./ActionList/ActionList";
+import './HistoryPage.scss';
 
 const HistoryPage = () => {
     const title = "History";
     const icon = <Icon name="th-list"/>;
 
     const [search, setSearch] = useState("");
+    const [actions, setActions] = useState(undefined);
     const [reminderNumber, setReminderNumber] = useState(LocalStorage.getReminderNumber());
 
     const events = new function () {
@@ -20,6 +23,7 @@ const HistoryPage = () => {
             init: () => {
                 Helper.fetchJson(Config.apiUrlPrefix + "/history")
                     .then(response => {
+                        setActions(response.actions);
                         setReminderNumber(response.reminderNumber);
                         LocalStorage.setReminderNumber(reminderNumber);
                     });
@@ -37,7 +41,7 @@ const HistoryPage = () => {
         <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
             <PanelHeading title={title} icon={icon}/>
             <PanelBody>
-
+                <ActionList actions={actions} />
             </PanelBody>
         </Page>
     );

@@ -2,8 +2,11 @@
 
 namespace App\Service;
 
+use App\Builder\ActionBuilder;
 use App\Builder\TaskBuilder;
 use App\Collection\TaskCollection;
+use App\Composer\ActionMessageComposer;
+use App\Config\ActionConfig;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
@@ -22,6 +25,8 @@ class TaskService
     private EntityManagerInterface $entityManager;
     private TaskBuilder $taskBuilder;
     private UserTaskSettingsRepository $userTaskSettingsRepository;
+    private ActionBuilder $actionBuilder;
+    private ActionMessageComposer $actionMessageComposer;
 
     public function __construct(
         TaskStatusConfig $taskStatusConfig,
@@ -29,7 +34,9 @@ class TaskService
         TrackedPeriodRepository $trackedPeriodRepository,
         EntityManagerInterface $entityManager,
         TaskBuilder $taskBuilder,
-        UserTaskSettingsRepository $userTaskSettingsRepository
+        UserTaskSettingsRepository $userTaskSettingsRepository,
+        ActionBuilder $actionBuilder,
+        ActionMessageComposer $actionMessageComposer
     ) {
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskRepository = $taskRepository;
@@ -37,6 +44,8 @@ class TaskService
         $this->entityManager = $entityManager;
         $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
+        $this->actionBuilder = $actionBuilder;
+        $this->actionMessageComposer = $actionMessageComposer;
     }
 
     public function getTasksByStatus(User $user, string $statusSlug): TaskCollection
@@ -67,27 +76,39 @@ class TaskService
         $parentSettings->setIsChildrenOpen(true);
         $this->entityManager->persist($parentSettings);
 
+        $message = $this->actionMessageComposer->composeNewTaskMessage();
+        $this->createAction($user, $task, ActionConfig::CREATE_TASK_ACTION, $message);
         $this->entityManager->flush();
         return $task;
     }
 
-    public function editTask(Task $task, ParameterBag $input): void
+    public function editTask(User $user, Task $task, ParameterBag $input): void
     {
         if ($input->has('title')) {
             $task->setTitle($input->get('title'));
+            $message = $this->actionMessageComposer->composeTaskTitleUpdateMessage($task->getTitle());
+            $this->createAction($user, $task, ActionConfig::EDIT_TASK_TITLE_ACTION, $message);
         }
         if ($input->has('link')) {
             $task->setLink($input->get('link'));
+            $message = $this->actionMessageComposer->composeTaskLinkUpdateMessage($task->getLink());
+            $this->createAction($user, $task, ActionConfig::EDIT_TASK_LINK_ACTION, $message);
         }
         if ($input->has('reminder')) {
             $reminder = $input->get('reminder');
             $task->setReminder($reminder ? (new DateTime())->setTimestamp($reminder) : null);
+            $message = $this->actionMessageComposer->composeTaskReminderUpdateMessage($task->getReminder());
+            $this->createAction($user, $task, ActionConfig::EDIT_TASK_REMINDER_ACTION, $message);
         }
         if ($input->has('status')) {
             $task->setStatus($input->get('status'));
+            $message = $this->actionMessageComposer->composeTaskStatusUpdateMessage($task->getStatus());
+            $this->createAction($user, $task, ActionConfig::EDIT_TASK_STATUS_ACTION, $message);
         }
         if ($input->has('description')) {
             $task->setDescription($input->get('description'));
+            $message = $this->actionMessageComposer->composeTaskDescriptionUpdateMessage($task->getDescription());
+            $this->createAction($user, $task, ActionConfig::EDIT_TASK_DESCRIPTION_ACTION, $message);
         }
         $this->entityManager->flush();
     }
@@ -113,5 +134,11 @@ class TaskService
         }
         $this->entityManager->remove($task);
         $this->entityManager->flush();
+    }
+
+    public function createAction(User $user, ?Task $task, string $type, string $message): void
+    {
+        $action = $this->actionBuilder->buildAction($user, $task, $type, $message);
+        $this->entityManager->persist($action);
     }
 }

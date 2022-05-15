@@ -1,0 +1,22 @@
+
+.history-action-list {
+  .column {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .time-column {
+    width: 120px;
+  }
+
+  .task-column {
+    width: 240px;
+
+    .title {
+      width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

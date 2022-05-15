@@ -4,8 +4,9 @@ namespace App\Collection;
 
 use Iterator;
 use ArrayIterator;
+use IteratorAggregate;
 
-abstract class AbstractCollection
+abstract class AbstractCollection implements IteratorAggregate
 {
     protected array $list;
 

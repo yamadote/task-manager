@@ -27,7 +27,7 @@ class TaskResponseBuilder
     public function buildStatusListResponse(TaskStatusCollection $collection): array
     {
         $statusListResponse = [];
-        foreach ($collection->getIterator() as $status) {
+        foreach ($collection as $status) {
             $statusListResponse[] = $this->buildStatusResponse($status);
         }
         return $statusListResponse;
@@ -39,7 +39,7 @@ class TaskResponseBuilder
         Task $root
     ): array {
         $taskListResponse = [];
-        foreach ($tasks->getIterator() as $task) {
+        foreach ($tasks as $task) {
             if ($task->getParent() === null) {
                 continue;
             }
