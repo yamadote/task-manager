@@ -3,7 +3,13 @@
 namespace App\Collection;
 
 use App\Entity\TaskStatus;
+use Iterator;
 
+/**
+ * Class TaskStatusCollection
+ * @package App\Collection
+ * @method TaskStatus[]|Iterator getIterator()
+ */
 class TaskStatusCollection extends AbstractCollection
 {
     /** @var TaskStatus[] */
