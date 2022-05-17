@@ -26,6 +26,7 @@
         "@fullcalendar/daygrid": "^5.11.0",
         "@fullcalendar/interaction": "^5.11.0",
         "@fullcalendar/react": "^5.11.1",
+        "bbcode-to-react": "^0.2.9",
         "moment": "^2.29.1",
         "react-mde": "^11.5.0",
         "react-router-dom": "^5.2.0",
