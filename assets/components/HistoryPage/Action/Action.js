@@ -49,9 +49,9 @@ const Action = ({action}) => {
     const time = moment.unix(action.createdAt).format('MMM DD HH:mm');
     return (
         <tr className={className}>
-            <td className="column time-column">{time}</td>
+            <td className="column time-column"><div className="column-content">{time}</div></td>
             <td className="column message-column">{parser.toReact(action.message)}</td>
-            <td className="column task-column"><div className="title">{action.task}</div></td>
+            <td className="column task-column"><div className="column-content">{action.task}</div></td>
         </tr>
     );
 }
