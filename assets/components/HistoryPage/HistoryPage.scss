@@ -5,6 +5,10 @@
     padding-right: 12px;
   }
 
+  .column-content {
+    width: inherit;
+  }
+
   .time-column {
     width: 120px;
   }
@@ -12,11 +16,20 @@
   .task-column {
     width: 240px;
 
-    .title {
-      width: 240px;
+    .column-content {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+  }
+
+  @media screen and (max-width: 992px) {
+    .time-column {
+      width: 90px;
+    }
+
+    .task-column {
+      width: 120px;
     }
   }
 }
