@@ -21,37 +21,38 @@ class ActionMessageComposer
 
     public function composeTaskTitleUpdateMessage(string $title): string
     {
-        return "The task title changed to \"$title\"";
+        return 'The task title changed to [title]' . $title . '[/title]';
     }
 
     public function composeTaskLinkUpdateMessage(string $link): string
     {
         if (empty($link)) {
-            return "The task link removed";
+            return 'The task link removed';
         }
-        return "The task link set to \"$link\"";
+        return 'The task link set to [link]' . $link . '[/link]';
     }
 
     public function composeTaskReminderUpdateMessage(?DateTimeInterface $reminder): string
     {
         if (null === $reminder) {
-            return "The task reminder removed";
+            return 'The task reminder removed';
         }
-        $date = $reminder->format("Y/m/d H:i");
-        return "The task reminder set to $date (UTC)";
+        return 'The task reminder set to [reminder]' . $reminder->getTimestamp() . '[/reminder]';
     }
 
-    public function composeTaskStatusUpdateMessage(int $status): string
+    public function composeTaskStatusUpdateMessage(int $id): string
     {
-        $statusTitle = $this->taskStatusConfig->getStatusById($status)->getTitle();
-        return "The task status changed to \"$statusTitle\"";
+        $status = $this->taskStatusConfig->getStatusById($id);
+        $slug = $status->getSlug();
+        $title = $status->getTitle();
+        return 'The task status changed to [status slug="' . $slug . '"]' . $title . '[/status]';
     }
 
     public function composeTaskDescriptionUpdateMessage(?string $description): string
     {
         if (empty($description)) {
-            return "The task description removed";
+            return 'The task description removed';
         }
-        return "The task description updated";
+        return 'The task description updated';
     }
 }
