@@ -29,7 +29,12 @@ const HistoryPage = () => {
                     });
             },
             onSearchUpdate: () => {
-                console.log("TODO SEARCH: " + search);
+                if (actions) {
+                    setActions((actions) => actions.map(action => {
+                        action.isHidden = !action.message.toLowerCase().includes(search.toLowerCase());
+                        return action;
+                    }));
+                }
             }
         }
     }

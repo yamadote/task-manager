@@ -17,7 +17,7 @@ const ActionList = ({actions}) => {
                 </tr>
             </thead>
             <tbody>
-                {actions.map(action => {
+                {actions.filter(action => !action.isHidden).map(action => {
                     return <Action key={action.id} action={action} />
                 })}
             </tbody>
