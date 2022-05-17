@@ -20,7 +20,7 @@ class LinkTag extends Tag {
 class ReminderTag extends Tag {
     toReact() {
         const timestamp = this.getContent(true);
-        const time = moment.unix(timestamp).format('YYYY/MM/DD HH:mm');
+        const time = moment.unix(timestamp).format('YYYY/MM/DD HH:mm dddd');
         return <b>{time}</b>;
     }
 }
