@@ -6,7 +6,9 @@ const Config = new function () {
         historyActionSpacerTime: 300,
         githubUrlPrefix: "https://github.com/",
         reminderTaskColor: 'rgb(255, 99, 71)',
-        activeTaskColor: '#ffb6c1'
+        activeTaskColor: '#ffb6c1',
+        repeatedActionTypes: ["editTaskTitle", "editTaskDescription"],
+        repeatedActionMaxAmount: 4
     }
 }
 

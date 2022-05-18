@@ -7,6 +7,20 @@
     border-top: 1px solid #ddd;
   }
 
+  .repeated-action {
+    cursor: pointer;
+    height: 5px;
+    border: 1px solid #ddd;
+
+    td {
+      padding: 0;
+    }
+  }
+
+  .repeated-action:hover {
+    background: lightyellow;
+  }
+
   .table-spacer {
     height: 20px;
 

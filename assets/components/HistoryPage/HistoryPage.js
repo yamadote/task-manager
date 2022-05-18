@@ -35,6 +35,14 @@ const HistoryPage = () => {
                 setActions(undefined);
                 events.init();
             },
+            revealAction: (id) => {
+                setActions((actions) => actions.map(action => {
+                    if (action.id === id) {
+                        action.revealed = true;
+                    }
+                    return action;
+                }));
+            },
             onSearchUpdate: () => {
                 if (actions) {
                     setActions((actions) => actions.map(action => {
@@ -58,7 +66,7 @@ const HistoryPage = () => {
                 </div>
             </PanelHeading>
             <PanelBody>
-                <ActionList actions={actions} />
+                <ActionList actions={actions} events={events} />
             </PanelBody>
         </Page>
     );
