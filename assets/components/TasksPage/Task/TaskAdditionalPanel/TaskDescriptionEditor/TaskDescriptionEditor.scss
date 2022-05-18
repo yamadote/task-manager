@@ -12,4 +12,8 @@
   .task-description-editor.changing .mde-text {
     background: var(--changing-color);
   }
+
+  .mde-header ul.mde-header-group {
+    padding: 6px;
+  }
 }
