@@ -9,22 +9,36 @@ const ActionList = ({actions}) => {
     if (!actions) {
         return null;
     }
+    const prepareDate = (timestamp) => {
+        return moment.unix(timestamp).format('MMMM DD dddd');
+    }
+    const renderSpacer = (action, content = null) => {
+        return <TableSpacer key={"spacer-" + action.id} content={content} />;
+    }
+    const resolveSpacer = (action, previousAction) => {
+        const date = prepareDate(action.createdAt);
+        if (!previousAction) {
+            return renderSpacer(action, date);
+        }
+        const previousDate = prepareDate(previousAction.createdAt);
+        if (date !== previousDate) {
+            return renderSpacer(action, date);
+        }
+        const diff = previousAction.createdAt - action.createdAt;
+        if (Config.historyActionSpacerTime < diff) {
+            return renderSpacer(action);
+        }
+        return null;
+    }
     let list = [];
-    let previousDate = null;
-    let previousTime = null;
+    let previousAction = null;
     actions.forEach(action => {
         if (action.isHidden) {
             return;
         }
-        const date = moment.unix(action.createdAt).format('MMMM DD dddd');
-        if (previousDate !== date) {
-            list.push(<TableSpacer content={date} />);
-        } else if (previousTime && ((previousTime - action.createdAt) > Config.historyActionSpacerTime)) {
-            list.push(<TableSpacer />);
-        }
-        previousDate = date;
-        previousTime = action.createdAt;
+        list.push(resolveSpacer(action, previousAction));
         list.push(<Action key={action.id} action={action} />);
+        previousAction = action;
     })
     return (
         <div className="table-responsive">

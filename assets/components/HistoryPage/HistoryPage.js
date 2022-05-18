@@ -6,13 +6,16 @@ import Config from "../App/Config";
 import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
 import Icon from "../App/Icon";
+import Button from "../App/Button";
 import LocalStorage from "../App/LocalStorage";
 import ActionList from "./ActionList/ActionList";
+import {useHistory} from "react-router-dom";
 import './HistoryPage.scss';
 
 const HistoryPage = () => {
     const title = "History";
     const icon = <Icon name="th-list"/>;
+    const history = useHistory();
 
     const [search, setSearch] = useState("");
     const [actions, setActions] = useState(undefined);
@@ -27,6 +30,10 @@ const HistoryPage = () => {
                         setReminderNumber(response.reminderNumber);
                         LocalStorage.setReminderNumber(reminderNumber);
                     });
+            },
+            reload: () => {
+                setActions(undefined);
+                events.init();
             },
             onSearchUpdate: () => {
                 if (actions) {
@@ -44,7 +51,12 @@ const HistoryPage = () => {
 
     return (
         <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
-            <PanelHeading title={title} icon={icon}/>
+            <PanelHeading title={title} icon={icon}>
+                <div>
+                    <Button onClick={events.reload}><span className="oi oi-reload"/></Button>
+                    <Button onClick={history.goBack}><span className="oi oi-chevron-left"/></Button>
+                </div>
+            </PanelHeading>
             <PanelBody>
                 <ActionList actions={actions} />
             </PanelBody>
