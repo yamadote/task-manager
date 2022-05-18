@@ -1,5 +1,28 @@
 
 .history-action-list {
+  border: none;
+  margin-top: -10px;
+
+  thead tr {
+    border-top: 1px solid #ddd;
+  }
+
+  .table-spacer {
+    height: 20px;
+
+    td {
+      border: none;
+
+      .column-content {
+        text-align: center;
+        font-weight: 600;
+        padding-top: 10px;
+        padding-bottom: 5px;
+        padding-right: 100px;
+      }
+    }
+  }
+
   .column {
     padding-left: 12px;
     padding-right: 12px;
@@ -10,11 +33,15 @@
   }
 
   .time-column {
-    width: 120px;
+    width: 36px;
+
+    .column-content {
+      text-align: center;
+    }
   }
 
   .task-column {
-    width: 240px;
+    width: 280px;
 
     .column-content {
       white-space: nowrap;
@@ -23,11 +50,13 @@
     }
   }
 
-  @media screen and (max-width: 992px) {
-    .time-column {
-      width: 90px;
+  @media screen and (max-width: 1200px) {
+    .task-column {
+      width: 200px;
     }
+  }
 
+  @media screen and (max-width: 992px) {
     .task-column {
       width: 120px;
     }

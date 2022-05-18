@@ -46,7 +46,7 @@ const Action = ({action}) => {
     if (action.type === 'editTaskStatus') {
         className = 'warning';
     }
-    const time = moment.unix(action.createdAt).format('MMM DD HH:mm');
+    const time = moment.unix(action.createdAt).format('HH:mm');
     return (
         <tr className={className}>
             <td className="column time-column"><div className="column-content">{time}</div></td>
