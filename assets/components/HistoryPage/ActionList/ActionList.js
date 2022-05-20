@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Action from "../Action/Action";
-import TableSpacer from "./TableSpacer";
+import ActionListSpacer from "./ActionListSpacer";
 import moment from "moment";
 import Config from "../../App/Config";
 import RepeatedAction from "../Action/RepeatedAction";
@@ -25,7 +25,7 @@ const ActionList = ({actions, events}) => {
         return moment.unix(timestamp).format('MMMM DD dddd');
     }
     const renderSpacer = (action, content = null) => {
-        return <TableSpacer key={"spacer-" + action.id} content={content} />;
+        return <ActionListSpacer key={"spacer-" + action.id} content={content} />;
     }
     const resolveSpacer = (action, previousAction) => {
         const date = prepareDate(action.createdAt);
@@ -67,9 +67,9 @@ const ActionList = ({actions, events}) => {
     })
     return (
         <div className="table-responsive">
-        <table className="table table-bordered history-action-list">
-            <tbody>{list}</tbody>
-        </table>
+            <table className="table table-bordered history-action-list">
+                <tbody>{list}</tbody>
+            </table>
         </div>
     );
 }

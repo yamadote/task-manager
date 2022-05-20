@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const TableSpacer = ({content}) => {
+const ActionListSpacer = ({content}) => {
     return (
         <tr className="table-spacer">
             <td colSpan={3}>
@@ -11,4 +11,4 @@ const TableSpacer = ({content}) => {
     );
 }
 
-export default TableSpacer;
+export default ActionListSpacer;
