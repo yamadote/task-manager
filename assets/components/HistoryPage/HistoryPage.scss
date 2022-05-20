@@ -1,10 +1,12 @@
 
 .history-action-list {
-  border: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   margin-top: -10px;
 
-  thead tr {
-    border-top: 1px solid #ddd;
+  tbody tr:first-child td {
+    border-top: none;
   }
 
   .repeated-action {
@@ -25,7 +27,8 @@
     height: 20px;
 
     td {
-      border: none;
+      border-left: none;
+      border-right: none;
 
       .column-content {
         text-align: center;
@@ -40,13 +43,18 @@
   .column {
     padding-left: 12px;
     padding-right: 12px;
+    border-bottom: none;
+
+    .column-content {
+      width: inherit;
+    }
   }
 
-  .column-content {
-    width: inherit;
+  .column.merged-column {
+    border-top: none;
   }
 
-  .time-column {
+  .column.time-column {
     width: 36px;
 
     .column-content {
@@ -54,7 +62,7 @@
     }
   }
 
-  .task-column {
+  .column.task-column {
     width: 280px;
 
     .column-content {

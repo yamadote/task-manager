@@ -38,20 +38,31 @@ parser.registerTag('link', LinkTag);
 parser.registerTag('reminder', ReminderTag);
 parser.registerTag('status', StatusTag);
 
-const Action = ({action}) => {
-    let className = '';
-    if (action.type === 'createTask') {
-        className = 'info';
+const Action = ({action, isMergedTaskColumn}) => {
+    const getStatusClassName = () => {
+        if (action.type === 'createTask') {
+            return 'info';
+        }
+        if (action.type === 'editTaskStatus') {
+            return 'warning';
+        }
+        return '';
     }
-    if (action.type === 'editTaskStatus') {
-        className = 'warning';
-    }
+    const statusClassName = getStatusClassName();
     const time = moment.unix(action.createdAt).format('HH:mm');
+    const message = parser.toReact(action.message);
+    const task = isMergedTaskColumn ? null : action.task.title;
     return (
-        <tr className={className}>
-            <td className="column time-column"><div className="column-content">{time}</div></td>
-            <td className="column message-column">{parser.toReact(action.message)}</td>
-            <td className="column task-column"><div className="column-content">{action.task}</div></td>
+        <tr>
+            <td className={"column time-column " + statusClassName}>
+                <div className="column-content">{time}</div>
+            </td>
+            <td className={"column message-column " + statusClassName}>
+                <div className="column-content">{message}</div>
+            </td>
+            <td className={"column task-column " + (isMergedTaskColumn ? 'merged-column' : '')}>
+                <div className="column-content">{task}</div>
+            </td>
         </tr>
     );
 }

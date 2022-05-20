@@ -11,19 +11,15 @@ const ActionList = ({actions, events}) => {
         return null;
     }
     const isRepeatedAction = (action, previousAction) => {
-        if (!previousAction) {
-            return false;
-        }
-        if (action.revealed) {
-            return false;
-        }
-        if (action.type !== previousAction.type) {
-            return false;
-        }
-        if (action.task !== previousAction.task) {
-            return false;
-        }
-        return Config.repeatedActionTypes.includes(action.type);
+        return !action.revealed
+            && previousAction
+            && previousAction.type === action.type
+            && previousAction.task.id === action.task.id
+            && Config.repeatedActionTypes.includes(action.type);
+    }
+    const isSameActionTask = (action, previousAction) => {
+        return previousAction
+            && previousAction.task.id === action.task.id;
     }
     const prepareDate = (timestamp) => {
         return moment.unix(timestamp).format('MMMM DD dddd');
@@ -63,7 +59,8 @@ const ActionList = ({actions, events}) => {
                 repeatedActionAmount += 1;
             }
         } else {
-            list.push(<Action key={action.id} action={action} />);
+            const isMergedTaskColumn = !spacer && !repeatedActionAmount && isSameActionTask(action, previousAction);
+            list.push(<Action key={action.id} action={action} isMergedTaskColumn={isMergedTaskColumn} />);
             repeatedActionAmount = 0;
         }
         previousAction = action;

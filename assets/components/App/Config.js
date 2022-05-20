@@ -7,7 +7,7 @@ const Config = new function () {
         githubUrlPrefix: "https://github.com/",
         reminderTaskColor: 'rgb(255, 99, 71)',
         activeTaskColor: '#ffb6c1',
-        repeatedActionTypes: ["editTaskTitle", "editTaskDescription"],
+        repeatedActionTypes: ["editTaskTitle", "editTaskDescription", "editTaskReminder"],
         repeatedActionMaxAmount: 4
     }
 }

@@ -12,7 +12,10 @@ class ActionResponseBuilder
         foreach ($actions as $action) {
             $response[] = [
                 'id' => $action->getId(),
-                'task' => $action->getTask()->getTitle(),
+                'task' => [
+                    'id' => $action->getTask()->getId(),
+                    'title' => $action->getTask()->getTitle(),
+                ],
                 'type' => $action->getType(),
                 'message' => $action->getMessage(),
                 'createdAt' => $action->getCreatedAt()->getTimestamp()
