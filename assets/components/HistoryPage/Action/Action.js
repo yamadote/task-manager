@@ -1,26 +1,22 @@
 
 import React from 'react';
-import moment from "moment";
 import './Action.scss';
 import ActionMessage from "./ActionMessage/ActionMessage";
 import ActionTask from "./ActionTask/ActionTask";
+import ActionTime from "./ActionTime/ActionTime";
 
 const Action = ({action, isMergedTaskColumn}) => {
-    const getStatusClassName = () => {
-        if (action.type === 'createTask') {
-            return 'info';
-        }
-        if (action.type === 'editTaskStatus') {
-            return 'warning';
-        }
-        return '';
+    let statusClassName = '';
+    if (action.type === 'createTask') {
+        statusClassName = 'info';
     }
-    const statusClassName = getStatusClassName();
-    const time = moment.unix(action.createdAt).format('HH:mm');
+    if (action.type === 'editTaskStatus') {
+        statusClassName = 'warning';
+    }
     return (
         <tr>
             <td className={"column time-column " + statusClassName}>
-                <div className="column-content">{time}</div>
+                <ActionTime timestamp={action.createdAt} />
             </td>
             <td className={"column message-column " + statusClassName}>
                 <ActionMessage message={action.message} />
