@@ -30,12 +30,12 @@ class IndexController extends AbstractController
      * @Route("/tasks", name="app_task_index", methods={"GET"})
      * @Route("/tasks/todo", name="app_task_todo", methods={"GET"})
      * @Route("/tasks/reminders", name="app_task_reminders", methods={"GET"})
-     * @Route("/{parent}", name="app_parent_index", methods={"GET"}, requirements={"parent"="\d+"})
-     * @Route("/{parent}/tasks", name="app_parent_task_index", methods={"GET"}, requirements={"parent"="\d+"})
-     * @Route("/{parent}/tasks/todo", name="app_parent_task_todo", methods={"GET"}, requirements={"parent"="\d+"})
-     * @Route("/{parent}/tasks/reminders", name="app_parent_task_reminders", methods={"GET"}, requirements={"parent"="\d+"})
+     * @Route("/{root}/tasks", name="app_parent_task_index", methods={"GET"}, requirements={"root"="\d+"})
+     * @Route("/{root}/tasks/todo", name="app_parent_task_todo", methods={"GET"}, requirements={"root"="\d+"})
+     * @Route("/{root}/tasks/reminders", name="app_parent_task_reminders", methods={"GET"}, requirements={"root"="\d+"})
      * @Route("/settings", name="app_settings", methods={"GET"})
      * @Route("/history", name="app_history", methods={"GET"})
+     * @Route("/{task}/history", name="app_task_history", methods={"GET"}, requirements={"task"="\d+"})
      * @IsGranted("ROLE_USER")
      */
     public function tasks(): Response

@@ -9,12 +9,14 @@ import Icon from "../App/Icon";
 import Button from "../App/Button";
 import LocalStorage from "../App/LocalStorage";
 import ActionList from "./ActionList/ActionList";
-import {useHistory} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 
 const HistoryPage = () => {
     const title = "History";
     const icon = <Icon name="th-list"/>;
     const history = useHistory();
+    const params = useParams();
+    const task = params.task;
 
     const [search, setSearch] = useState("");
     const [actions, setActions] = useState(undefined);
@@ -23,7 +25,8 @@ const HistoryPage = () => {
     const events = new function () {
         return {
             init: () => {
-                Helper.fetchJson(Config.apiUrlPrefix + "/history")
+                const params = {'task': task};
+                Helper.fetchJson(Config.apiUrlPrefix + "/history", params)
                     .then(response => {
                         setActions(response.actions);
                         setReminderNumber(response.reminderNumber);
@@ -53,7 +56,7 @@ const HistoryPage = () => {
         }
     }
 
-    useLayoutEffect(events.init, []);
+    useLayoutEffect(events.init, [task]);
     useLayoutEffect(events.onSearchUpdate, [search]);
 
     return (

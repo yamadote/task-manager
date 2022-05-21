@@ -155,9 +155,9 @@ class User implements UserInterface
         }
     }
 
-    public function equals(User $task): bool
+    public function equals(User $user): bool
     {
-        return $this->getId() === $task->getId();
+        return $this->getId() === $user->getId();
     }
 
     /**
