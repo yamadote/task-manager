@@ -10,16 +10,18 @@
   }
 
   .repeated-action {
-    cursor: pointer;
     height: 7px;
-    border: 1px solid #ddd;
 
-    td {
+    .column {
       padding: 0;
     }
   }
 
-  .repeated-action:hover {
+  .column.clickable {
+    cursor: pointer;
+  }
+
+  .column.clickable:hover {
     background: lightyellow;
   }
 

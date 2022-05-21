@@ -59,7 +59,7 @@ const ActionList = ({actions, events}) => {
                 repeatedActionAmount += 1;
             }
         } else {
-            const isMergedTaskColumn = !spacer && !repeatedActionAmount && isSameActionTask(action, previousAction);
+            const isMergedTaskColumn = !spacer && isSameActionTask(action, previousAction);
             list.push(<Action key={action.id} action={action} isMergedTaskColumn={isMergedTaskColumn} />);
             repeatedActionAmount = 0;
         }
