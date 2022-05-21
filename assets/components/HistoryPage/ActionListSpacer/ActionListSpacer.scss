@@ -1,0 +1,31 @@
+
+.history-action-list {
+  .action-list-spacer {
+    height: 20px;
+
+    td {
+      border-left: none;
+      border-right: none;
+
+      .column-content {
+        text-align: center;
+        font-weight: 600;
+        padding-top: 10px;
+        padding-bottom: 5px;
+        padding-right: 100px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1200px) {
+    .action-list-spacer td .column-content {
+      padding-right: 70px;
+    }
+  }
+
+  @media screen and (max-width: 992px) {
+    .action-list-spacer td .column-content {
+      padding-right: 40px;
+    }
+  }
+}

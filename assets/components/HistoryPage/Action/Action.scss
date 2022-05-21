@@ -1,45 +1,11 @@
 
 .history-action-list {
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  margin-top: -10px;
-
-  tbody tr:first-child td {
-    border-top: none;
-  }
-
-  .repeated-action {
-    height: 7px;
-
-    .column {
-      padding: 0;
-    }
-  }
-
   .column.clickable {
     cursor: pointer;
   }
 
   .column.clickable:hover {
     background: lightyellow;
-  }
-
-  .table-spacer {
-    height: 20px;
-
-    td {
-      border-left: none;
-      border-right: none;
-
-      .column-content {
-        text-align: center;
-        font-weight: 600;
-        padding-top: 10px;
-        padding-bottom: 5px;
-        padding-right: 100px;
-      }
-    }
   }
 
   .column {
@@ -78,17 +44,11 @@
     .task-column {
       width: 200px;
     }
-    .table-spacer td .column-content {
-      padding-right: 70px;
-    }
   }
 
   @media screen and (max-width: 992px) {
     .task-column {
       width: 120px;
-    }
-    .table-spacer td .column-content {
-      padding-right: 40px;
     }
   }
 }

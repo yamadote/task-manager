@@ -1,0 +1,11 @@
+
+.history-action-list {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin-top: -10px;
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+}

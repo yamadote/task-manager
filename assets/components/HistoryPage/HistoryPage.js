@@ -10,7 +10,6 @@ import Button from "../App/Button";
 import LocalStorage from "../App/LocalStorage";
 import ActionList from "./ActionList/ActionList";
 import {useHistory} from "react-router-dom";
-import './HistoryPage.scss';
 
 const HistoryPage = () => {
     const title = "History";

@@ -1,10 +1,11 @@
 
 import React from 'react';
 import Action from "../Action/Action";
-import ActionListSpacer from "./ActionListSpacer";
+import ActionListSpacer from "../ActionListSpacer/ActionListSpacer";
 import moment from "moment";
 import Config from "../../App/Config";
-import RepeatedAction from "../Action/RepeatedAction";
+import RepeatedAction from "../RepeatedAction/RepeatedAction";
+import './ActionList.scss';
 
 const ActionList = ({actions, events}) => {
     if (!actions) {

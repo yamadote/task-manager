@@ -1,5 +1,6 @@
 
 import React from 'react';
+import './RepeatedAction.scss';
 
 const RepeatedAction = ({action, events}) => {
     return (
