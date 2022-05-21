@@ -3,6 +3,7 @@ import React from 'react';
 import moment from "moment";
 import './Action.scss';
 import ActionMessage from "./ActionMessage/ActionMessage";
+import ActionTask from "./ActionTask/ActionTask";
 
 const Action = ({action, isMergedTaskColumn}) => {
     const getStatusClassName = () => {
@@ -16,7 +17,6 @@ const Action = ({action, isMergedTaskColumn}) => {
     }
     const statusClassName = getStatusClassName();
     const time = moment.unix(action.createdAt).format('HH:mm');
-    const task = isMergedTaskColumn ? null : action.task.title;
     return (
         <tr>
             <td className={"column time-column " + statusClassName}>
@@ -26,7 +26,7 @@ const Action = ({action, isMergedTaskColumn}) => {
                 <ActionMessage message={action.message} />
             </td>
             <td className={"column task-column " + (isMergedTaskColumn ? 'merged-column' : '')}>
-                <div className="column-content">{task}</div>
+                { !isMergedTaskColumn ? <ActionTask task={action.task} /> : null }
             </td>
         </tr>
     );

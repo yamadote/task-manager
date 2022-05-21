@@ -9,11 +9,12 @@
   }
 
   .column {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding: 0;
     border-bottom: none;
 
     .column-content {
+      margin: 8px 12px;
+      word-break: break-word;
       width: inherit;
     }
   }
@@ -27,28 +28,6 @@
 
     .column-content {
       text-align: center;
-    }
-  }
-
-  .column.task-column {
-    width: 280px;
-
-    .column-content {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  @media screen and (max-width: 1200px) {
-    .task-column {
-      width: 200px;
-    }
-  }
-
-  @media screen and (max-width: 992px) {
-    .task-column {
-      width: 120px;
     }
   }
 }

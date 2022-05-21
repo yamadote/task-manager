@@ -1,0 +1,37 @@
+
+.history-action-list {
+  .column.task-column {
+    width: 280px;
+
+    .column-content {
+      .title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .btn {
+        display: none;
+        padding: 0 3px 0 5px;
+        margin: -2px -3px 0 8px;
+        float: right;
+      }
+    }
+  }
+
+  .column.task-column:hover .column-content .btn {
+    display: block;
+  }
+
+  @media screen and (max-width: 1200px) {
+    .column.task-column {
+      width: 200px;
+    }
+  }
+
+  @media screen and (max-width: 992px) {
+    .column.task-column {
+      width: 120px;
+    }
+  }
+}
