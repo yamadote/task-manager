@@ -72,8 +72,8 @@ const Helper = new function () {
         getGithubIssueNumber(link) {
             return "#" + link.split('/').slice(-1)[0];
         },
-        getHistoryPageUrl() {
-            return '/history';
+        getHistoryPageUrl(task) {
+            return (task ? '/' + task.id : '' ) + '/history';
         }
     }
 }
