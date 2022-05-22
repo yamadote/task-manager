@@ -11,6 +11,12 @@ import Button from "../../../App/Button";
 
 const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
     const [isDescriptionHidden, setDescriptionHidden] = useState(!task.description)
+
+    const onNewTaskClick = () => events.createNewTask(task.id);
+    const onDescriptionClick = () => setDescriptionHidden(false);
+    const onRemoveTaskClick = () => events.removeTask(task.id);
+    const createdAt = moment.unix(task.createdAt).format('DD/MM/YYYY HH:mm');
+
     return (
         <div className="additional-panel">
             <div className="fields">
@@ -20,10 +26,12 @@ const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
             </div>
             <div className="additional-panel-buttons">
                 <TaskTimeTrackingButton task={task} isActive={isActive} events={events}/>
-                <Button onClick={() => events.createNewTask(task.id)} buttonStyle='secondary' buttonSize='sm'>New Task</Button>
-                <Button onClick={() => events.removeTask(task.id)} buttonStyle='danger' buttonSize='sm'>Remove</Button>
-                <Button onClick={() => setDescriptionHidden(false)} buttonStyle='info' buttonSize='sm'>Description</Button>
-                <span className="created-at">{moment.unix(task.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+                <Button onClick={onNewTaskClick} buttonStyle='secondary' buttonSize='sm'>New Task</Button>
+                <Button onClick={onDescriptionClick} buttonStyle='info' buttonSize='sm'>Description</Button>
+                <span className="created-at">{createdAt}</span>
+                <Button className="remove" onClick={onRemoveTaskClick} buttonSize='sm'>
+                    <span className="oi oi-trash"/>
+                </Button>
             </div>
             { isDescriptionHidden ? null : <TaskDescriptionEditor task={task} events={events}/> }
         </div>
