@@ -12,14 +12,14 @@
         font-weight: 600;
         padding-top: 10px;
         padding-bottom: 5px;
-        padding-right: 100px;
+        padding-right: 90px;
       }
     }
   }
 
   @media screen and (max-width: 1200px) {
     .action-list-spacer td .column-content {
-      padding-right: 70px;
+      padding-right: 60px;
     }
   }
 
@@ -29,3 +29,8 @@
     }
   }
 }
+
+.history-action-list.hidden-task-column .action-list-spacer .column-content {
+  padding-right: 40px;
+}
+
