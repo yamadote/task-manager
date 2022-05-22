@@ -62,7 +62,7 @@ const HistoryPage = () => {
         <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
             <HistoryPanelHeading title={title} icon={icon} task={task} events={events} />
             <PanelBody>
-                <ActionList actions={actions} events={events} />
+                <ActionList actions={actions} events={events} task={task} />
             </PanelBody>
         </Page>
     );

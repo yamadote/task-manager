@@ -7,7 +7,7 @@ import Config from "../../App/Config";
 import RepeatedAction from "../RepeatedAction/RepeatedAction";
 import './ActionList.scss';
 
-const ActionList = ({actions, events}) => {
+const ActionList = ({actions, events, task}) => {
     if (!actions) {
         return null;
     }
@@ -68,7 +68,7 @@ const ActionList = ({actions, events}) => {
     })
     return (
         <div className="table-responsive">
-            <table className="table table-bordered history-action-list">
+            <table className={"table table-bordered history-action-list " + (task ? "hidden-task-column" : '')}>
                 <tbody>{list}</tbody>
             </table>
         </div>
