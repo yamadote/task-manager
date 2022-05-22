@@ -8,6 +8,7 @@ import moment from "moment";
 import TaskDescriptionEditor from "./TaskDescriptionEditor/TaskDescriptionEditor";
 import TaskTimeTrackingButton from "./TaskTimeTrackingButton/TaskTimeTrackingButton"
 import Button from "../../../App/Button";
+import OpenIcon from "../../../App/OpenIcon";
 
 const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
     const [isDescriptionHidden, setDescriptionHidden] = useState(!task.description)
@@ -30,7 +31,7 @@ const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
                 <Button onClick={onDescriptionClick} buttonStyle='info' buttonSize='sm'>Description</Button>
                 <span className="created-at">{createdAt}</span>
                 <Button className="remove" onClick={onRemoveTaskClick} buttonSize='sm'>
-                    <span className="oi oi-trash"/>
+                    <OpenIcon name="trash"/>
                 </Button>
             </div>
             { isDescriptionHidden ? null : <TaskDescriptionEditor task={task} events={events}/> }

@@ -5,6 +5,7 @@ import Button from "../../App/Button";
 import PanelHeadingTask from "../../Page/PanelHeading/PanelHeadingTask/PanelHeadingTask";
 import {useHistory} from "react-router-dom";
 import Helper from "../../App/Helper";
+import OpenIcon from "../../App/OpenIcon";
 
 const HistoryPanelHeading = ({title, icon, task, events}) => {
     const history = useHistory();
@@ -18,8 +19,8 @@ const HistoryPanelHeading = ({title, icon, task, events}) => {
         <PanelHeading title={title} icon={icon}>
             { renderPanelHeadingTask(task) }
             <div>
-                <Button onClick={events.reload}><span className="oi oi-reload"/></Button>
-                <Button onClick={history.goBack}><span className="oi oi-chevron-left"/></Button>
+                <Button onClick={events.reload}><OpenIcon name="reload"/></Button>
+                <Button onClick={history.goBack}><OpenIcon name="chevron-left"/></Button>
             </div>
         </PanelHeading>
     );
