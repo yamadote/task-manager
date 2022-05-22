@@ -9,6 +9,8 @@ import TaskDescriptionEditor from "./TaskDescriptionEditor/TaskDescriptionEditor
 import TaskTimeTrackingButton from "./TaskTimeTrackingButton/TaskTimeTrackingButton"
 import Button from "../../../App/Button";
 import OpenIcon from "../../../App/OpenIcon";
+import {Link} from "react-router-dom";
+import Helper from "../../../App/Helper";
 
 const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
     const [isDescriptionHidden, setDescriptionHidden] = useState(!task.description)
@@ -30,9 +32,10 @@ const TaskAdditionalPanel = ({task, isActive, statuses, events}) => {
                 <Button onClick={onNewTaskClick} buttonStyle='secondary' buttonSize='sm'>New Task</Button>
                 <Button onClick={onDescriptionClick} buttonStyle='info' buttonSize='sm'>Description</Button>
                 <span className="created-at">{createdAt}</span>
-                <Button className="remove" onClick={onRemoveTaskClick} buttonSize='sm'>
-                    <OpenIcon name="trash"/>
-                </Button>
+                <Link to={Helper.getHistoryPageUrl(task)}>
+                    <Button className="right-side-button" buttonSize='sm'><OpenIcon name="clock"/></Button>
+                </Link>
+                <Button className="right-side-button" onClick={onRemoveTaskClick} buttonSize='sm'><OpenIcon name="trash"/></Button>
             </div>
             { isDescriptionHidden ? null : <TaskDescriptionEditor task={task} events={events}/> }
         </div>
