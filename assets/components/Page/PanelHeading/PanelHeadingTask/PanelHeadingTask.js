@@ -7,7 +7,7 @@ import OpenIcon from "../../../App/OpenIcon";
 const PanelHeadingTask = ({task, backLink}) => {
     return (
         <div className="panel-heading-task">
-            {task.title ? <span className="panel-heading-task-title">{task.title}</span> : null}
+            {task.title ? <span className="panel-heading-task-title" title={task.title}>{task.title}</span> : null}
             <Link className="btn btn-default" to={backLink}>
                 <OpenIcon name="share-boxed"/>
             </Link>
