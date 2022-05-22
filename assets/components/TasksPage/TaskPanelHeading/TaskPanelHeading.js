@@ -1,19 +1,20 @@
 
 import React from 'react';
-import {Link} from "react-router-dom";
 import Helper from "../../App/Helper";
-import '../../Page/PanelHeading/PanelHeading.scss';
-import './TaskPanelHeading.scss';
 import PanelHeading from "../../Page/PanelHeading/PanelHeading";
 import Button from "../../App/Button";
+import PanelHeadingTask from "../../Page/PanelHeading/PanelHeadingTask/PanelHeadingTask";
 
 const TaskPanelHeading = ({title, icon, root, events}) => {
+    const renderPanelHeadingTask = (root) => {
+        if (root) {
+            const backLink = Helper.getTaskPageUrl(root?.parent);
+            return <PanelHeadingTask task={root} backLink={backLink} />;
+        }
+    }
     return (
         <PanelHeading title={title} icon={icon}>
-            <div className="panel-task-root">
-                {root ? <span className="root-title">{root.title}</span> : ''}
-                {root ? <Link className="btn btn-default" to={Helper.getTaskPageUrl(root?.parent)}><span className="oi oi-share-boxed"/></Link> : null}
-            </div>
+            { renderPanelHeadingTask(root) }
             <div>
                 <Button onClick={() => events.toggleCalendar()}><span className="oi oi-credit-card"/></Button>
                 <Button onClick={() => events.reload()}><span className="oi oi-reload"/></Button>

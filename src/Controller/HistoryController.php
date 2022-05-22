@@ -42,7 +42,7 @@ class HistoryController extends AbstractController
         $taskId = $request->query->get('task');
         if (empty($taskId)) {
             $actions = $this->actionRepository->findByUser($this->getUser());
-            return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions);
+            return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions, null);
         }
         $task = $this->taskRepository->find($taskId);
         if (empty($task)) {
@@ -52,6 +52,6 @@ class HistoryController extends AbstractController
             return $this->jsonResponseBuilder->buildPermissionDenied();
         }
         $actions = $this->actionRepository->findByTask($task);
-        return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions);
+        return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions, $task);
     }
 }

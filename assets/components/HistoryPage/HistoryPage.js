@@ -1,23 +1,22 @@
 
 import React, {useLayoutEffect, useState} from 'react';
-import PanelHeading from "../Page/PanelHeading/PanelHeading";
 import Helper from "../App/Helper";
 import Config from "../App/Config";
 import Page from "../Page/Page";
 import PanelBody from "../Page/PanelBody/PanelBody";
 import Icon from "../App/Icon";
-import Button from "../App/Button";
 import LocalStorage from "../App/LocalStorage";
 import ActionList from "./ActionList/ActionList";
-import {useHistory, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
+import HistoryPanelHeading from "./HistoryPanelHeading/HistoryPanelHeading";
 
 const HistoryPage = () => {
     const title = "History";
     const icon = <Icon name="th-list"/>;
-    const history = useHistory();
     const params = useParams();
-    const task = params.task;
 
+    const getTaskInitialState = (params) => params.task ? {'id': parseInt(params.task)} : undefined;
+    const [task, setTask] = useState(getTaskInitialState(params))
     const [search, setSearch] = useState("");
     const [actions, setActions] = useState(undefined);
     const [reminderNumber, setReminderNumber] = useState(LocalStorage.getReminderNumber());
@@ -25,9 +24,9 @@ const HistoryPage = () => {
     const events = new function () {
         return {
             init: () => {
-                const params = {'task': task};
-                Helper.fetchJson(Config.apiUrlPrefix + "/history", params)
+                Helper.fetchJson(Config.apiUrlPrefix + "/history", {'task': params.task})
                     .then(response => {
+                        setTask(response.task);
                         setActions(response.actions);
                         setReminderNumber(response.reminderNumber);
                         LocalStorage.setReminderNumber(reminderNumber);
@@ -56,17 +55,12 @@ const HistoryPage = () => {
         }
     }
 
-    useLayoutEffect(events.init, [task]);
+    useLayoutEffect(events.init, [params.task]);
     useLayoutEffect(events.onSearchUpdate, [search]);
 
     return (
         <Page sidebar={{root: null, onSearch:setSearch, reminderNumber:reminderNumber}}>
-            <PanelHeading title={title} icon={icon}>
-                <div>
-                    <Button onClick={events.reload}><span className="oi oi-reload"/></Button>
-                    <Button onClick={history.goBack}><span className="oi oi-chevron-left"/></Button>
-                </div>
-            </PanelHeading>
+            <HistoryPanelHeading title={title} icon={icon} task={task} events={events} />
             <PanelBody>
                 <ActionList actions={actions} events={events} />
             </PanelBody>
