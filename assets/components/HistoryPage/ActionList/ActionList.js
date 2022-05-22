@@ -15,12 +15,12 @@ const ActionList = ({actions, events, task}) => {
         return !action.revealed
             && previousAction
             && previousAction.type === action.type
-            && previousAction.task.id === action.task.id
+            && previousAction.task?.id === action.task?.id
             && Config.repeatedActionTypes.includes(action.type);
     }
     const isSameActionTask = (action, previousAction) => {
         return previousAction
-            && previousAction.task.id === action.task.id;
+            && previousAction.task?.id === action.task?.id;
     }
     const prepareDate = (timestamp) => {
         return moment.unix(timestamp).format('MMMM DD dddd');

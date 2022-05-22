@@ -28,9 +28,10 @@ class HistoryResponseComposer
 
     public function composeListResponse(User $user, ActionCollection $actions, ?Task $task): JsonResponse
     {
+        $includeActionTask = $task === null;
         $reminderNumber = $this->taskRepository->countUserReminders($user);
         return $this->jsonResponseBuilder->build([
-            'actions' => $this->actionResponseBuilder->buildActionListResponse($actions),
+            'actions' => $this->actionResponseBuilder->buildActionListResponse($actions, $includeActionTask),
             'reminderNumber' => $reminderNumber,
             'task' => $task ? $this->composeTaskResponse($task) : null
         ]);
