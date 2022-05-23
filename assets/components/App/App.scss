@@ -47,6 +47,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   background-color: #64686b;
   border-color: #64686b;
 }
+.btn-info {
+  background-color: #28a0c4;
+  border-color: #2198b7;
+}
+.btn-info:hover {
+  background-color: #178bad;
+  border-color: #127d9a;
+}
 .btn-to-link {
   background: none!important;
   border: none;

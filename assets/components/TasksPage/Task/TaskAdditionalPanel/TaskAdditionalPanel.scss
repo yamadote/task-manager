@@ -64,10 +64,19 @@
     flex-wrap: wrap;
 
     .created-at {
-      margin-left: auto;
       line-height: 18px;
-      margin-right: 8px;
-      margin-top: 10px;
+      margin: 10px 8px 0 auto;
+    }
+
+    .btn.right-side-button {
+      height: 24px;
+      width: 24px;
+      padding: 2px 0 0 1px;
+      margin: 6px 1px 0 4px;
+
+      .oi-trash {
+        margin-left: 1px;
+      }
     }
   }
 }

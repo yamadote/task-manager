@@ -22,7 +22,7 @@ const Action = ({action, isMergedTaskColumn}) => {
                 <ActionMessage message={action.message} />
             </td>
             <td className={"column task-column " + (isMergedTaskColumn ? 'merged-column' : '')}>
-                { !isMergedTaskColumn ? <ActionTask task={action.task} /> : null }
+                { action.task && !isMergedTaskColumn ? <ActionTask task={action.task} /> : null }
             </td>
         </tr>
     );

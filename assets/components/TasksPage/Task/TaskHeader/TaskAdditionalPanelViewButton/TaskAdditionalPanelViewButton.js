@@ -1,12 +1,13 @@
 
 import React from 'react';
+import OpenIcon from "../../../../App/OpenIcon";
 
 const TaskAdditionalPanelViewButton = ({task, events}) => {
-    const onButtonClick = () => events.updateTaskAdditionalPanelViewSetting(task.id, !task.isAdditionalPanelOpen)
-    const iconClassName = task.isAdditionalPanelOpen ? "oi oi-chevron-top" : "oi oi-chevron-bottom";
+    const onButtonClick = () => events.updateTaskAdditionalPanelViewSetting(task.id, !task.isAdditionalPanelOpen);
+    const iconName = task.isAdditionalPanelOpen ? "chevron-top" : "chevron-bottom";
     return (
         <button onClick={onButtonClick} className='title-button'>
-            <span className={iconClassName}/>
+            <OpenIcon name={iconName}/>
         </button>
     );
 }

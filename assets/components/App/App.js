@@ -43,7 +43,7 @@ const App = () => {
                 <Route path="/settings">
                     <SettingsPage/>
                 </Route>
-                <Route path="/history">
+                <Route path="/:task?/history">
                     <HistoryPage/>
                 </Route>
             </Switch>

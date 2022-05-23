@@ -1,5 +1,6 @@
 
 import React from 'react';
+import OpenIcon from "../../../../App/OpenIcon";
 
 const TaskLink = ({link}) => {
     if (link.includes("https://github.com/")) {
@@ -7,7 +8,7 @@ const TaskLink = ({link}) => {
     }
     return (
         <a href={link} target="_blank" className="title-link">
-            <span className="oi oi-external-link"/>
+            <OpenIcon name="external-link"/>
         </a>
     )
 }
