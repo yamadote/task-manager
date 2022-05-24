@@ -8,10 +8,14 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      max-width: 300px;
+      max-width: 360px;
       height: 24px;
       line-height: 26px;
       padding-right: 2px;
+
+      @media (max-width: 1000px) {
+        max-width: 300px;
+      }
 
       @media (max-width: 768px) {
         max-width: 200px;
