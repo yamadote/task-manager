@@ -1,0 +1,8 @@
+
+.form-control.search-query:focus {
+  border-color: #ccc;
+}
+
+.form-control.search-query.searching {
+  background-color: var(--changing-color);
+}

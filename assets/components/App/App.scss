@@ -1,5 +1,6 @@
 :root {
-  --changing-color: lightyellow;
+  --changing-color: #ffffe0;
+  --active-sidebar-link-color:  #f0f0f0;
 }
 body {
   position: relative;
@@ -245,7 +246,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   padding-right: 0;
 }
 .list-group-item a:hover {
-  background-color: #E6E9ED;
+  background-color: var(--active-sidebar-link-color);
 }
 .list-group-item {
   padding: 0;

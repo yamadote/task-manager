@@ -3,15 +3,11 @@ import React from 'react';
 import './Sidebar.scss';
 import {Link} from "react-router-dom";
 import Icon from "../../App/Icon";
+import Search from "./Search/Search";
 
 const Sidebar = ({root, onSearch, reminderNumber}) => {
     const showReminderNumber = reminderNumber && reminderNumber > 0;
     const prefix = root === null ? '' : '/' + root.id;
-    const searchInputKeyDown = (event) => {
-        setTimeout(() => {
-            onSearch(event.target.value)
-        });
-    }
     return (
         <div className="col-xs-6 col-sm-3 sidebar-offcanvas" role="navigation">
             <ul className="list-group">
@@ -19,7 +15,7 @@ const Sidebar = ({root, onSearch, reminderNumber}) => {
                     <span><Icon name="align-justify"/> <b>SIDE PANEL</b></span>
                 </li>
                 <li className="list-group-item list-group-item-search">
-                    <input type="text" onKeyDown={searchInputKeyDown} className="form-control search-query" placeholder="Search" />
+                    <Search onSearch={onSearch} />
                 </li>
                 <li className="list-group-item">
                     <Link to={prefix + "/tasks"}><Icon name="list-alt"/>All Tasks</Link>
