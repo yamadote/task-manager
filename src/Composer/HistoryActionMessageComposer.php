@@ -5,7 +5,7 @@ namespace App\Composer;
 use App\Config\TaskStatusConfig;
 use DateTimeInterface;
 
-class ActionMessageComposer
+class HistoryActionMessageComposer
 {
     private TaskStatusConfig $taskStatusConfig;
 

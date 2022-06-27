@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use App\Builder\ActionBuilder;
+use App\Builder\HistoryActionBuilder;
 use App\Builder\TaskBuilder;
 use App\Collection\TaskCollection;
-use App\Composer\ActionMessageComposer;
-use App\Config\ActionConfig;
+use App\Composer\HistoryActionMessageComposer;
+use App\Config\HistoryActionConfig;
 use App\Config\TaskStatusConfig;
 use App\Entity\Task;
 use App\Entity\User;
@@ -25,8 +25,8 @@ class TaskService
     private EntityManagerInterface $entityManager;
     private TaskBuilder $taskBuilder;
     private UserTaskSettingsRepository $userTaskSettingsRepository;
-    private ActionBuilder $actionBuilder;
-    private ActionMessageComposer $actionMessageComposer;
+    private HistoryActionBuilder $historyActionBuilder;
+    private HistoryActionMessageComposer $historyActionMessageComposer;
 
     public function __construct(
         TaskStatusConfig $taskStatusConfig,
@@ -35,8 +35,8 @@ class TaskService
         EntityManagerInterface $entityManager,
         TaskBuilder $taskBuilder,
         UserTaskSettingsRepository $userTaskSettingsRepository,
-        ActionBuilder $actionBuilder,
-        ActionMessageComposer $actionMessageComposer
+        HistoryActionBuilder $historyActionBuilder,
+        HistoryActionMessageComposer $historyActionMessageComposer
     ) {
         $this->taskStatusConfig = $taskStatusConfig;
         $this->taskRepository = $taskRepository;
@@ -44,8 +44,8 @@ class TaskService
         $this->entityManager = $entityManager;
         $this->taskBuilder = $taskBuilder;
         $this->userTaskSettingsRepository = $userTaskSettingsRepository;
-        $this->actionBuilder = $actionBuilder;
-        $this->actionMessageComposer = $actionMessageComposer;
+        $this->historyActionBuilder = $historyActionBuilder;
+        $this->historyActionMessageComposer = $historyActionMessageComposer;
     }
 
     public function getTasksByStatus(User $user, string $statusSlug): TaskCollection
@@ -76,8 +76,8 @@ class TaskService
         $parentSettings->setIsChildrenOpen(true);
         $this->entityManager->persist($parentSettings);
 
-        $message = $this->actionMessageComposer->composeNewTaskMessage();
-        $this->createAction($user, $task, ActionConfig::CREATE_TASK_ACTION, $message);
+        $message = $this->historyActionMessageComposer->composeNewTaskMessage();
+        $this->createHistoryAction($user, $task, HistoryActionConfig::CREATE_TASK_ACTION, $message);
         $this->entityManager->flush();
         return $task;
     }
@@ -86,29 +86,29 @@ class TaskService
     {
         if ($input->has('title')) {
             $task->setTitle($input->get('title'));
-            $message = $this->actionMessageComposer->composeTaskTitleUpdateMessage($task->getTitle());
-            $this->createAction($user, $task, ActionConfig::EDIT_TASK_TITLE_ACTION, $message);
+            $message = $this->historyActionMessageComposer->composeTaskTitleUpdateMessage($task->getTitle());
+            $this->createHistoryAction($user, $task, HistoryActionConfig::EDIT_TASK_TITLE_ACTION, $message);
         }
         if ($input->has('link')) {
             $task->setLink($input->get('link'));
-            $message = $this->actionMessageComposer->composeTaskLinkUpdateMessage($task->getLink());
-            $this->createAction($user, $task, ActionConfig::EDIT_TASK_LINK_ACTION, $message);
+            $message = $this->historyActionMessageComposer->composeTaskLinkUpdateMessage($task->getLink());
+            $this->createHistoryAction($user, $task, HistoryActionConfig::EDIT_TASK_LINK_ACTION, $message);
         }
         if ($input->has('reminder')) {
             $reminder = $input->get('reminder');
             $task->setReminder($reminder ? (new DateTime())->setTimestamp($reminder) : null);
-            $message = $this->actionMessageComposer->composeTaskReminderUpdateMessage($task->getReminder());
-            $this->createAction($user, $task, ActionConfig::EDIT_TASK_REMINDER_ACTION, $message);
+            $message = $this->historyActionMessageComposer->composeTaskReminderUpdateMessage($task->getReminder());
+            $this->createHistoryAction($user, $task, HistoryActionConfig::EDIT_TASK_REMINDER_ACTION, $message);
         }
         if ($input->has('status')) {
             $task->setStatus($input->get('status'));
-            $message = $this->actionMessageComposer->composeTaskStatusUpdateMessage($task->getStatus());
-            $this->createAction($user, $task, ActionConfig::EDIT_TASK_STATUS_ACTION, $message);
+            $message = $this->historyActionMessageComposer->composeTaskStatusUpdateMessage($task->getStatus());
+            $this->createHistoryAction($user, $task, HistoryActionConfig::EDIT_TASK_STATUS_ACTION, $message);
         }
         if ($input->has('description')) {
             $task->setDescription($input->get('description'));
-            $message = $this->actionMessageComposer->composeTaskDescriptionUpdateMessage($task->getDescription());
-            $this->createAction($user, $task, ActionConfig::EDIT_TASK_DESCRIPTION_ACTION, $message);
+            $message = $this->historyActionMessageComposer->composeTaskDescriptionUpdateMessage($task->getDescription());
+            $this->createHistoryAction($user, $task, HistoryActionConfig::EDIT_TASK_DESCRIPTION_ACTION, $message);
         }
         $this->entityManager->flush();
     }
@@ -136,9 +136,9 @@ class TaskService
         $this->entityManager->flush();
     }
 
-    public function createAction(User $user, ?Task $task, string $type, string $message): void
+    public function createHistoryAction(User $user, ?Task $task, string $type, string $message): void
     {
-        $action = $this->actionBuilder->buildAction($user, $task, $type, $message);
-        $this->entityManager->persist($action);
+        $historyAction = $this->historyActionBuilder->buildAction($user, $task, $type, $message);
+        $this->entityManager->persist($historyAction);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Builder\JsonResponseBuilder;
 use App\Composer\HistoryResponseComposer;
-use App\Repository\ActionRepository;
+use App\Repository\HistoryActionRepository;
 use App\Repository\TaskRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,18 +18,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class HistoryController extends AbstractController
 {
     private HistoryResponseComposer $historyResponseComposer;
-    private ActionRepository $actionRepository;
+    private HistoryActionRepository $historyActionRepository;
     private TaskRepository $taskRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
 
     public function __construct(
         HistoryResponseComposer $historyResponseComposer,
-        ActionRepository $actionRepository,
+        HistoryActionRepository $historyActionRepository,
         TaskRepository $taskRepository,
         JsonResponseBuilder $jsonResponseBuilder
     ) {
         $this->historyResponseComposer = $historyResponseComposer;
-        $this->actionRepository = $actionRepository;
+        $this->historyActionRepository = $historyActionRepository;
         $this->taskRepository = $taskRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
     }
@@ -41,7 +41,7 @@ class HistoryController extends AbstractController
     {
         $taskId = $request->query->get('task');
         if (empty($taskId)) {
-            $actions = $this->actionRepository->findByUser($this->getUser());
+            $actions = $this->historyActionRepository->findByUser($this->getUser());
             return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions, null);
         }
         $task = $this->taskRepository->find($taskId);
@@ -51,7 +51,7 @@ class HistoryController extends AbstractController
         if (!$task->getUser()->equals($this->getUser())) {
             return $this->jsonResponseBuilder->buildPermissionDenied();
         }
-        $actions = $this->actionRepository->findByTask($task);
+        $actions = $this->historyActionRepository->findByTask($task);
         return $this->historyResponseComposer->composeListResponse($this->getUser(), $actions, $task);
     }
 }

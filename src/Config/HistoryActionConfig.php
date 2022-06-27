@@ -2,7 +2,7 @@
 
 namespace App\Config;
 
-class ActionConfig
+class HistoryActionConfig
 {
     public const CREATE_TASK_ACTION = 'createTask';
     public const EDIT_TASK_TITLE_ACTION = 'editTaskTitle';

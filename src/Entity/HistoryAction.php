@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\ActionRepository;
+use App\Repository\HistoryActionRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=ActionRepository::class)
+ * @ORM\Entity(repositoryClass=HistoryActionRepository::class)
  */
-class Action
+class HistoryAction
 {
     /**
      * @ORM\Id

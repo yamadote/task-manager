@@ -2,13 +2,13 @@
 
 namespace App\Builder;
 
-use App\Collection\ActionCollection;
-use App\Entity\Action;
+use App\Collection\HistoryActionCollection;
+use App\Entity\HistoryAction;
 use App\Entity\Task;
 
-class ActionResponseBuilder
+class HistoryActionResponseBuilder
 {
-    public function buildActionListResponse(ActionCollection $actions, bool $includeActionTask): array
+    public function buildActionListResponse(HistoryActionCollection $actions, bool $includeActionTask): array
     {
         $response = [];
         foreach ($actions as $action) {
@@ -17,7 +17,7 @@ class ActionResponseBuilder
         return $response;
     }
 
-    private function buildActionResponse(Action $action, bool $includeActionTask): array
+    private function buildActionResponse(HistoryAction $action, bool $includeActionTask): array
     {
         $response = [
             'id' => $action->getId(),

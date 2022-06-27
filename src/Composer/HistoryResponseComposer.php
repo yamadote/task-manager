@@ -2,9 +2,9 @@
 
 namespace App\Composer;
 
-use App\Builder\ActionResponseBuilder;
+use App\Builder\HistoryActionResponseBuilder;
 use App\Builder\JsonResponseBuilder;
-use App\Collection\ActionCollection;
+use App\Collection\HistoryActionCollection;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Repository\TaskRepository;
@@ -14,24 +14,24 @@ class HistoryResponseComposer
 {
     private TaskRepository $taskRepository;
     private JsonResponseBuilder $jsonResponseBuilder;
-    private ActionResponseBuilder $actionResponseBuilder;
+    private HistoryActionResponseBuilder $historyActionResponseBuilder;
 
     public function __construct(
         TaskRepository $taskRepository,
         JsonResponseBuilder $jsonResponseBuilder,
-        ActionResponseBuilder $actionResponseBuilder
+        HistoryActionResponseBuilder $historyActionResponseBuilder
     ) {
         $this->taskRepository = $taskRepository;
         $this->jsonResponseBuilder = $jsonResponseBuilder;
-        $this->actionResponseBuilder = $actionResponseBuilder;
+        $this->historyActionResponseBuilder = $historyActionResponseBuilder;
     }
 
-    public function composeListResponse(User $user, ActionCollection $actions, ?Task $task): JsonResponse
+    public function composeListResponse(User $user, HistoryActionCollection $actions, ?Task $task): JsonResponse
     {
         $includeActionTask = $task === null;
         $reminderNumber = $this->taskRepository->countUserReminders($user);
         return $this->jsonResponseBuilder->build([
-            'actions' => $this->actionResponseBuilder->buildActionListResponse($actions, $includeActionTask),
+            'actions' => $this->historyActionResponseBuilder->buildActionListResponse($actions, $includeActionTask),
             'reminderNumber' => $reminderNumber,
             'task' => $task ? $this->composeTaskResponse($task) : null
         ]);
