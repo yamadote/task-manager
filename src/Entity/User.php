@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -50,6 +51,11 @@ class User implements UserInterface
      * @var Collection|TrackedPeriod[]
      */
     private Collection $trackedPeriods;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private ?DateTimeInterface $firstActionTime;
 
     public function __construct()
     {
@@ -166,5 +172,15 @@ class User implements UserInterface
     public function getTrackedPeriods(): Collection
     {
         return $this->trackedPeriods;
+    }
+
+    public function getFirstActionTime(): ?DateTimeInterface
+    {
+        return $this->firstActionTime;
+    }
+
+    public function setFirstActionTime(?DateTimeInterface $firstActionTime): void
+    {
+        $this->firstActionTime = $firstActionTime;
     }
 }

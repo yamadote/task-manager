@@ -140,5 +140,8 @@ class TaskService
     {
         $historyAction = $this->historyActionBuilder->buildAction($user, $task, $type, $message);
         $this->entityManager->persist($historyAction);
+        if (null === $user->getFirstActionTime()) {
+            $user->setFirstActionTime($historyAction->getCreatedAt());
+        }
     }
 }

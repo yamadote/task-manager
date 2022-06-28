@@ -19,4 +19,14 @@ class HistoryActionCollection extends AbstractCollection
     {
         $this->list[] = $task;
     }
+
+    public function getLast(): ?HistoryAction
+    {
+        return $this->isEmpty() ? null : $this->list[count($this->list) - 1];
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->list);
+    }
 }
