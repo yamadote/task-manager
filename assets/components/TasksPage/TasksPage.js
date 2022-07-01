@@ -88,6 +88,7 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
                 const url = Helper.getNewTaskUrl();
                 Helper.fetchJsonPost(url, {'parent': parent})
                     .then(task => {
+                        task.autoFocus = true;
                         setTasks(tasks => [task, ...tasks])
                         if (parent !== null) {
                             events.updateTask(parent, {isChildrenOpen: true})
@@ -176,6 +177,7 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
             onSearchUpdate: () => {
                 setTasks((tasks) => tasks.map(task => {
                     task.isHidden = !isTaskVisible(task, search, tasks, root);
+                    task.autoFocus = false;
                     return task;
                 }));
             },
@@ -183,6 +185,7 @@ const TasksPage = ({title, icon, fetchFrom, nested}) => {
                 const newRoot = findRootTask(params);
                 setTasks((tasks) => tasks.map(task => {
                     task.isHidden = !isTaskVisible(task, search, tasks, newRoot);
+                    task.autoFocus = false;
                     return task;
                 }));
                 setRoot(composeRootTask(newRoot, root, tasks))
