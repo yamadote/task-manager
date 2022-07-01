@@ -16,8 +16,11 @@ cp ./.env ./.env.local
 
 Start dev environment:
 ```
-export NODE_OPTIONS=--openssl-legacy-provider; npm run watch 
+npm run watch 
 ```
+If case of error try to add:  
+ `export NODE_OPTIONS="--openssl-legacy-provider"`   
+
 ```
 cd docker
 docker-compose up
